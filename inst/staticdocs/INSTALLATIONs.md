@@ -39,19 +39,19 @@ First, install dependant/imported/suggested packages:
     source("http://bioconductor.org/biocLite.R")
     biocLite(c("hexbin","ape","supraHex","graph","Rgraphviz","igraph","Biobase","limma","survival","foreach","doMC"))
 
-Second, install the package `dnet` under [stable release version](http://cran.r-project.org/package=dnet):
+Second, install the package `dcGOR` under [stable release version](http://cran.r-project.org/package=dcGOR):
 
-    install.packages("dnet",repos="http://cran.r-project.org",type="source")
+    install.packages("dcGOR",repos="http://cran.r-project.org",type="source")
 
-Notes: to install the package `dnet` under [latest development version](https://github.com/hfang-bristol/dnet), please run:
+Notes: to install the package `dcGOR` under [latest development version](https://github.com/hfang-bristol/dcGOR), please run:
 
     source("http://bioconductor.org/biocLite.R")
     biocLite("devtools")
     library(devtools)
-    install_github(c("dnet","supraHex"), username="hfang-bristol")
+    install_github(c("dcGOR"), username="hfang-bristol")
 
 ## 3. Workflow of the package
 
 It provides a brief overview of how the package operates and what you expect to get from it.
 
-<a href="javascript:newWin('dcGOR_workflow.png', 'dnet_workflow.png', '1200', '1200')" title="Click to enlarge"><img style="max-width:95%;border:1px solid #0000FF;box-shadow:5px 5px 2px #C0C0FF;" src='dcGOR_workflow.png', width="800px" /></a>
+<a href="javascript:newWin('dcGOR_workflow.png', 'dcGOR_workflow.png', '1200', '1200')" title="Click to enlarge"><img style="max-width:95%;border:1px solid #0000FF;box-shadow:5px 5px 2px #C0C0FF;" src='dcGOR_workflow.png', width="800px" /></a>
