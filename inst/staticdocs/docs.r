@@ -13,6 +13,14 @@ list(
                 'Anno-method'
             )
         ),
+        sd_section("Ontologies mainly including open biomedical ontology (obo)",
+            "These ontologies each are represented as a direct acyclic graph (DAG). DAG is stored as an object of class 'igraph'.",
+            c(
+                "obo.GOBP",
+                "obo.GOMF",
+                "obo.GOCC"
+            )
+        ),
         sd_section("Annotations of SCOP domain superfamilies by ontologies",
             "These R objects are about SCOP domain superfamilies (sf) and their annotations by various ontologies, derived from the dcGO database.",
             c(

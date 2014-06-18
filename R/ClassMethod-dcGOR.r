@@ -35,6 +35,8 @@ require(Matrix)
 #' \item{\code{selectMethod(f, signature="InfoDataFrame")}: }{retrieve the definition code for the method 'f' defined in this class}
 #' }
 #' @import methods
+#' @import Matrix
+#' @import igraph
 #' @docType class
 #' @keywords classes
 #' @name InfoDataFrame-class
