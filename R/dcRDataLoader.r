@@ -2,7 +2,7 @@
 #'
 #' \code{dcRDataLoader} is supposed to load RData that are used by package dcGOR.
 #'
-#' @param RData which built-in RData to load. If NOT NA, this RData will be always loaded. It can be: domains (including 'SCOP.sf'), ontologies (including 'obo.GOBP', 'obo.GOMF', 'obo.GOCC'), annotations (including 'SCOP.sf2GOBP', 'SCOP.sf2GOMF', 'SCOP.sf2GOCC'). On the meanings, please refer to the Documentations
+#' @param RData which built-in RData to load. If NOT NA, this RData will be always loaded. It can be: domains (including 'SCOP.sf'), ontologies (including 'obo.GOBP', 'obo.GOMF', 'obo.GOCC'), annotations (including 'SCOP.sf2GOBP', 'SCOP.sf2GOMF', 'SCOP.sf2GOCC'), and domainome in eukaryotic genomes (including 'Ancestral_domainome', 'eTOL'). On the meanings, please refer to the Documentations
 #' @param domain domain part of annotation RData to load. When RData is NA and this plus next are NOT NA, then this plus next one are used to specify which annotation RData to load. In addition to NA, it can also be: 'SCOP.sf'
 #' @param ontology ontology part of annotation RData to load. This only works together with the previous 'domain' parameter. In addition to NA, it can also be: 'GOBP', 'GOMF', 'GOCC'
 #' @param verbose logical to indicate whether the messages will be displayed in the screen. By default, it sets to TRUE for display
@@ -23,7 +23,7 @@
 #' # 2) in an indirect way: specify both domain and ontology
 #' SCOP.sf2GOMF <- dcRDataLoader(domain='SCOP.sf', ontology='GOMF')
 
-dcRDataLoader <- function(RData=c(NA,'SCOP.sf','obo.GOBP','obo.GOMF','obo.GOCC','SCOP.sf2GOBP','SCOP.sf2GOMF','SCOP.sf2GOCC'), domain=c(NA,'SCOP.sf'), ontology=c(NA,'GOBP','GOMF','GOCC'), verbose=T, RData.location="http://supfam.org/dcGOR/data")
+dcRDataLoader <- function(RData=c(NA,'SCOP.sf','obo.GOBP','obo.GOMF','obo.GOCC','SCOP.sf2GOBP','SCOP.sf2GOMF','SCOP.sf2GOCC','Ancestral_domainome','eTOL'), domain=c(NA,'SCOP.sf'), ontology=c(NA,'GOBP','GOMF','GOCC'), verbose=T, RData.location="http://supfam.org/dcGOR/data")
 {
 
     ## match.arg matches arg against a table of candidate values as specified by choices, where NA means to take the first one

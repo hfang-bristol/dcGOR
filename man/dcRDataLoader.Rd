@@ -4,18 +4,19 @@
 \usage{
 dcRDataLoader(RData = c(NA, "SCOP.sf", "obo.GOBP", "obo.GOMF",
 "obo.GOCC",
-"SCOP.sf2GOBP", "SCOP.sf2GOMF", "SCOP.sf2GOCC"), domain = c(NA,
-"SCOP.sf"),
-ontology = c(NA, "GOBP", "GOMF", "GOCC"), verbose = T,
-RData.location = "http://supfam.org/dcGOR/data")
+"SCOP.sf2GOBP", "SCOP.sf2GOMF", "SCOP.sf2GOCC", "Ancestral_domainome",
+"eTOL"), domain = c(NA, "SCOP.sf"), ontology = c(NA, "GOBP", "GOMF",
+"GOCC"), verbose = T, RData.location = "http://supfam.org/dcGOR/data")
 }
 \arguments{
 \item{RData}{which built-in RData to load. If NOT NA,
 this RData will be always loaded. It can be: domains
 (including 'SCOP.sf'), ontologies (including 'obo.GOBP',
 'obo.GOMF', 'obo.GOCC'), annotations (including
-'SCOP.sf2GOBP', 'SCOP.sf2GOMF', 'SCOP.sf2GOCC'). On the
-meanings, please refer to the Documentations}
+'SCOP.sf2GOBP', 'SCOP.sf2GOMF', 'SCOP.sf2GOCC'), and
+domainome in eukaryotic genomes (including
+'Ancestral_domainome', 'eTOL'). On the meanings, please
+refer to the Documentations}
 
 \item{domain}{domain part of annotation RData to load.
 When RData is NA and this plus next are NOT NA, then this
