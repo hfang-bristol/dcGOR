@@ -2,10 +2,10 @@
 \alias{dcRWRpipeline}
 \title{Function to setup a pipeine to estimate RWR-based contact strength between samples from an input domain-sample data matrix and an input graph}
 \usage{
-dcRWRpipeline(data, g, method = c("direct", "indirect"),
+dcRWRpipeline(data, g, method = c("indirect", "direct"),
 normalise = c("laplacian", "row", "column", "none"), restart = 0.75,
 normalise.affinity.matrix = c("none", "quantile"),
-permutation = c("random", "degree"), num.permutation = 10,
+permutation = c("random", "degree"), num.permutation = 100,
 p.adjust.method = c("BH", "BY", "bonferroni", "holm", "hochberg",
 "hommel"),
 adjp.cutoff = 0.05, parallel = TRUE, multicores = NULL, verbose = T)

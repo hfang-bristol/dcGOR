@@ -63,7 +63,7 @@
 #' iContact
 #' }
 
-dcRWRpipeline <- function(data, g, method=c("direct","indirect"), normalise=c("laplacian","row","column","none"), restart=0.75, normalise.affinity.matrix=c("none","quantile"), permutation=c("random","degree"), num.permutation=10, p.adjust.method=c("BH","BY","bonferroni","holm","hochberg","hommel"), adjp.cutoff=0.05, parallel=TRUE, multicores=NULL, verbose=T)
+dcRWRpipeline <- function(data, g, method=c("indirect","direct"), normalise=c("laplacian","row","column","none"), restart=0.75, normalise.affinity.matrix=c("none","quantile"), permutation=c("random","degree"), num.permutation=100, p.adjust.method=c("BH","BY","bonferroni","holm","hochberg","hommel"), adjp.cutoff=0.05, parallel=TRUE, multicores=NULL, verbose=T)
 {
 
     startT <- Sys.time()
