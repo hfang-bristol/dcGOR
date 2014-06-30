@@ -2,15 +2,20 @@ Package: dcGOR
 Type: Package
 Title: an open-source R package for analysing domain-centric ontologies and annotations
 Version: 0.99.0
-Date: 2014-6-18
+Date: 2014-6-30
 Author: Hai Fang and Julian Gough
 Maintainer: Hai Fang <hfang@cs.bris.ac.uk>
-Depends: R (>= 3.1.0), Matrix, igraph
+Depends: R (>= 3.1.0), Matrix, igraph, dnet
 Imports: methods
-Suggests: 
-Description: The 'dcGOR' package is intended to provide the wider bioinformatics community with the use of the dcGO database. The dcGO (http://supfam.org/SUPERFAMILY/dcGO) is a comprehensive domain-centric database for annotating protein domains using a variety of ontologies on functions, phenotypes, diseases and more. With the package, users are expected to easily analyse and visualise domain-centric ontologies and annotations. Supported analyses include but are not limited to: easy access to a wide range of ontologies and their domain-centric annotations; enrichment analysis and visual outputs; semantic similarity between ontology terms and between annotated domains; random walk with restart upon domain-domain (semantic) networks; and high-performance parallel computing.
+Suggests: foreach, doMC
+Description: The 'dcGOR' package is intended to provide the wider bioinformatics community with the use of the dcGO database. The dcGO (http://supfam.org/SUPERFAMILY/dcGO) is a comprehensive domain-centric database for annotating protein domains using a variety of ontologies on functions, phenotypes, diseases and more. With the package, users are expected to easily analyse and visualise domain-centric ontologies and annotations. Supported analyses include but are not limited to: easy access to a wide range of ontologies and their domain-centric annotations; enrichment analysis and visual outputs; semantic similarity between annotated domains from ontology term semantic similarity; random walk with restart upon domain-domain (semantic) networks; and high-performance parallel computing.
 URL: https://github.com/hfang-bristol/dcGOR
 Collate: 
     'ClassMethod-dcGOR.r'
+    'dcDAGannotate.r'
+    'dcRDataLoader.r'
+    'dcEnrichment.r'
+    'dcDAGdomainSim.r'
+    'dcRWRpipeline.r'
 License: GPL-2
 biocViews: Bioinformatics

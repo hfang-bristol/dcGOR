@@ -3,6 +3,8 @@
 \alias{Data}
 \alias{Data,InfoDataFrame-method}
 \alias{InfoDataFrame-method}
+\alias{[,InfoDataFrame,ANY,ANY,ANY-method}
+\alias{[,InfoDataFrame-method}
 \alias{colNames}
 \alias{colNames,InfoDataFrame-method}
 \alias{data.frame2InfoDataFrame}
@@ -35,11 +37,25 @@ dimLabels(x)
 \S4method{Data}{InfoDataFrame}(x)
 
 \S4method{show}{InfoDataFrame}(object)
+
+\S4method{[}{InfoDataFrame,ANY,ANY,ANY}(x, i, j, ..., drop = FALSE)
 }
 \arguments{
 \item{x}{an object of class \code{InfoDataFrame}}
 
 \item{object}{an object of class \code{InfoDataFrame}}
+
+\item{i}{an index}
+
+\item{j}{an index}
+
+\item{...}{additional parameters}
+
+\item{drop}{For matrices and arrays.  If \code{TRUE} the
+result is coerced to the lowest possible dimension (see
+the examples).  This only works for extracting elements,
+not for the replacement.  See \code{\link{drop}} for
+further details.  }
 }
 \description{
 Methods defined for class \code{InfoDataFrame}.

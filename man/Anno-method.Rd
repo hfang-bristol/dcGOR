@@ -1,6 +1,8 @@
 \docType{methods}
 \name{Anno-method}
 \alias{Anno-method}
+\alias{[,Anno,ANY,ANY,ANY-method}
+\alias{[,Anno-method}
 \alias{annoData}
 \alias{annoData,Anno-method}
 \alias{dData}
@@ -37,11 +39,25 @@
 \S4method{domainNames}{Anno}(object)
 
 \S4method{show}{Anno}(object)
+
+\S4method{[}{Anno,ANY,ANY,ANY}(x, i, j, ..., drop = FALSE)
 }
 \arguments{
 \item{x}{an object of class \code{Anno}}
 
 \item{object}{an object of class \code{Anno}}
+
+\item{i}{an index}
+
+\item{j}{an index}
+
+\item{...}{additional parameters}
+
+\item{drop}{For matrices and arrays.  If \code{TRUE} the
+result is coerced to the lowest possible dimension (see
+the examples).  This only works for extracting elements,
+not for the replacement.  See \code{\link{drop}} for
+further details.  }
 }
 \description{
 Methods defined for class \code{Anno}.

@@ -39,7 +39,8 @@ the object} } Standard generic methods: \itemize{
 the object} \item{\code{show()}: }{abbreviated display of
 the object} \item{\code{as(data.frame, "InfoDataFrame")}:
 }{convert a data.frame to an object of class
-InfoDataFrame} }
+InfoDataFrame} \item{\code{[i,j]}: }{get the subset of
+the same class} }
 }
 
 \section{Access}{
@@ -73,6 +74,7 @@ ncol(x)
 rowNames(x)
 colNames(x)
 Data(x)
+x[1:3,]
 }
 \seealso{
 \code{\link{InfoDataFrame-method}}

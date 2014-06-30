@@ -45,7 +45,8 @@ generic methods: \itemize{ \item{\code{str()}: }{compact
 display of the content in the object}
 \item{\code{show()}: }{abbreviated display of the object}
 \item{\code{as(matrix, "Anno")}: }{convert a matrix (or
-data.frame) to an object of class Anno} }
+data.frame) to an object of class Anno}
+\item{\code{[i,j]}: }{get the subset of the same class} }
 }
 
 \section{Access}{
@@ -93,6 +94,8 @@ domainData(x)
 dData(x)
 termNames(x)
 domainNames(x)
+# 5) get the subset
+x[1:3,1:2]
 }
 \seealso{
 \code{\link{Anno-method}}

@@ -24,6 +24,7 @@ require(Matrix)
 #' \item{\code{str()}: }{compact display of the content in the object}
 #' \item{\code{show()}: }{abbreviated display of the object}
 #' \item{\code{as(data.frame, "InfoDataFrame")}: }{convert a data.frame to an object of class InfoDataFrame}
+#' \item{\code{[i,j]}: }{get the subset of the same class}
 #' }
 #' @section Access:
 #' Ways to access information on this class:
@@ -59,6 +60,7 @@ require(Matrix)
 #' rowNames(x)
 #' colNames(x)
 #' Data(x)
+#' x[1:3,]
 
 #' @rdname InfoDataFrame-class
 #' @aliases InfoDataFrame
@@ -79,7 +81,7 @@ setClass(
         }else{
             return(TRUE)
         }
-    }    
+    } 
 )
 
 ########################################
@@ -87,6 +89,9 @@ setClass(
 #' @description Methods defined for class \code{InfoDataFrame}.
 #' @param x an object of class \code{InfoDataFrame}
 #' @param object an object of class \code{InfoDataFrame}
+#' @param i an index
+#' @param j an index
+#' @param ... additional parameters
 #' @docType methods
 #' @keywords methods
 #' @name InfoDataFrame-method
@@ -204,6 +209,31 @@ setMethod("show", "InfoDataFrame",
     }
 )
 
+#' @rdname InfoDataFrame-method
+#' @aliases [,InfoDataFrame-method
+#' @export
+setMethod("[", signature(x="InfoDataFrame"),
+    function(x, i, j, ..., drop = FALSE) {
+        if (missing(drop)){
+            drop = FALSE
+        }
+        
+        if(missing(j)) {
+            labels <- x@dimLabels
+            D <- x@data[i,,drop = drop]
+        } else {
+            labels <- x@dimLabels[j,,drop = drop]
+        }
+        
+        if( missing( i )){
+            D <- x@data[,j,drop = drop]
+        }else{
+            D <- x@data[i,j,drop = drop]
+        }
+        
+        x <- new("InfoDataFrame", data=D, dimLabels=labels)
+    }
+)
 
 ################################################################################
 ################################################################################
@@ -250,6 +280,7 @@ setClassUnion("AnnoData", c("matrix", "data.frame", "dgCMatrix"))
 #' \item{\code{str()}: }{compact display of the content in the object}
 #' \item{\code{show()}: }{abbreviated display of the object}
 #' \item{\code{as(matrix, "Anno")}: }{convert a matrix (or data.frame) to an object of class Anno}
+#' \item{\code{[i,j]}: }{get the subset of the same class}
 #' }
 #' @section Access:
 #' Ways to access information on this class:
@@ -295,6 +326,8 @@ setClassUnion("AnnoData", c("matrix", "data.frame", "dgCMatrix"))
 #' dData(x)
 #' termNames(x)
 #' domainNames(x)
+#' # 5) get the subset
+#' x[1:3,1:2]
 
 #' @rdname Anno-class
 #' @aliases Anno
@@ -342,6 +375,9 @@ setClass(
 #' @description Methods defined for class \code{Anno}.
 #' @param x an object of class \code{Anno}
 #' @param object an object of class \code{Anno}
+#' @param i an index
+#' @param j an index
+#' @param ... additional parameters
 #' @docType methods
 #' @keywords methods
 #' @name Anno-method
@@ -462,5 +498,46 @@ setMethod("show",
         }else{
             cat("domainData (NULL)\n", sep="")
         }
+    }
+)
+
+#' @rdname Anno-method
+#' @aliases [,Anno-method
+#' @export
+setMethod("[", signature(x="Anno"), 
+    function(x, i, j, ..., drop = FALSE) {
+        if (missing(drop)){
+            drop <- FALSE
+        }
+        if (missing(i) && missing(j)) {
+            if (length(list(...))!=0){
+                stop("specify domains or terms to subset")
+            }
+            return(x)
+        }
+
+        if (!missing(j)) {
+            tD <- termData(x)[j,, ..., drop=drop]
+        }else{
+            tD <- termData(x)
+        }
+        
+        if (!missing(i)) {
+            dD <- domainData(x)[i,,..., drop=drop]
+        }else{
+            dD <- domainData(x)
+        }
+        
+        if (missing(i) & !missing(j)){
+            aD <- annoData(x)[,j]
+        }else if (!missing(i) & missing(j)){
+            aD <- annoData(x)[i,]
+        }else if (!missing(i) & !missing(j)){
+            aD <- annoData(x)[i,j]
+        }else{
+            aD <- annoData(x)
+        }
+        
+        x <- new("Anno", annoData=aD, termData=tD, domainData=dD)
     }
 )
