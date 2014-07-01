@@ -2,31 +2,52 @@
 \alias{dcRDataLoader}
 \title{Function to load dcGOR built-in RData}
 \usage{
-dcRDataLoader(RData = c(NA, "SCOP.sf", "obo.GOBP", "obo.GOMF",
-"obo.GOCC",
-"SCOP.sf2GOBP", "SCOP.sf2GOMF", "SCOP.sf2GOCC", "Ancestral_domainome",
-"eTOL"), domain = c(NA, "SCOP.sf"), ontology = c(NA, "GOBP", "GOMF",
-"GOCC"), verbose = T, RData.location = "http://supfam.org/dcGOR/data")
+dcRDataLoader(RData = c(NA, "SCOP.sf", "SCOP.fa", "obo.GOBP",
+"obo.GOMF",
+"obo.GOCC", "obo.DO", "obo.HPPA", "obo.HPMI", "obo.HPON", "obo.MP",
+"obo.EC",
+"obo.KW", "obo.UP", "SCOP.sf2GOBP", "SCOP.sf2GOMF", "SCOP.sf2GOCC",
+"SCOP.sf2DO", "SCOP.sf2HPPA", "SCOP.sf2HPMI", "SCOP.sf2HPON",
+"SCOP.sf2MP",
+"SCOP.sf2EC", "SCOP.sf2KW", "SCOP.sf2UP", "SCOP.fa2GOBP",
+"SCOP.fa2GOMF",
+"SCOP.fa2GOCC", "SCOP.fa2DO", "SCOP.fa2HPPA", "SCOP.fa2HPMI",
+"SCOP.fa2HPON",
+"SCOP.fa2MP", "SCOP.fa2EC", "SCOP.fa2KW", "SCOP.fa2UP",
+"Ancestral_domainome",
+"eTOL"), domain = c(NA, "SCOP.sf", "SCOP.fa"), ontology = c(NA,
+"GOBP", "GOMF", "GOCC", "DO", "HPPA", "HPMI", "HPON", "MP", "EC", "KW",
+"UP"),
+verbose = T, RData.location = "http://supfam.org/dcGOR/data")
 }
 \arguments{
 \item{RData}{which built-in RData to load. If NOT NA,
 this RData will be always loaded. It can be: domains
-(including 'SCOP.sf'), ontologies (including 'obo.GOBP',
-'obo.GOMF', 'obo.GOCC'), annotations (including
-'SCOP.sf2GOBP', 'SCOP.sf2GOMF', 'SCOP.sf2GOCC'), and
-domainome in eukaryotic genomes (including
-'Ancestral_domainome', 'eTOL'). On the meanings, please
-refer to the Documentations}
+(including 'SCOP.sf', 'SCOP.fa'), ontologies (including
+'obo.GOBP', 'obo.GOMF', 'obo.GOCC', 'obo.DO', 'obo.HPPA',
+'obo.HPMI', 'obo.HPON', 'obo.MP', 'obo.EC', 'obo.KW',
+'obo.UP'), annotations (including 'SCOP.sf2GOBP',
+'SCOP.sf2GOMF', 'SCOP.sf2GOCC', 'SCOP.sf2DO',
+'SCOP.sf2HPPA', 'SCOP.sf2HPMI', 'SCOP.sf2HPON',
+'SCOP.sf2MP', 'SCOP.sf2EC', 'SCOP.sf2KW', 'SCOP.sf2UP',
+'SCOP.fa2GOBP', 'SCOP.fa2GOMF', 'SCOP.fa2GOCC',
+'SCOP.fa2DO', 'SCOP.fa2HPPA', 'SCOP.fa2HPMI',
+'SCOP.fa2HPON', 'SCOP.fa2MP', 'SCOP.fa2EC', 'SCOP.fa2KW',
+'SCOP.fa2UP'), and domainome in eukaryotic genomes
+(including 'Ancestral_domainome', 'eTOL'). On the
+meanings, please refer to the Documentations}
 
 \item{domain}{domain part of annotation RData to load.
 When RData is NA and this plus next are NOT NA, then this
 plus next one are used to specify which annotation RData
-to load. In addition to NA, it can also be: 'SCOP.sf'}
+to load. In addition to NA, it can also be: 'SCOP.sf',
+'SCOP.fa'}
 
 \item{ontology}{ontology part of annotation RData to
 load. This only works together with the previous 'domain'
 parameter. In addition to NA, it can also be: 'GOBP',
-'GOMF', 'GOCC'}
+'GOMF', 'GOCC', 'DO', 'HPPA', 'HPMI', 'HPON', 'MP', 'EC',
+'KW', 'UP'}
 
 \item{verbose}{logical to indicate whether the messages
 will be displayed in the screen. By default, it sets to

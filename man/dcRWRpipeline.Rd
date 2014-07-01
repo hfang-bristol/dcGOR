@@ -146,7 +146,7 @@ method.domain="BM.average", method.term="Resnik", parallel=FALSE,
 verbose=TRUE)
 sim
 
-# 5) convert the above semantic similarity to a domain-domain (semantic) network (as an 'igraph' object)
+# 5) convert the above semantic similarity to a network (as an 'igraph' object)
 adjmatrix <- as.matrix(sim)
 network <- igraph::graph.adjacency(adjmatrix, mode="undirected",
 weighted=TRUE, diag=FALSE)

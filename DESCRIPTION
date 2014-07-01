@@ -1,8 +1,8 @@
 Package: dcGOR
 Type: Package
 Title: an open-source R package for analysing domain-centric ontologies and annotations
-Version: 0.99.0
-Date: 2014-6-30
+Version: 1.0.0
+Date: 2014-7-1
 Author: Hai Fang and Julian Gough
 Maintainer: Hai Fang <hfang@cs.bris.ac.uk>
 Depends: R (>= 3.1.0), Matrix, igraph, dnet

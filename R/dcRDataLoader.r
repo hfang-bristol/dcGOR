@@ -2,9 +2,9 @@
 #'
 #' \code{dcRDataLoader} is supposed to load RData that are used by package dcGOR.
 #'
-#' @param RData which built-in RData to load. If NOT NA, this RData will be always loaded. It can be: domains (including 'SCOP.sf'), ontologies (including 'obo.GOBP', 'obo.GOMF', 'obo.GOCC'), annotations (including 'SCOP.sf2GOBP', 'SCOP.sf2GOMF', 'SCOP.sf2GOCC'), and domainome in eukaryotic genomes (including 'Ancestral_domainome', 'eTOL'). On the meanings, please refer to the Documentations
-#' @param domain domain part of annotation RData to load. When RData is NA and this plus next are NOT NA, then this plus next one are used to specify which annotation RData to load. In addition to NA, it can also be: 'SCOP.sf'
-#' @param ontology ontology part of annotation RData to load. This only works together with the previous 'domain' parameter. In addition to NA, it can also be: 'GOBP', 'GOMF', 'GOCC'
+#' @param RData which built-in RData to load. If NOT NA, this RData will be always loaded. It can be: domains (including 'SCOP.sf', 'SCOP.fa'), ontologies (including 'obo.GOBP', 'obo.GOMF', 'obo.GOCC', 'obo.DO', 'obo.HPPA', 'obo.HPMI', 'obo.HPON', 'obo.MP', 'obo.EC', 'obo.KW', 'obo.UP'), annotations (including 'SCOP.sf2GOBP', 'SCOP.sf2GOMF', 'SCOP.sf2GOCC', 'SCOP.sf2DO', 'SCOP.sf2HPPA', 'SCOP.sf2HPMI', 'SCOP.sf2HPON', 'SCOP.sf2MP', 'SCOP.sf2EC', 'SCOP.sf2KW', 'SCOP.sf2UP', 'SCOP.fa2GOBP', 'SCOP.fa2GOMF', 'SCOP.fa2GOCC', 'SCOP.fa2DO', 'SCOP.fa2HPPA', 'SCOP.fa2HPMI', 'SCOP.fa2HPON', 'SCOP.fa2MP', 'SCOP.fa2EC', 'SCOP.fa2KW', 'SCOP.fa2UP'), and domainome in eukaryotic genomes (including 'Ancestral_domainome', 'eTOL'). On the meanings, please refer to the Documentations
+#' @param domain domain part of annotation RData to load. When RData is NA and this plus next are NOT NA, then this plus next one are used to specify which annotation RData to load. In addition to NA, it can also be: 'SCOP.sf', 'SCOP.fa'
+#' @param ontology ontology part of annotation RData to load. This only works together with the previous 'domain' parameter. In addition to NA, it can also be: 'GOBP', 'GOMF', 'GOCC', 'DO', 'HPPA', 'HPMI', 'HPON', 'MP', 'EC', 'KW', 'UP'
 #' @param verbose logical to indicate whether the messages will be displayed in the screen. By default, it sets to TRUE for display
 #' @param RData.location the characters to tell the location of built-in RData files. By default, it remotely locates at "http://supfam.org/dnet/data" or "https://github.com/hfang-bristol/dcGOR/data". For the user equipped with fast internet connection, this option can be just left as default. But it is always advisable to download these files locally. Especially when the user needs to run this function many times, there is no need to ask the function to remotely download every time (also it will unnecessarily increase the runtime). For examples, these files (as a whole or part of them) can be first downloaded into your current working directory, and then set this option as: \eqn{RData.location="."}. If RData to load is already part of package itself, this parameter can be ignored (since this function will try to load it via function \code{data} first)
 #' @return 
@@ -23,7 +23,7 @@
 #' # 2) in an indirect way: specify both domain and ontology
 #' SCOP.sf2GOMF <- dcRDataLoader(domain='SCOP.sf', ontology='GOMF')
 
-dcRDataLoader <- function(RData=c(NA,'SCOP.sf','obo.GOBP','obo.GOMF','obo.GOCC','SCOP.sf2GOBP','SCOP.sf2GOMF','SCOP.sf2GOCC','Ancestral_domainome','eTOL'), domain=c(NA,'SCOP.sf'), ontology=c(NA,'GOBP','GOMF','GOCC'), verbose=T, RData.location="http://supfam.org/dcGOR/data")
+dcRDataLoader <- function(RData=c(NA,'SCOP.sf','SCOP.fa','obo.GOBP','obo.GOMF','obo.GOCC','obo.DO','obo.HPPA','obo.HPMI','obo.HPON','obo.MP','obo.EC','obo.KW','obo.UP','SCOP.sf2GOBP','SCOP.sf2GOMF','SCOP.sf2GOCC','SCOP.sf2DO','SCOP.sf2HPPA','SCOP.sf2HPMI','SCOP.sf2HPON','SCOP.sf2MP','SCOP.sf2EC','SCOP.sf2KW','SCOP.sf2UP','SCOP.fa2GOBP','SCOP.fa2GOMF','SCOP.fa2GOCC','SCOP.fa2DO','SCOP.fa2HPPA','SCOP.fa2HPMI','SCOP.fa2HPON','SCOP.fa2MP','SCOP.fa2EC','SCOP.fa2KW','SCOP.fa2UP','Ancestral_domainome','eTOL'), domain=c(NA,'SCOP.sf','SCOP.fa'), ontology=c(NA,'GOBP','GOMF','GOCC','DO','HPPA','HPMI','HPON','MP','EC','KW','UP'), verbose=T, RData.location="http://supfam.org/dcGOR/data")
 {
 
     ## match.arg matches arg against a table of candidate values as specified by choices, where NA means to take the first one
@@ -68,9 +68,9 @@ dcRDataLoader <- function(RData=c(NA,'SCOP.sf','obo.GOBP','obo.GOMF','obo.GOCC',
     load_local1 <- file.path(path_host, paste("data/", RData, ".RData", sep=""))
     load_local2 <- file.path(path_host, paste(RData, ".RData", sep=""))
     load_package <- RData
-    
+
     ## first, load data from the package itself
-    if(class(suppressWarnings(try(data(list=load_package, package="dcGOR"), T)))=="try-error"){
+    if(class(suppressWarnings(try(eval(parse(text=paste("data(",load_package,", package='dcGOR')",sep=""))), T)))=="try-error"){
         ## second, load local R files
         RData_local <- c(load_local1, load_local2)
         load_flag <- sapply(RData_local, function(x){

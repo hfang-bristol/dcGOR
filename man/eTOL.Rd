@@ -56,7 +56,6 @@ reference for genome research. \emph{Scientific reports}, 3:2015.
 
 \keyword{datasets}
 \examples{
-library(ape)
 data(eTOL)
 eTOL
 # list all components

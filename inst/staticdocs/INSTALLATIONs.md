@@ -43,9 +43,3 @@ Second, install the package `dcGOR` hosted in [github](https://github.com/hfang-
 
     library(devtools)
     install_github(c("dcGOR"), username="hfang-bristol")
-
-## 3. Workflow of the package
-
-It provides a brief overview of how the package operates and what you expect to get from it.
-
-<a href="javascript:newWin('dcGOR_workflow.png', 'dcGOR_workflow.png', '1200', '1200')" title="Click to enlarge"><img style="max-width:95%;border:1px solid #0000FF;box-shadow:5px 5px 2px #C0C0FF;" src='dcGOR_workflow.png', width="800px" /></a>
