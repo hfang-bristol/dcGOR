@@ -74,7 +74,7 @@ list(
             )
         ),
         sd_section("Complete domains (domain-ome) in Eukaryotic tree of life (eTOL)",
-            "These databases are used for domain-centric genome analysis in Eukaryotes. Note: these domains are defined as SCOP domain superfamilies",
+            "These databases are used for domain-centric genome analysis in Eukaryotes. Note: these domains are defined as SCOP domain superfamilies.",
             c(
                 "Ancestral_domainome",
                 "eTOL"

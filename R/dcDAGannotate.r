@@ -16,6 +16,7 @@
 #' @seealso \code{\link{dcRDataLoader}}, \code{\link{dcEnrichment}}, \code{\link{dcDAGdomainSim}}
 #' @include dcDAGannotate.r
 #' @examples
+#' \dontrun{
 #' # 1) load obo.GOMF (as 'igraph' object)
 #' g <- dcRDataLoader('obo.GOMF')
 #'
@@ -36,6 +37,7 @@
 #' data <- sapply(V(dag)$annotations, length)
 #' names(data) <- V(dag)$name
 #' dnet::visDAG(g=dag, data=data, node.info="both")
+#' }
 
 dcDAGannotate <- function (g, annotations, path.mode=c("all_paths","shortest_paths","all_shortest_paths"), verbose=TRUE)
 {

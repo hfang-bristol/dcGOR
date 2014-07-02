@@ -55,6 +55,7 @@ there are many nodes in query, while the mode "all_paths"
 results in the complete subgraph.
 }
 \examples{
+\dontrun{
 # 1) load obo.GOMF (as 'igraph' object)
 g <- dcRDataLoader('obo.GOMF')
 
@@ -76,6 +77,7 @@ verbose=TRUE)
 data <- sapply(V(dag)$annotations, length)
 names(data) <- V(dag)$name
 dnet::visDAG(g=dag, data=data, node.info="both")
+}
 }
 \seealso{
 \code{\link{dcRDataLoader}}, \code{\link{dcEnrichment}},

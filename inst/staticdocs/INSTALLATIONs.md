@@ -42,4 +42,7 @@ First, install dependant/imported/suggested packages:
 Second, install the package `dcGOR` hosted in [github](https://github.com/hfang-bristol/dcGOR):
 
     library(devtools)
-    install_github(c("dcGOR"), username="hfang-bristol")
+    for(pkg in c("dcGOR","dnet")){
+        if(!(pkg %in% rownames(installed.packages()))) remove.packages(pkg)
+        install_github(pkg, username="hfang-bristol")
+    }
