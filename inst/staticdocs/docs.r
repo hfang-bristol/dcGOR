@@ -4,7 +4,7 @@ list(
     
     index = list(
         sd_section("Functions for analysis and visualisations",
-            "These analysis and visualisation functions are used to process ontologies (and annotations), to do enrichment analysis, to calculate semantic similarity between annotated domains based on ontology term semantic similarity, and to perform random walk with restart upon domain-domain (semantic) networks. Most of analyses can be done via high-performance parallel computing.",
+            "These analysis and visualisation functions are used to process ontologies (and annotations), to do enrichment analysis, to calculate semantic similarity between annotated domains based on ontology term semantic similarity, and to perform random walk with restart upon domain-domain (semantic) networks. Most of analyses are supported by high-performance parallel computing.",
             c(
                 'dcDAGannotate',
                 'dcRDataLoader',
@@ -20,7 +20,9 @@ list(
                 'InfoDataFrame-method',
                 'AnnoData-class',
                 'Anno-class',
-                'Anno-method'
+                'Anno-method',
+                'Eoutput-class',
+                'Eoutput-method'
             )
         ),
         sd_section("Ontologies mainly including open biomedical ontology (obo)",

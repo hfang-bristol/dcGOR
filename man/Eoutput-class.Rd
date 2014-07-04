@@ -1,0 +1,96 @@
+\docType{class}
+\name{Eoutput-class}
+\alias{Eoutput}
+\alias{Eoutput-class}
+\title{Definition for S4 class Eoutput}
+\value{
+Class Eoutput
+}
+\description{
+\code{Eoutput} is an S4 class to store output from
+enrichment analysis by \code{\link{dcEnrichment}}.
+}
+\section{Slots}{
+
+\describe{
+\item{\code{term_info}}{A data.frame of nTerm X 5 containing term
+information, where nTerm is the number of terms in consideration, and
+the 5 columns are "term_id" (i.e. "Term ID"), "term_name" (i.e. "Term
+Name"), "namespace" (i.e. "Term Namespace"), "distance" (i.e. "Term
+Distance") and "IC" (i.e. "Information Content for the term based on
+annotation frequency by it")}
+
+\item{\code{anno}}{A list of terms, each storing annotated domains.
+Always, terms are identified by "term_id" and domain members identified
+by their ids (e.g. sunids for SCOP domains)}
+
+\item{\code{data}}{A vector containing input data in
+\code{\link{dcEnrichment}}. It is not always the same as the input data
+as only those mappable are retained}
+
+\item{\code{overlap}}{A vector of terms, each storing domains
+overlapped between domains annotated by a term and domains in the input
+data (i.e. the domains of interest). Always, terms are identified by
+"term_id" and domain members identified by their ids (e.g. sunids for
+SCOP domains)}
+
+\item{\code{zscore}}{A vector of terms, containing z-scores}
+
+\item{\code{pvalue}}{A vector of terms, containing p-values}
+
+\item{\code{adjp}}{A vector of terms, containing adjusted p-values. It
+is the p value but after being adjusted for multiple comparisons}
+}}
+\section{Creation}{
+An object of this class can be created via:
+\code{new("Eoutput", term_info, anno, data, overlap,
+zscore, pvalue, adjp)}
+}
+
+\section{Methods}{
+Class-specific methods: \itemize{ \item{\code{overlap()}:
+}{retrieve the slot 'overlap' in the object}
+\item{\code{zscore()}: }{retrieve the slot 'zscore' in
+the object} \item{\code{pvalue()}: }{retrieve the slot
+'pvalue' in the object} \item{\code{adjp()}: }{retrieve
+the slot 'adjp' in the object} \item{\code{view()}:
+}{retrieve an integrated data.frame used for viewing the
+object} } Standard generic methods: \itemize{
+\item{\code{str()}: }{compact display of the content in
+the object} \item{\code{show()}: }{abbreviated display of
+the object} }
+}
+
+\section{Access}{
+Ways to access information on this class: \itemize{
+\item{\code{showClass("Eoutput")}: }{show the class
+definition} \item{\code{showMethods(classes="Eoutput")}:
+}{show the method definition upon this class}
+\item{\code{getSlots("Eoutput")}: }{get the name and
+class of each slot in this class}
+\item{\code{slotNames("Eoutput")}: }{get the name of each
+slot in this class} \item{\code{selectMethod(f,
+signature="Eoutput")}: }{retrieve the definition code for
+the method 'f' defined in this class} }
+}
+\examples{
+\dontrun{
+# 1) load SCOP.sf (as 'InfoDataFrame' object)
+SCOP.sf <- dcRDataLoader('SCOP.sf')
+# randomly select 20 domains
+data <- sample(rowNames(SCOP.sf), 20)
+
+# 2) perform enrichment analysis, producing an object of S4 class 'Eoutput'
+eOutput <- dcEnrichment(data, domain="SCOP.sf", ontology="GOMF")
+eOutput
+
+# 3) view the top 5 significant terms
+view(eOutput)
+}
+}
+\seealso{
+\code{\link{Eoutput-method}}
+}
+\keyword{S4}
+\keyword{classes}
+

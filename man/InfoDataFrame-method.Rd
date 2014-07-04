@@ -18,7 +18,7 @@
 \alias{rowNames}
 \alias{rowNames,InfoDataFrame-method}
 \alias{show,InfoDataFrame-method}
-\title{Methods defined for class InfoDataFrame}
+\title{Methods defined for S4 class InfoDataFrame}
 \usage{
 dimLabels(x)
 
@@ -63,5 +63,6 @@ Methods defined for class \code{InfoDataFrame}.
 \seealso{
 \code{\link{InfoDataFrame-class}}
 }
+\keyword{S4}
 \keyword{methods}
 

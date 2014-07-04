@@ -2,7 +2,7 @@
 \name{InfoDataFrame-class}
 \alias{InfoDataFrame}
 \alias{InfoDataFrame-class}
-\title{Definition for class InfoDataFrame}
+\title{Definition for S4 class InfoDataFrame}
 \value{
 Class InfoDataFrame
 }
@@ -24,23 +24,23 @@ An object of this class can be created via:
 }
 
 \section{Methods}{
-Class-specific methods: \itemize{
-\item{\code{dimLabels()}: }{retrieve labels used for
-display of rows and columns in the object}
-\item{\code{dim()}: }{retrieve the dimension in the
-object} \item{\code{nrow()}: }{retrieve number of rows in
-the object} \item{\code{ncol()}: }{retrieve number of
-columns in the object} \item{\code{rowNames()}:
-}{retrieve names of rows in the object}
-\item{\code{colNames()}: }{retrieve names of columns in
-the object} \item{\code{Data()}: }{retrieve the data in
-the object} } Standard generic methods: \itemize{
-\item{\code{str()}: }{compact display of the content in
-the object} \item{\code{show()}: }{abbreviated display of
-the object} \item{\code{as(data.frame, "InfoDataFrame")}:
-}{convert a data.frame to an object of class
-InfoDataFrame} \item{\code{[i,j]}: }{get the subset of
-the same class} }
+Class-specific methods: \itemize{ \item{\code{dim()}:
+}{retrieve the dimension in the object}
+\item{\code{nrow()}: }{retrieve number of rows in the
+object} \item{\code{ncol()}: }{retrieve number of columns
+in the object} \item{\code{rowNames()}: }{retrieve names
+of rows in the object} \item{\code{colNames()}:
+}{retrieve names of columns in the object}
+\item{\code{dimLabels()}: }{retrieve the slot
+'dimLabels', containing labels used for display of rows
+and columns in the object} \item{\code{Data()}:
+}{retrieve the slot 'data' in the object} } Standard
+generic methods: \itemize{ \item{\code{str()}: }{compact
+display of the content in the object}
+\item{\code{show()}: }{abbreviated display of the object}
+\item{\code{as(data.frame, "InfoDataFrame")}: }{convert a
+data.frame to an object of class InfoDataFrame}
+\item{\code{[i,j]}: }{get the subset of the same class} }
 }
 
 \section{Access}{
@@ -79,5 +79,6 @@ x[1:3,]
 \seealso{
 \code{\link{InfoDataFrame-method}}
 }
+\keyword{S4}
 \keyword{classes}
 

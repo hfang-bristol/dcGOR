@@ -1,1 +1,1 @@
-Demo   Under construction
+LECA   Demo for analysing ancestral domainome in Eukaryotes

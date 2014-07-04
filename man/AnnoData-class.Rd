@@ -2,7 +2,7 @@
 \name{AnnoData-class}
 \alias{AnnoData}
 \alias{AnnoData-class}
-\title{Definition for VIRTUAL class AnnoData}
+\title{Definition for VIRTUAL S4 class AnnoData}
 \value{
 Class AnnoData
 }
@@ -14,5 +14,6 @@ Matrix). It is used as a virtual class
 \seealso{
 \code{\link{Anno-class}}
 }
+\keyword{S4}
 \keyword{classes}
 

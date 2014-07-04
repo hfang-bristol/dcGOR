@@ -109,10 +109,10 @@ parameter can be ignored (since this function will try to
 load it via function \code{data} first)}
 }
 \value{
-an object of class "eTerm", a list with following
-components: \itemize{ \item{\code{term_info}: a matrix of
-nTerm X 5 containing term information, where nTerm is the
-number of terms in consideration, and the 5 columns are
+an object of S4 class \code{\link{Eoutput-class}}, with
+following slots: \itemize{ \item{\code{term_info}: a matrix
+of nTerm X 5 containing term information, where nTerm is
+the number of terms in consideration, and the 5 columns are
 "term_id" (i.e. "Term ID"), "term_name" (i.e. "Term Name"),
 "namespace" (i.e. "Term Namespace"), "distance" (i.e. "Term
 Distance") and "IC" (i.e. "Information Content for the term
@@ -132,8 +132,7 @@ identified by their ids (e.g. sunids for SCOP domains)}
 \item{\code{pvalue}: a vector containing p-values}
 \item{\code{adjp}: a vector containing adjusted p-values.
 It is the p value but after being adjusted for multiple
-comparisons} \item{\code{call}: the call that produced this
-result} }
+comparisons} }
 }
 \description{
 \code{dcEnrichment} is supposed to conduct enrichment
@@ -173,27 +172,36 @@ SCOP.sf <- dcRDataLoader('SCOP.sf')
 # randomly select 20 domains
 data <- sample(rowNames(SCOP.sf), 20)
 
-# 2) perform enrichment analysis
-eTerm <- dcEnrichment(data, domain="SCOP.sf", ontology="GOMF")
+# 2) perform enrichment analysis, producing an object of S4 class 'Eoutput'
+eOutput <- dcEnrichment(data, domain="SCOP.sf", ontology="GOMF")
+eOutput
 
-# 3) visualise the top significant terms in the ontology hierarchy
-# load obo.GOMF (as 'igraph' object)
+# 3) view the top 5 significance terms
+view(eOutput, top_num=5, sortBy="pvalue", details=TRUE)
+
+# 4) visualise the top 5 significant terms in the ontology hierarchy
+# load obo.GOMF (as an 'igraph' object)
 g <- dcRDataLoader('obo.GOMF')
-# focus the top 5 enriched terms
-nodes_query <- names(sort(eTerm$adjp)[1:5])
-nodes.highlight <- rep("red", length(nodes_query))
-names(nodes.highlight) <- nodes_query
+# focus on the top 5 significant terms (in terms of adjusted p-value) as nodes in query
+nodes_query <- names(sort(adjp(eOutput))[1:5])
+# induce DAG only including nodes/terms in query
 subg <- dnet::dDAGinduce(g, nodes_query)
-# color-code terms according to the adjust p-values (taking the form of 10-based negative logarithm)
-dnet::visDAG(g=subg, data=-1*log10(eTerm$adjp[V(subg)$name]),
-node.info="both", zlim=c(0,2), node.attrs=list(color=nodes.highlight))
-# color-code terms according to the z-scores
-dnet::visDAG(g=subg, data=eTerm$zscore[V(subg)$name], node.info="both",
+# color-code terms according to adjusted p-values (taking the form of 10-based negative logarithm)
+dnet::visDAG(g=subg, data=-1*log10(adjp(eOutput)), node.info="both",
+zlim=c(0,2))
+# also highlight (framed in black) nodes/terms in query
+nodes.highlight <- rep("black", length(nodes_query))
+names(nodes.highlight) <- nodes_query
+dnet::visDAG(g=subg, data=-1*log10(adjp(eOutput)), node.info="both",
+zlim=c(0,2), node.attrs=list(color=nodes.highlight))
+# the same as above but color-code terms according to the z-scores
+dnet::visDAG(g=subg, data=zscore(eOutput), node.info="both",
 colormap="darkblue-white-darkorange",
 node.attrs=list(color=nodes.highlight))
 }
 }
 \seealso{
-\code{\link{dcRDataLoader}}, \code{\link{dcDAGannotate}}
+\code{\link{dcRDataLoader}}, \code{\link{dcDAGannotate}},
+\code{\link{Eoutput-class}}
 }
 

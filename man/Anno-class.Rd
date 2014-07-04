@@ -2,7 +2,7 @@
 \name{Anno-class}
 \alias{Anno}
 \alias{Anno-class}
-\title{Definition for class Anno}
+\title{Definition for S4 class Anno}
 \value{
 Class Anno
 }
@@ -30,13 +30,14 @@ An object of this class can be created via:
 \section{Methods}{
 Class-specific methods: \itemize{ \item{\code{dim()}:
 }{retrieve the dimension in the object}
-\item{\code{annoData()}: }{retrieve annoData in the
-object} \item{\code{termData()}: }{retrieve termData (as
-class InfoDataFrame) in the object}
-\item{\code{domainData()}: }{retrieve domainData (as
-class InfoDataFrame) in the object} \item{\code{tData()}:
-}{retrieve termData in the object} \item{\code{dData()}:
-}{retrieve domainData in the object}
+\item{\code{annoData()}: }{retrieve the slot 'annoData'
+in the object} \item{\code{termData()}: }{retrieve the
+slot 'termData' (as class InfoDataFrame) in the object}
+\item{\code{domainData()}: }{retrieve the slot
+'domainData' (as class InfoDataFrame) in the object}
+\item{\code{tData()}: }{retrieve termData (as data.frame)
+in the object} \item{\code{dData()}: }{retrieve
+domainData (as data.frame) in the object}
 \item{\code{termNames()}: }{retrieve term names (ie, row
 names of termData) in the object}
 \item{\code{domanNames()}: }{retrieve domain names (ie,
@@ -100,5 +101,6 @@ x[1:3,1:2]
 \seealso{
 \code{\link{Anno-method}}
 }
+\keyword{S4}
 \keyword{classes}
 

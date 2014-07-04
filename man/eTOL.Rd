@@ -64,6 +64,7 @@ names(eTOL)
 eTOL$genome_info[1:5,]
 # look at the dimension of connectivity
 dim(eTOL$connectivity)
+\dontrun{
 # visualise the connectivity matrix
 Ntip <- length(eTOL$tip.label) # number of tips
 Nnode <- eTOL$Nnode # number of internal nodes
@@ -72,4 +73,5 @@ visHeatmapAdv(data, Rowv=FALSE,Colv=FALSE, zlim=c(0,1),
 colormap="gray-black",
 add.expr=abline(v=c(1,Ntip+1,(Ntip+Nnode+1))-0.5, col="white"),
 key=FALSE, labRow=NA, labCol=NA)
+}
 }

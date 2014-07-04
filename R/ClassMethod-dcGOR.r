@@ -1,7 +1,7 @@
 require(Matrix)
 ################################################################################
 ################################################################################
-#' @title Definition for class InfoDataFrame
+#' @title Definition for S4 class InfoDataFrame
 #' @description \code{InfoDataFrame} has two slots: data and dimLabels.
 #' @return Class InfoDataFrame
 #' @slot data A data.frame containing terms (rows) and measured variables (columns).
@@ -11,13 +11,13 @@ require(Matrix)
 #' @section Methods:
 #' Class-specific methods:
 #' \itemize{
-#' \item{\code{dimLabels()}: }{retrieve labels used for display of rows and columns in the object}
 #' \item{\code{dim()}: }{retrieve the dimension in the object}
 #' \item{\code{nrow()}: }{retrieve number of rows in the object}
 #' \item{\code{ncol()}: }{retrieve number of columns in the object}
 #' \item{\code{rowNames()}: }{retrieve names of rows in the object}
 #' \item{\code{colNames()}: }{retrieve names of columns in the object}
-#' \item{\code{Data()}: }{retrieve the data in the object}
+#' \item{\code{dimLabels()}: }{retrieve the slot 'dimLabels', containing labels used for display of rows and columns in the object}
+#' \item{\code{Data()}: }{retrieve the slot 'data' in the object}
 #' }
 #' Standard generic methods:
 #' \itemize{
@@ -39,7 +39,7 @@ require(Matrix)
 #' @import Matrix
 #' @import igraph
 #' @docType class
-#' @keywords classes
+#' @keywords S4 classes
 #' @name InfoDataFrame-class
 #' @rdname InfoDataFrame-class
 #' @seealso \code{\link{InfoDataFrame-method}}
@@ -85,7 +85,7 @@ setClass(
 )
 
 ########################################
-#' @title Methods defined for class InfoDataFrame
+#' @title Methods defined for S4 class InfoDataFrame
 #' @description Methods defined for class \code{InfoDataFrame}.
 #' @param x an object of class \code{InfoDataFrame}
 #' @param object an object of class \code{InfoDataFrame}
@@ -93,7 +93,7 @@ setClass(
 #' @param j an index
 #' @param ... additional parameters
 #' @docType methods
-#' @keywords methods
+#' @keywords S4 methods
 #' @name InfoDataFrame-method
 #' @rdname InfoDataFrame-method
 #' @seealso \code{\link{InfoDataFrame-class}}
@@ -237,13 +237,13 @@ setMethod("[", signature(x="InfoDataFrame"),
 
 ################################################################################
 ################################################################################
-#' @title Definition for VIRTUAL class AnnoData
+#' @title Definition for VIRTUAL S4 class AnnoData
 #' @description \code{AnnoData} is union of other classes: either matrix, or data.frame or dgCMatrix (a sparse matrix in the package Matrix). It is used as a virtual class
 #' @return Class AnnoData
 #' @import Matrix
 #' @import methods
 #' @docType class
-#' @keywords classes
+#' @keywords S4 classes
 #' @name AnnoData-class
 #' @rdname AnnoData-class
 #' @seealso \code{\link{Anno-class}}
@@ -255,7 +255,7 @@ setClassUnion("AnnoData", c("matrix", "data.frame", "dgCMatrix"))
 
 ################################################################################
 ################################################################################
-#' @title Definition for class Anno
+#' @title Definition for S4 class Anno
 #' @description \code{Anno} has 3 slots: annoData, termData and domainData
 #' @return Class Anno
 #' @slot annoData An object of class AnnoData, containing data matrix with the column number equal to nrow(termData) and the row number equal to nrow(domainData).
@@ -267,11 +267,11 @@ setClassUnion("AnnoData", c("matrix", "data.frame", "dgCMatrix"))
 #' Class-specific methods:
 #' \itemize{
 #' \item{\code{dim()}: }{retrieve the dimension in the object}
-#' \item{\code{annoData()}: }{retrieve annoData in the object}
-#' \item{\code{termData()}: }{retrieve termData (as class InfoDataFrame) in the object}
-#' \item{\code{domainData()}: }{retrieve domainData (as class InfoDataFrame) in the object}
-#' \item{\code{tData()}: }{retrieve termData in the object}
-#' \item{\code{dData()}: }{retrieve domainData in the object}
+#' \item{\code{annoData()}: }{retrieve the slot 'annoData' in the object}
+#' \item{\code{termData()}: }{retrieve the slot 'termData' (as class InfoDataFrame) in the object}
+#' \item{\code{domainData()}: }{retrieve the slot 'domainData' (as class InfoDataFrame) in the object}
+#' \item{\code{tData()}: }{retrieve termData (as data.frame) in the object}
+#' \item{\code{dData()}: }{retrieve domainData (as data.frame) in the object}
 #' \item{\code{termNames()}: }{retrieve term names (ie, row names of termData) in the object}
 #' \item{\code{domanNames()}: }{retrieve domain names (ie, row names of domainData) in the object}
 #' }
@@ -293,7 +293,7 @@ setClassUnion("AnnoData", c("matrix", "data.frame", "dgCMatrix"))
 #' }
 #' @import methods
 #' @docType class
-#' @keywords classes
+#' @keywords S4 classes
 #' @name Anno-class
 #' @seealso \code{\link{Anno-method}}
 #' @examples
@@ -371,7 +371,7 @@ setClass(
 )
 
 ########################################
-#' @title Methods defined for class Anno
+#' @title Methods defined for S4 class Anno
 #' @description Methods defined for class \code{Anno}.
 #' @param x an object of class \code{Anno}
 #' @param object an object of class \code{Anno}
@@ -379,7 +379,7 @@ setClass(
 #' @param j an index
 #' @param ... additional parameters
 #' @docType methods
-#' @keywords methods
+#' @keywords S4 methods
 #' @name Anno-method
 #' @rdname Anno-method
 #' @seealso \code{\link{Anno-class}}
@@ -541,3 +541,217 @@ setMethod("[", signature(x="Anno"),
         x <- new("Anno", annoData=aD, termData=tD, domainData=dD)
     }
 )
+
+
+################################################################################
+################################################################################
+#' @title Definition for S4 class Eoutput
+#' @description \code{Eoutput} is an S4 class to store output from enrichment analysis by \code{\link{dcEnrichment}}.
+#' @return Class Eoutput
+#' @slot term_info A data.frame of nTerm X 5 containing term information, where nTerm is the number of terms in consideration, and the 5 columns are "term_id" (i.e. "Term ID"), "term_name" (i.e. "Term Name"), "namespace" (i.e. "Term Namespace"), "distance" (i.e. "Term Distance") and "IC" (i.e. "Information Content for the term based on annotation frequency by it")
+#' @slot anno A list of terms, each storing annotated domains. Always, terms are identified by "term_id" and domain members identified by their ids (e.g. sunids for SCOP domains)
+#' @slot data A vector containing input data in \code{\link{dcEnrichment}}. It is not always the same as the input data as only those mappable are retained
+#' @slot overlap A vector of terms, each storing domains overlapped between domains annotated by a term and domains in the input data (i.e. the domains of interest). Always, terms are identified by "term_id" and domain members identified by their ids (e.g. sunids for SCOP domains)
+#' @slot zscore A vector of terms, containing z-scores
+#' @slot pvalue A vector of terms, containing p-values
+#' @slot adjp A vector of terms, containing adjusted p-values. It is the p value but after being adjusted for multiple comparisons
+#' @section Creation:
+#' An object of this class can be created via: \code{new("Eoutput", term_info, anno, data, overlap, zscore, pvalue, adjp)}
+#' @section Methods:
+#' Class-specific methods:
+#' \itemize{
+#' \item{\code{overlap()}: }{retrieve the slot 'overlap' in the object}
+#' \item{\code{zscore()}: }{retrieve the slot 'zscore' in the object}
+#' \item{\code{pvalue()}: }{retrieve the slot 'pvalue' in the object}
+#' \item{\code{adjp()}: }{retrieve the slot 'adjp' in the object}
+#' \item{\code{view()}: }{retrieve an integrated data.frame used for viewing the object}
+#' }
+#' Standard generic methods:
+#' \itemize{
+#' \item{\code{str()}: }{compact display of the content in the object}
+#' \item{\code{show()}: }{abbreviated display of the object}
+#' }
+#' @section Access:
+#' Ways to access information on this class:
+#' \itemize{
+#' \item{\code{showClass("Eoutput")}: }{show the class definition}
+#' \item{\code{showMethods(classes="Eoutput")}: }{show the method definition upon this class}
+#' \item{\code{getSlots("Eoutput")}: }{get the name and class of each slot in this class}
+#' \item{\code{slotNames("Eoutput")}: }{get the name of each slot in this class}
+#' \item{\code{selectMethod(f, signature="Eoutput")}: }{retrieve the definition code for the method 'f' defined in this class}
+#' }
+#' @import methods
+#' @docType class
+#' @keywords S4 classes
+#' @name Eoutput-class
+#' @rdname Eoutput-class
+#' @seealso \code{\link{Eoutput-method}}
+#' @examples
+#' \dontrun{
+#' # 1) load SCOP.sf (as 'InfoDataFrame' object)
+#' SCOP.sf <- dcRDataLoader('SCOP.sf')
+#' # randomly select 20 domains
+#' data <- sample(rowNames(SCOP.sf), 20)
+#' 
+#' # 2) perform enrichment analysis, producing an object of S4 class 'Eoutput'
+#' eOutput <- dcEnrichment(data, domain="SCOP.sf", ontology="GOMF")
+#' eOutput
+#'
+#' # 3) view the top 5 significant terms
+#' view(eOutput)
+#' }
+
+#' @rdname Eoutput-class
+#' @aliases Eoutput
+#' @exportClass Eoutput
+setClass(
+    Class="Eoutput",
+    representation(
+        term_info= "data.frame",
+        anno     = "list",
+        data     = "vector",
+        overlap  = "vector",
+        zscore   = "vector",
+        pvalue   = "vector",
+        adjp     = "vector"
+    ),
+    prototype = prototype(
+        term_info= data.frame(),
+        anno     = list(),
+        data     = vector(),
+        overlap  = vector(),
+        zscore   = vector(),
+        pvalue   = vector(),
+        adjp     = vector()
+    ),
+    validity = function(object){
+        if(!is.data.frame(object@term_info)){
+            return("term_info is not data.frame")
+        }else{
+            return(TRUE)
+        }
+    }
+)
+
+########################################
+#' @title Methods defined for S4 class Eoutput
+#' @description Methods defined for S4 class \code{Eoutput}.
+#' @param object an object of S4 class \code{Eoutput}. Usually this is an output from \code{\link{dcEnrichment}}
+#' @param x an object of S4 class \code{Eoutput}. Usually this is an output from \code{\link{dcEnrichment}}
+#' @param top_num the maximum number (5, by default) of terms will be viewed.
+#' @param sortBy which statistics will be used for sorting and viewing terms. It can be "pvalue" for p value, "adjp" for adjusted p value, "zscore" for enrichment z-score, "nAnno" for the number in domains annotated by a term, "nOverlap" for the number in overlaps, and "none" for ordering simply according to ID of terms
+#' @param decreasing logical to indicate whether to sort in a decreasing order. If it is null, by default it will be true for "zscore", "nAnno" or "nOverlap"; otherwise false
+#' @param details logical to indicate whether the detailed information of terms is also viewed. By default, it sets to TRUE for the inclusion
+#' @return
+#' view(x) returns a data frame with following components:
+#' \itemize{
+#'  \item{\code{term_id}: term ID}
+#'  \item{\code{nAnno}: number in domains annotated by a term}
+#'  \item{\code{nOverlap}: number in overlaps}
+#'  \item{\code{zscore}: enrichment z-score}
+#'  \item{\code{pvalue}: p value}
+#'  \item{\code{adjp}: adjusted p value}
+#'  \item{\code{term_name}: term name; optional, it is only appended when "details" is true}
+#'  \item{\code{term_namespace}: term namespace; optional, it is only appended when "details" is true}
+#'  \item{\code{term_distance}: term distance; optional, it is only appended when "details" is true}
+#' }
+#' @docType methods
+#' @keywords S4 methods
+#' @name Eoutput-method
+#' @rdname Eoutput-method
+#' @seealso \code{\link{Eoutput-class}}
+
+setGeneric("overlap", function(x) standardGeneric("overlap"))
+#' @rdname Eoutput-method
+#' @aliases overlap
+#' @export
+setMethod("overlap", "Eoutput", function(x) x@overlap)
+
+setGeneric("zscore", function(x) standardGeneric("zscore"))
+#' @rdname Eoutput-method
+#' @aliases zscore
+#' @export
+setMethod("zscore", "Eoutput", function(x) x@zscore)
+
+setGeneric("pvalue", function(x) standardGeneric("pvalue"))
+#' @rdname Eoutput-method
+#' @aliases pvalue
+#' @export
+setMethod("pvalue", "Eoutput", function(x) x@pvalue)
+
+setGeneric("adjp", function(x) standardGeneric("adjp"))
+#' @rdname Eoutput-method
+#' @aliases adjp
+#' @export
+setMethod("adjp", "Eoutput", function(x) x@adjp)
+
+setGeneric("view", function(x, ...) standardGeneric("view"))
+#' @rdname Eoutput-method
+#' @aliases view
+#' @export
+setMethod("view", "Eoutput", 
+    function(x, top_num=5, sortBy=c("pvalue","adjp","zscore","nAnno","nOverlap","none"), decreasing=NULL, details=T){
+        sortBy <- match.arg(sortBy)
+    
+        if( is.null(top_num) ){
+            top_num <- length(x@term_info$term_id)
+        }
+        if ( top_num > length(x@term_info$term_id) ){
+            top_num <- length(x@term_info$term_id)
+        }
+    
+        tab <- data.frame( term_id          = x@term_info$term_id,
+                           nAnno            = sapply(x@anno,length),
+                           nOverlap         = sapply(x@overlap,length),
+                           zscore           = x@zscore,
+                           pvalue           = x@pvalue,
+                           adjp             = x@adjp,
+                           term_name        = x@term_info$term_name,
+                           term_namespace   = x@term_info$term_namespace,
+                           term_distance    = x@term_info$term_distance
+                          )
+    
+        if(details == T){
+            res <- tab[,c(1:9)]
+        }else{
+            res <- tab[,c(1:6)]
+        }
+    
+        if(is.null(decreasing)){
+            if(sortBy=="zscore" | sortBy=="nAnno" | sortBy=="nOverlap"){
+                decreasing <- T
+            }else{
+                decreasing <- F
+            }
+        }
+    
+        switch(sortBy, 
+            adjp={res <- res[order(res[,6], decreasing=decreasing)[1:top_num],]},
+            pvalue={res <- res[order(res[,5], decreasing=decreasing)[1:top_num],]},
+            zscore={res <- res[order(res[,4], decreasing=decreasing)[1:top_num],]},
+            nAnno={res <- res[order(res[,2], decreasing=decreasing)[1:top_num],]},
+            nOverlap={res <- res[order(res[,3], decreasing=decreasing)[1:top_num],]},
+            none={res <- res[order(res[,1], decreasing=decreasing)[1:top_num],]}
+        )
+        
+        res
+    }
+)
+
+#' @rdname Eoutput-method
+#' @aliases show,Eoutput-method
+#' @export
+setMethod("show", "Eoutput",
+    function(object) {
+        cat(sprintf("An object of S4 class %s, containing 7 slots:", class(object)), "\n", sep="")
+        cat(sprintf("  @term_info: data.frame of %d terms X %d information", dim(object@term_info)[1],dim(object@term_info)[2]), "\n", sep="")
+        cat(sprintf("  @anno: a list of %d terms, each storing annotated domains", length(object@anno)), "\n", sep="")
+        cat(sprintf("  @data: a vector containing a group of %d input domains", length(object@data)), "\n", sep="")
+        cat(sprintf("  @overlap: a vector of %d terms, each containing domains overlapped with input domains", length(object@overlap)), "\n", sep="")
+        cat(sprintf("  @zscore: a vector of %d terms, containing z-scores", length(object@zscore)), "\n", sep="")
+        cat(sprintf("  @pvalue: a vector of %d terms, containing p-values", length(object@pvalue)), "\n", sep="")
+        cat(sprintf("  @adjp: a vector of %d terms, containing adjusted p-values", length(object@adjp)), "\n", sep="")
+        cat(sprintf("In summary, a total of %d terms analysed for a group of %d input domains", dim(object@term_info)[1],length(object@data)), "\n", sep="")
+    }
+)
+

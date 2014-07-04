@@ -16,7 +16,7 @@
 #' @param verbose logical to indicate whether the messages will be displayed in the screen. By default, it sets to TRUE for display
 #' @param RData.location the characters to tell the location of built-in RData files. By default, it remotely locates at "http://supfam.org/dnet/data" or "https://github.com/hfang-bristol/dcGOR/data". For the user equipped with fast internet connection, this option can be just left as default. But it is always advisable to download these files locally. Especially when the user needs to run this function many times, there is no need to ask the function to remotely download every time (also it will unnecessarily increase the runtime). For examples, these files (as a whole or part of them) can be first downloaded into your current working directory, and then set this option as: \eqn{RData.location="."}. If RData to load is already part of package itself, this parameter can be ignored (since this function will try to load it via function \code{data} first)
 #' @return 
-#' an object of class "eTerm", a list with following components:
+#' an object of S4 class \code{\link{Eoutput-class}}, with following slots:
 #' \itemize{
 #'  \item{\code{term_info}: a matrix of nTerm X 5 containing term information, where nTerm is the number of terms in consideration, and the 5 columns are "term_id" (i.e. "Term ID"), "term_name" (i.e. "Term Name"), "namespace" (i.e. "Term Namespace"), "distance" (i.e. "Term Distance") and "IC" (i.e. "Information Content for the term based on annotation frequency by it")}
 #'  \item{\code{anno}: a list of terms, each storing annotated domain members. Always, terms are identified by "term_id" and domain members identified by their ids (e.g. sunids for SCOP domains)}
@@ -25,7 +25,6 @@
 #'  \item{\code{zscore}: a vector containing z-scores}
 #'  \item{\code{pvalue}: a vector containing p-values}
 #'  \item{\code{adjp}: a vector containing adjusted p-values. It is the p value but after being adjusted for multiple comparisons}
-#'  \item{\code{call}: the call that produced this result}
 #' }
 #' @note The interpretation of the algorithms used to account for the hierarchy of the ontology is:
 #' \itemize{
@@ -37,7 +36,7 @@
 #' }
 #' @export
 #' @importFrom dnet dDAGinduce visDAG dDAGlevel dDAGroot
-#' @seealso \code{\link{dcRDataLoader}}, \code{\link{dcDAGannotate}}
+#' @seealso \code{\link{dcRDataLoader}}, \code{\link{dcDAGannotate}}, \code{\link{Eoutput-class}}
 #' @include dcEnrichment.r
 #' @examples
 #' \dontrun{
@@ -46,21 +45,28 @@
 #' # randomly select 20 domains
 #' data <- sample(rowNames(SCOP.sf), 20)
 #' 
-#' # 2) perform enrichment analysis
-#' eTerm <- dcEnrichment(data, domain="SCOP.sf", ontology="GOMF")
+#' # 2) perform enrichment analysis, producing an object of S4 class 'Eoutput'
+#' eOutput <- dcEnrichment(data, domain="SCOP.sf", ontology="GOMF")
+#' eOutput
 #'
-#' # 3) visualise the top significant terms in the ontology hierarchy
-#' # load obo.GOMF (as 'igraph' object)
+#' # 3) view the top 5 significance terms 
+#' view(eOutput, top_num=5, sortBy="pvalue", details=TRUE)
+#'
+#' # 4) visualise the top 5 significant terms in the ontology hierarchy
+#' # load obo.GOMF (as an 'igraph' object)
 #' g <- dcRDataLoader('obo.GOMF')
-#' # focus the top 5 enriched terms
-#' nodes_query <- names(sort(eTerm$adjp)[1:5])
-#' nodes.highlight <- rep("red", length(nodes_query))
-#' names(nodes.highlight) <- nodes_query
+#' # focus on the top 5 significant terms (in terms of adjusted p-value) as nodes in query
+#' nodes_query <- names(sort(adjp(eOutput))[1:5])
+#' # induce DAG only including nodes/terms in query
 #' subg <- dnet::dDAGinduce(g, nodes_query)
-#' # color-code terms according to the adjust p-values (taking the form of 10-based negative logarithm)
-#' dnet::visDAG(g=subg, data=-1*log10(eTerm$adjp[V(subg)$name]), node.info="both", zlim=c(0,2), node.attrs=list(color=nodes.highlight))
-#' # color-code terms according to the z-scores
-#' dnet::visDAG(g=subg, data=eTerm$zscore[V(subg)$name], node.info="both", colormap="darkblue-white-darkorange", node.attrs=list(color=nodes.highlight))
+#' # color-code terms according to adjusted p-values (taking the form of 10-based negative logarithm)
+#' dnet::visDAG(g=subg, data=-1*log10(adjp(eOutput)), node.info="both", zlim=c(0,2))
+#' # also highlight (framed in black) nodes/terms in query
+#' nodes.highlight <- rep("black", length(nodes_query))
+#' names(nodes.highlight) <- nodes_query
+#' dnet::visDAG(g=subg, data=-1*log10(adjp(eOutput)), node.info="both", zlim=c(0,2), node.attrs=list(color=nodes.highlight))
+#' # the same as above but color-code terms according to the z-scores
+#' dnet::visDAG(g=subg, data=zscore(eOutput), node.info="both", colormap="darkblue-white-darkorange", node.attrs=list(color=nodes.highlight))
 #' }
 
 dcEnrichment <- function(data, domain=c("SCOP.sf"), ontology=c("GOBP","GOMF","GOCC"), sizeRange=c(10,1000), min.overlap=3, which_distance=NULL, test=c("HypergeoTest","FisherTest","BinomialTest"), p.adjust.method=c("BH", "BY", "bonferroni", "holm", "hochberg", "hommel"), ontology.algorithm=c("none","pc","elim","lea"), elim.pvalue=1e-2, lea.depth=2, verbose=T, RData.location="http://supfam.org/dcGOR/data")
@@ -619,16 +625,15 @@ dcEnrichment <- function(data, domain=c("SCOP.sf"), ontology=c("GOBP","GOMF","GO
     names(annotations) <- V(dag)$term_id
     annotations <- annotations[names(gs)]
     
-    eTerm <- list(term_info= set_info,
-                  anno     = annotations,
-                  data     = data,
-                  overlap  = overlaps,
-                  zscore   = zscores,
-                  pvalue   = pvals,
-                  adjp     = adjpvals,
-                  call     = match.call()
+    eOutput <- new("Eoutput",
+                    term_info = set_info,
+                    anno      = annotations,
+                    data      = data,
+                    overlap   = overlaps,
+                    zscore    = zscores,
+                    pvalue    = pvals,
+                    adjp      = adjpvals
                  )
-    class(eTerm) <- "eTerm"
-    
-    invisible(eTerm)
+
+    invisible(eOutput)
 }
