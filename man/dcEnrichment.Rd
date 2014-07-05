@@ -1,14 +1,17 @@
 \name{dcEnrichment}
 \alias{dcEnrichment}
-\title{Function to conduct enrichment analysis given the input data and the ontology in query}
+\title{Function to conduct ontology enrichment analysis given a group of domains}
 \usage{
-dcEnrichment(data, domain = c("SCOP.sf"), ontology = c("GOBP", "GOMF",
-"GOCC"), sizeRange = c(10, 1000), min.overlap = 3,
-which_distance = NULL, test = c("HypergeoTest", "FisherTest",
-"BinomialTest"), p.adjust.method = c("BH", "BY", "bonferroni", "holm",
-"hochberg", "hommel"), ontology.algorithm = c("none", "pc", "elim",
-"lea"),
-elim.pvalue = 0.01, lea.depth = 2, verbose = T,
+dcEnrichment(data, domain = c("SCOP.sf", "SCOP.fa"), ontology =
+c("GOBP",
+"GOMF", "GOCC", "DO", "HPPA", "HPMI", "HPON", "MP", "EC", "KW", "UP"),
+sizeRange = c(10, 1000), min.overlap = 3, which_distance = NULL,
+test = c("HypergeoTest", "FisherTest", "BinomialTest"),
+p.adjust.method = c("BH", "BY", "bonferroni", "holm", "hochberg",
+"hommel"),
+ontology.algorithm = c("none", "pc", "elim", "lea"), elim.pvalue =
+0.01,
+lea.depth = 2, verbose = T,
 RData.location = "http://supfam.org/dcGOR/data")
 }
 \arguments{
@@ -16,12 +19,18 @@ RData.location = "http://supfam.org/dcGOR/data")
 domains, for example, sunids for SCOP domains}
 
 \item{domain}{the domain identity. It can be one of
-'SCOP.sf' for SCOP superfamilies}
+'SCOP.sf' for SCOP superfamilies, 'SCOP.fa' for SCOP
+families}
 
-\item{ontology}{the ontology supported currently. It can
-be "GOBP" for Gene Ontology Biological Process, "GOMF"
-for Gene Ontology Molecular Function, "GOCC" for Gene
-Ontology Cellular Component. For details on the
+\item{ontology}{the ontology identity. It can be "GOBP"
+for Gene Ontology Biological Process, "GOMF" for Gene
+Ontology Molecular Function, "GOCC" for Gene Ontology
+Cellular Component, "DO" for Disease Ontology, "HPPA" for
+Human Phenotype Phenotypic Abnormality, "HPMI" for Human
+Phenotype Mode of Inheritance, "HPON" for Human Phenotype
+ONset and clinical course, "MP" for Mammalian Phenotype,
+"EC" for Enzyme Commission, "KW" for UniProtKB KeyWords,
+"UP" for UniProtKB UniPathway. For details on the
 eligibility for pairs of input domain and ontology,
 please refer to the online Documentations at
 \url{http://supfam.org/dcGOR/docs.html}}
@@ -109,25 +118,28 @@ parameter can be ignored (since this function will try to
 load it via function \code{data} first)}
 }
 \value{
-an object of S4 class \code{\link{Eoutput-class}}, with
-following slots: \itemize{ \item{\code{term_info}: a matrix
-of nTerm X 5 containing term information, where nTerm is
-the number of terms in consideration, and the 5 columns are
-"term_id" (i.e. "Term ID"), "term_name" (i.e. "Term Name"),
-"namespace" (i.e. "Term Namespace"), "distance" (i.e. "Term
-Distance") and "IC" (i.e. "Information Content for the term
-based on annotation frequency by it")} \item{\code{anno}: a
-list of terms, each storing annotated domain members.
-Always, terms are identified by "term_id" and domain
-members identified by their ids (e.g. sunids for SCOP
-domains)} \item{\code{data}: a vector containing input data
-in consideration. It is not always the same as the input
-data as only those mappable are retained}
-\item{\code{overlap}: a list of terms, each storing domains
-overlapped between domains annotated by a term and domains
-in the input data (i.e. the domains of interest). Always,
-terms are identified by "term_id" and domain members
-identified by their ids (e.g. sunids for SCOP domains)}
+an object of S4 class \code{\link{Eoutput}}, with following
+slots: \itemize{ \item{\code{domain}: a character
+specifying the domain identity} \item{\code{ontology}: a
+character specifying the ontology used}
+\item{\code{term_info}: a matrix of nTerm X 5 containing
+term information, where nTerm is the number of terms in
+consideration, and the 5 columns are "term_id" (i.e. "Term
+ID"), "term_name" (i.e. "Term Name"), "namespace" (i.e.
+"Term Namespace"), "distance" (i.e. "Term Distance") and
+"IC" (i.e. "Information Content for the term based on
+annotation frequency by it")} \item{\code{anno}: a list of
+terms, each storing annotated domain members. Always, terms
+are identified by "term_id" and domain members identified
+by their ids (e.g. sunids for SCOP domains)}
+\item{\code{data}: a vector containing input data in
+consideration. It is not always the same as the input data
+as only those mappable are retained} \item{\code{overlap}:
+a list of terms, each storing domains overlapped between
+domains annotated by a term and domains in the input data
+(i.e. the domains of interest). Always, terms are
+identified by "term_id" and domain members identified by
+their ids (e.g. sunids for SCOP domains)}
 \item{\code{zscore}: a vector containing z-scores}
 \item{\code{pvalue}: a vector containing p-values}
 \item{\code{adjp}: a vector containing adjusted p-values.
@@ -136,10 +148,11 @@ comparisons} }
 }
 \description{
 \code{dcEnrichment} is supposed to conduct enrichment
-analysis given the input data and the ontology in query. It
-returns an object of class "eTerm". Enrichment analysis is
-based on either Fisher's exact test or Hypergeometric test.
-The test can respect the hierarchy of the ontology.
+analysis for an input group of domains using a specified
+ontology. It returns an object of S4 class "Eoutput".
+Enrichment analysis is based on either Fisher's exact test
+or Hypergeometric test. The test can respect the hierarchy
+of the ontology.
 }
 \note{
 The interpretation of the algorithms used to account for
@@ -176,32 +189,16 @@ data <- sample(rowNames(SCOP.sf), 20)
 eOutput <- dcEnrichment(data, domain="SCOP.sf", ontology="GOMF")
 eOutput
 
-# 3) view the top 5 significance terms
-view(eOutput, top_num=5, sortBy="pvalue", details=TRUE)
+# 3) view the top 10 significance terms
+view(eOutput, top_num=10, sortBy="pvalue", details=TRUE)
 
-# 4) visualise the top 5 significant terms in the ontology hierarchy
-# load obo.GOMF (as an 'igraph' object)
-g <- dcRDataLoader('obo.GOMF')
-# focus on the top 5 significant terms (in terms of adjusted p-value) as nodes in query
-nodes_query <- names(sort(adjp(eOutput))[1:5])
-# induce DAG only including nodes/terms in query
-subg <- dnet::dDAGinduce(g, nodes_query)
-# color-code terms according to adjusted p-values (taking the form of 10-based negative logarithm)
-dnet::visDAG(g=subg, data=-1*log10(adjp(eOutput)), node.info="both",
-zlim=c(0,2))
-# also highlight (framed in black) nodes/terms in query
-nodes.highlight <- rep("black", length(nodes_query))
-names(nodes.highlight) <- nodes_query
-dnet::visDAG(g=subg, data=-1*log10(adjp(eOutput)), node.info="both",
-zlim=c(0,2), node.attrs=list(color=nodes.highlight))
-# the same as above but color-code terms according to the z-scores
-dnet::visDAG(g=subg, data=zscore(eOutput), node.info="both",
-colormap="darkblue-white-darkorange",
-node.attrs=list(color=nodes.highlight))
+# 4) visualise the top 10 significant terms in the ontology hierarchy
+# color-coded according to 10-based negative logarithm of adjusted p-values (adjp)
+visEnrichment(eOutput)
 }
 }
 \seealso{
 \code{\link{dcRDataLoader}}, \code{\link{dcDAGannotate}},
-\code{\link{Eoutput-class}}
+\code{\link{Eoutput-class}}, \code{\link{visEnrichment}}
 }
 

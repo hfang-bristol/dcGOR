@@ -13,6 +13,10 @@ enrichment analysis by \code{\link{dcEnrichment}}.
 \section{Slots}{
 
 \describe{
+\item{\code{domain}}{A character specifying the domain identity}
+
+\item{\code{ontology}}{A character specifying the ontology identity}
+
 \item{\code{term_info}}{A data.frame of nTerm X 5 containing term
 information, where nTerm is the number of terms in consideration, and
 the 5 columns are "term_id" (i.e. "Term ID"), "term_name" (i.e. "Term
@@ -28,11 +32,10 @@ by their ids (e.g. sunids for SCOP domains)}
 \code{\link{dcEnrichment}}. It is not always the same as the input data
 as only those mappable are retained}
 
-\item{\code{overlap}}{A vector of terms, each storing domains
-overlapped between domains annotated by a term and domains in the input
-data (i.e. the domains of interest). Always, terms are identified by
-"term_id" and domain members identified by their ids (e.g. sunids for
-SCOP domains)}
+\item{\code{overlap}}{A list of terms, each storing domains overlapped
+between domains annotated by a term and domains in the input data (i.e.
+the domains of interest). Always, terms are identified by "term_id" and
+domain members identified by their ids (e.g. sunids for SCOP domains)}
 
 \item{\code{zscore}}{A vector of terms, containing z-scores}
 
@@ -43,19 +46,19 @@ is the p value but after being adjusted for multiple comparisons}
 }}
 \section{Creation}{
 An object of this class can be created via:
-\code{new("Eoutput", term_info, anno, data, overlap,
-zscore, pvalue, adjp)}
+\code{new("Eoutput", domain, ontology, term_info, anno,
+data, overlap, zscore, pvalue, adjp)}
 }
 
 \section{Methods}{
-Class-specific methods: \itemize{ \item{\code{overlap()}:
-}{retrieve the slot 'overlap' in the object}
-\item{\code{zscore()}: }{retrieve the slot 'zscore' in
-the object} \item{\code{pvalue()}: }{retrieve the slot
-'pvalue' in the object} \item{\code{adjp()}: }{retrieve
-the slot 'adjp' in the object} \item{\code{view()}:
-}{retrieve an integrated data.frame used for viewing the
-object} } Standard generic methods: \itemize{
+Class-specific methods: \itemize{ \item{\code{zscore()}:
+}{retrieve the slot 'zscore' in the object}
+\item{\code{pvalue()}: }{retrieve the slot 'pvalue' in
+the object} \item{\code{adjp()}: }{retrieve the slot
+'adjp' in the object} \item{\code{view()}: }{retrieve an
+integrated data.frame used for viewing the object}
+\item{\code{write()}: }{write the object into a local
+file} } Standard generic methods: \itemize{
 \item{\code{str()}: }{compact display of the content in
 the object} \item{\code{show()}: }{abbreviated display of
 the object} }
@@ -84,8 +87,16 @@ data <- sample(rowNames(SCOP.sf), 20)
 eOutput <- dcEnrichment(data, domain="SCOP.sf", ontology="GOMF")
 eOutput
 
-# 3) view the top 5 significant terms
-view(eOutput)
+# 3) write into the file 'Eoutput.txt' in your local directory
+write(eOutput, file='Eoutput.txt')
+
+# 4) view the top 5 significant terms
+view(eOutput, top_num=5, sortBy="pvalue", details=TRUE)
+
+# 4) retrieve several slots directly
+zscore(eOutput)[1:5]
+pvalue(eOutput)[1:5]
+adjp(eOutput)[1:5]
 }
 }
 \seealso{

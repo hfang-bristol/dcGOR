@@ -15,6 +15,7 @@ Collate:
     'dcDAGannotate.r'
     'dcRDataLoader.r'
     'dcEnrichment.r'
+    'visEnrichment.r'
     'dcDAGdomainSim.r'
     'dcRWRpipeline.r'
 License: GPL-2

@@ -9,6 +9,7 @@ list(
                 'dcDAGannotate',
                 'dcRDataLoader',
                 'dcEnrichment',
+                'visEnrichment',
                 'dcDAGdomainSim',
                 'dcRWRpipeline'
             )

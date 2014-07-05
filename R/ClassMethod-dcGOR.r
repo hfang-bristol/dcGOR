@@ -193,7 +193,7 @@ setAs("data.frame", "InfoDataFrame", function(from) new("InfoDataFrame",data=fro
 #' @export
 setMethod("show", "InfoDataFrame",
     function(object) {
-        cat("An object of class ", class(object), "\n", sep="")
+        cat("An object of S4 class '", class(object), "'\n", sep="")
         if(sum(dim(object@data)) !=0 ){
             .showInfoDataFrame(
                 object, 
@@ -465,7 +465,7 @@ setAs("matrix", "Anno", function(from) {
 setMethod("show", 
     signature=signature(object="Anno"),
     function(object) {
-        cat("An object of class ", class(object), "\n", sep="")
+        cat("An object of S4 class '", class(object), "'\n", sep="")
         adim <- dim(object)
         if (length(adim)>1){
             cat("annoData:", if (length(adim)>1) paste(adim[[1]], "domains,",adim[[2]], "terms") else NULL, "\n")
@@ -548,23 +548,25 @@ setMethod("[", signature(x="Anno"),
 #' @title Definition for S4 class Eoutput
 #' @description \code{Eoutput} is an S4 class to store output from enrichment analysis by \code{\link{dcEnrichment}}.
 #' @return Class Eoutput
+#' @slot domain A character specifying the domain identity
+#' @slot ontology A character specifying the ontology identity
 #' @slot term_info A data.frame of nTerm X 5 containing term information, where nTerm is the number of terms in consideration, and the 5 columns are "term_id" (i.e. "Term ID"), "term_name" (i.e. "Term Name"), "namespace" (i.e. "Term Namespace"), "distance" (i.e. "Term Distance") and "IC" (i.e. "Information Content for the term based on annotation frequency by it")
 #' @slot anno A list of terms, each storing annotated domains. Always, terms are identified by "term_id" and domain members identified by their ids (e.g. sunids for SCOP domains)
 #' @slot data A vector containing input data in \code{\link{dcEnrichment}}. It is not always the same as the input data as only those mappable are retained
-#' @slot overlap A vector of terms, each storing domains overlapped between domains annotated by a term and domains in the input data (i.e. the domains of interest). Always, terms are identified by "term_id" and domain members identified by their ids (e.g. sunids for SCOP domains)
+#' @slot overlap A list of terms, each storing domains overlapped between domains annotated by a term and domains in the input data (i.e. the domains of interest). Always, terms are identified by "term_id" and domain members identified by their ids (e.g. sunids for SCOP domains)
 #' @slot zscore A vector of terms, containing z-scores
 #' @slot pvalue A vector of terms, containing p-values
 #' @slot adjp A vector of terms, containing adjusted p-values. It is the p value but after being adjusted for multiple comparisons
 #' @section Creation:
-#' An object of this class can be created via: \code{new("Eoutput", term_info, anno, data, overlap, zscore, pvalue, adjp)}
+#' An object of this class can be created via: \code{new("Eoutput", domain, ontology, term_info, anno, data, overlap, zscore, pvalue, adjp)}
 #' @section Methods:
 #' Class-specific methods:
 #' \itemize{
-#' \item{\code{overlap()}: }{retrieve the slot 'overlap' in the object}
 #' \item{\code{zscore()}: }{retrieve the slot 'zscore' in the object}
 #' \item{\code{pvalue()}: }{retrieve the slot 'pvalue' in the object}
 #' \item{\code{adjp()}: }{retrieve the slot 'adjp' in the object}
 #' \item{\code{view()}: }{retrieve an integrated data.frame used for viewing the object}
+#' \item{\code{write()}: }{write the object into a local file}
 #' }
 #' Standard generic methods:
 #' \itemize{
@@ -597,8 +599,16 @@ setMethod("[", signature(x="Anno"),
 #' eOutput <- dcEnrichment(data, domain="SCOP.sf", ontology="GOMF")
 #' eOutput
 #'
-#' # 3) view the top 5 significant terms
-#' view(eOutput)
+#' # 3) write into the file 'Eoutput.txt' in your local directory
+#' write(eOutput, file='Eoutput.txt')
+#'
+#' # 4) view the top 5 significant terms
+#' view(eOutput, top_num=5, sortBy="pvalue", details=TRUE)
+#'
+#' # 4) retrieve several slots directly
+#' zscore(eOutput)[1:5]
+#' pvalue(eOutput)[1:5]
+#' adjp(eOutput)[1:5]
 #' }
 
 #' @rdname Eoutput-class
@@ -607,6 +617,8 @@ setMethod("[", signature(x="Anno"),
 setClass(
     Class="Eoutput",
     representation(
+        domain   = "character",
+        ontology = "character",
         term_info= "data.frame",
         anno     = "list",
         data     = "vector",
@@ -616,6 +628,8 @@ setClass(
         adjp     = "vector"
     ),
     prototype = prototype(
+        domain   = "domain",
+        ontology = "ontology",
         term_info= data.frame(),
         anno     = list(),
         data     = vector(),
@@ -638,15 +652,18 @@ setClass(
 #' @description Methods defined for S4 class \code{Eoutput}.
 #' @param object an object of S4 class \code{Eoutput}. Usually this is an output from \code{\link{dcEnrichment}}
 #' @param x an object of S4 class \code{Eoutput}. Usually this is an output from \code{\link{dcEnrichment}}
-#' @param top_num the maximum number (5, by default) of terms will be viewed.
+#' @param top_num the maximum number (5, by default) of terms will be viewed. If NULL or NA, all terms will be viewed (this can be used for the subsequent saving)
 #' @param sortBy which statistics will be used for sorting and viewing terms. It can be "pvalue" for p value, "adjp" for adjusted p value, "zscore" for enrichment z-score, "nAnno" for the number in domains annotated by a term, "nOverlap" for the number in overlaps, and "none" for ordering simply according to ID of terms
 #' @param decreasing logical to indicate whether to sort in a decreasing order. If it is null, by default it will be true for "zscore", "nAnno" or "nOverlap"; otherwise false
 #' @param details logical to indicate whether the detailed information of terms is also viewed. By default, it sets to TRUE for the inclusion
+#' @param file a character specifying a file name written into. By default, it is 'Eoutput.txt'
+#' @param verbose logical to indicate whether the messages will be displayed in the screen. By default, it sets to true for display
 #' @return
 #' view(x) returns a data frame with following components:
 #' \itemize{
 #'  \item{\code{term_id}: term ID}
 #'  \item{\code{nAnno}: number in domains annotated by a term}
+#'  \item{\code{nGroup}: number in domains from the input group}
 #'  \item{\code{nOverlap}: number in overlaps}
 #'  \item{\code{zscore}: enrichment z-score}
 #'  \item{\code{pvalue}: p value}
@@ -655,17 +672,31 @@ setClass(
 #'  \item{\code{term_namespace}: term namespace; optional, it is only appended when "details" is true}
 #'  \item{\code{term_distance}: term distance; optional, it is only appended when "details" is true}
 #' }
+#' write(x) also returns the same data frame as view(x), in addition to a specified local file.
 #' @docType methods
 #' @keywords S4 methods
 #' @name Eoutput-method
 #' @rdname Eoutput-method
 #' @seealso \code{\link{Eoutput-class}}
 
-setGeneric("overlap", function(x) standardGeneric("overlap"))
 #' @rdname Eoutput-method
-#' @aliases overlap
+#' @aliases show,Eoutput-method
 #' @export
-setMethod("overlap", "Eoutput", function(x) x@overlap)
+setMethod("show", "Eoutput",
+    function(object) {
+        cat(sprintf("An object of S4 class '%s', containing following slots:", class(object)), "\n", sep="")
+        cat(sprintf("  @domain: '%s'", object@domain), "\n", sep="")
+        cat(sprintf("  @ontology: '%s'", object@ontology), "\n", sep="")
+        cat(sprintf("  @term_info: a data.frame of %d terms X %d information", dim(object@term_info)[1],dim(object@term_info)[2]), "\n", sep="")
+        cat(sprintf("  @anno: a list of %d terms, each storing annotated domains", length(object@anno)), "\n", sep="")
+        cat(sprintf("  @data: a vector containing a group of %d input domains", length(object@data)), "\n", sep="")
+        cat(sprintf("  @overlap: a list of %d terms, each containing domains overlapped with input domains", length(object@overlap)), "\n", sep="")
+        cat(sprintf("  @zscore: a vector of %d terms, containing z-scores", length(object@zscore)), "\n", sep="")
+        cat(sprintf("  @pvalue: a vector of %d terms, containing p-values", length(object@pvalue)), "\n", sep="")
+        cat(sprintf("  @adjp: a vector of %d terms, containing adjusted p-values", length(object@adjp)), "\n", sep="")
+        cat(sprintf("In summary, a total of %d terms ('%s') are analysed for a group of %d input domains ('%s')", dim(object@term_info)[1],object@ontology,length(object@data),object@domain), "\n", sep="")
+    }
+)
 
 setGeneric("zscore", function(x) standardGeneric("zscore"))
 #' @rdname Eoutput-method
@@ -693,7 +724,7 @@ setMethod("view", "Eoutput",
     function(x, top_num=5, sortBy=c("pvalue","adjp","zscore","nAnno","nOverlap","none"), decreasing=NULL, details=T){
         sortBy <- match.arg(sortBy)
     
-        if( is.null(top_num) ){
+        if( is.null(top_num) || is.na(top_num) ){
             top_num <- length(x@term_info$term_id)
         }
         if ( top_num > length(x@term_info$term_id) ){
@@ -702,6 +733,7 @@ setMethod("view", "Eoutput",
     
         tab <- data.frame( term_id          = x@term_info$term_id,
                            nAnno            = sapply(x@anno,length),
+                           nGroup           = length(x@data),
                            nOverlap         = sapply(x@overlap,length),
                            zscore           = x@zscore,
                            pvalue           = x@pvalue,
@@ -712,9 +744,9 @@ setMethod("view", "Eoutput",
                           )
     
         if(details == T){
-            res <- tab[,c(1:9)]
+            res <- tab[,c(1:10)]
         }else{
-            res <- tab[,c(1:6)]
+            res <- tab[,c(1:7)]
         }
     
         if(is.null(decreasing)){
@@ -726,11 +758,11 @@ setMethod("view", "Eoutput",
         }
     
         switch(sortBy, 
-            adjp={res <- res[order(res[,6], decreasing=decreasing)[1:top_num],]},
-            pvalue={res <- res[order(res[,5], decreasing=decreasing)[1:top_num],]},
-            zscore={res <- res[order(res[,4], decreasing=decreasing)[1:top_num],]},
+            adjp={res <- res[order(res[,7], decreasing=decreasing)[1:top_num],]},
+            pvalue={res <- res[order(res[,6], decreasing=decreasing)[1:top_num],]},
+            zscore={res <- res[order(res[,5], decreasing=decreasing)[1:top_num],]},
             nAnno={res <- res[order(res[,2], decreasing=decreasing)[1:top_num],]},
-            nOverlap={res <- res[order(res[,3], decreasing=decreasing)[1:top_num],]},
+            nOverlap={res <- res[order(res[,4], decreasing=decreasing)[1:top_num],]},
             none={res <- res[order(res[,1], decreasing=decreasing)[1:top_num],]}
         )
         
@@ -738,20 +770,24 @@ setMethod("view", "Eoutput",
     }
 )
 
+setGeneric("write", function(x, ...) standardGeneric("write"))
 #' @rdname Eoutput-method
-#' @aliases show,Eoutput-method
+#' @aliases write
 #' @export
-setMethod("show", "Eoutput",
-    function(object) {
-        cat(sprintf("An object of S4 class %s, containing 7 slots:", class(object)), "\n", sep="")
-        cat(sprintf("  @term_info: data.frame of %d terms X %d information", dim(object@term_info)[1],dim(object@term_info)[2]), "\n", sep="")
-        cat(sprintf("  @anno: a list of %d terms, each storing annotated domains", length(object@anno)), "\n", sep="")
-        cat(sprintf("  @data: a vector containing a group of %d input domains", length(object@data)), "\n", sep="")
-        cat(sprintf("  @overlap: a vector of %d terms, each containing domains overlapped with input domains", length(object@overlap)), "\n", sep="")
-        cat(sprintf("  @zscore: a vector of %d terms, containing z-scores", length(object@zscore)), "\n", sep="")
-        cat(sprintf("  @pvalue: a vector of %d terms, containing p-values", length(object@pvalue)), "\n", sep="")
-        cat(sprintf("  @adjp: a vector of %d terms, containing adjusted p-values", length(object@adjp)), "\n", sep="")
-        cat(sprintf("In summary, a total of %d terms analysed for a group of %d input domains", dim(object@term_info)[1],length(object@data)), "\n", sep="")
+setMethod("write", "Eoutput", 
+    function(x, file="Eoutput.txt", verbose=T){
+        if(file=='' || is.na(file) || is.null(file)){
+            file <- "Eoutput.txt"
+        }
+        
+        out <- view(x, top_num=NULL, sortBy="pvalue", details=TRUE)
+        
+        write.table(out, file=file, col.names=T, row.names=F, sep="\t")
+        
+        if(verbose){
+            message(sprintf("A file ('%s') has been written into your local directory ('%s')", file, getwd()), appendLF=T)
+        }
+        
+        invisible(out)
     }
 )
-

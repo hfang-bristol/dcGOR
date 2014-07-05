@@ -3,20 +3,18 @@
 \alias{Eoutput-method}
 \alias{adjp}
 \alias{adjp,Eoutput-method}
-\alias{overlap}
-\alias{overlap,Eoutput-method}
 \alias{pvalue}
 \alias{pvalue,Eoutput-method}
 \alias{show,Eoutput-method}
 \alias{view}
 \alias{view,Eoutput-method}
+\alias{write}
+\alias{write,Eoutput-method}
 \alias{zscore}
 \alias{zscore,Eoutput-method}
 \title{Methods defined for S4 class Eoutput}
 \usage{
-overlap(x)
-
-\S4method{overlap}{Eoutput}(x)
+\S4method{show}{Eoutput}(object)
 
 \S4method{zscore}{Eoutput}(x)
 
@@ -27,7 +25,7 @@ overlap(x)
 \S4method{view}{Eoutput}(x, top_num = 5, sortBy = c("pvalue", "adjp",
 "zscore", "nAnno", "nOverlap", "none"), decreasing = NULL, details = T)
 
-\S4method{show}{Eoutput}(object)
+\S4method{write}{Eoutput}(x, file = "Eoutput.txt", verbose = T)
 }
 \arguments{
 \item{object}{an object of S4 class \code{Eoutput}.
@@ -38,7 +36,8 @@ Usually this is an output from
 this is an output from \code{\link{dcEnrichment}}}
 
 \item{top_num}{the maximum number (5, by default) of
-terms will be viewed.}
+terms will be viewed. If NULL or NA, all terms will be
+viewed (this can be used for the subsequent saving)}
 
 \item{sortBy}{which statistics will be used for sorting
 and viewing terms. It can be "pvalue" for p value, "adjp"
@@ -55,12 +54,20 @@ false}
 \item{details}{logical to indicate whether the detailed
 information of terms is also viewed. By default, it sets
 to TRUE for the inclusion}
+
+\item{file}{a character specifying a file name written
+into. By default, it is 'Eoutput.txt'}
+
+\item{verbose}{logical to indicate whether the messages
+will be displayed in the screen. By default, it sets to
+true for display}
 }
 \value{
 view(x) returns a data frame with following components:
 \itemize{ \item{\code{term_id}: term ID}
 \item{\code{nAnno}: number in domains annotated by a term}
-\item{\code{nOverlap}: number in overlaps}
+\item{\code{nGroup}: number in domains from the input
+group} \item{\code{nOverlap}: number in overlaps}
 \item{\code{zscore}: enrichment z-score}
 \item{\code{pvalue}: p value} \item{\code{adjp}: adjusted p
 value} \item{\code{term_name}: term name; optional, it is
@@ -68,7 +75,9 @@ only appended when "details" is true}
 \item{\code{term_namespace}: term namespace; optional, it
 is only appended when "details" is true}
 \item{\code{term_distance}: term distance; optional, it is
-only appended when "details" is true} }
+only appended when "details" is true} } write(x) also
+returns the same data frame as view(x), in addition to a
+specified local file.
 }
 \description{
 Methods defined for S4 class \code{Eoutput}.
