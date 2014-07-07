@@ -2,23 +2,23 @@
 #'
 #' \code{dcDAGannotate} is supposed to produce a subgraph induced by the input annotation data, given a direct acyclic graph (DAG; an ontology). The input is a graph of "igraph" or "graphNET" object, a list of the vertices containing annotation data, and the mode defining the paths to the root of DAG. The induced subgraph contains vertices (with annotation data) and their ancestors along with the defined paths to the root of DAG. The annotations at these vertices (including their ancestors) are also updated according to the true-path rule: a domain annotated to a term should also be annotated by its all ancestor terms.
 #'
-#' @param g an object of class "igraph" or "graphNEL"
-#' @param annotations an object of class "Anno", that is, the vertices/nodes for which annotation data are provided
+#' @param g an object of class "igraph" or \code{\link{Onto}}
+#' @param annotations an object of class \code{\link{Anno}}, that is, the vertices/nodes for which annotation data are provided
 #' @param path.mode the mode of paths induced by vertices/nodes with input annotation data. It can be "all_paths" for all possible paths to the root, "shortest_paths" for only one path to the root (for each node in query), "all_shortest_paths" for all shortest paths to the root (i.e. for each node, find all shortest paths with the equal lengths)
 #' @param verbose logical to indicate whether the messages will be displayed in the screen. By default, it sets to true for display
 #' @return 
 #' \itemize{
-#'  \item{\code{subg}: an induced subgraph, an object of class "igraph". In addition to the original attributes to nodes and edges, the return subgraph is also appended by new node attributes: "annotations", which contains a list of domains either as original annotations or inherited annotations; "IC", which stands for information content defined as negative 10-based log-transformed frequency of domains annotated to that term.}
+#'  \item{\code{subg}: an induced subgraph, an object of class "igraph" or "Onto" (the same as input). In addition to the original attributes to nodes and edges, the return subgraph is also appended by new node attributes: "annotations", which contains a list of domains either as original annotations or inherited annotations; "IC", which stands for information content defined as negative 10-based log-transformed frequency of domains annotated to that term.}
 #' }
 #' @note For the mode "shortest_paths", the induced subgraph is the most concise, and thus informative for visualisation when there are many nodes in query, while the mode "all_paths" results in the complete subgraph.
 #' @export
 #' @importFrom dnet dDAGinduce dDAGlevel visDAG dDAGtermSim dDAGgeneSim
-#' @seealso \code{\link{dcRDataLoader}}, \code{\link{dcEnrichment}}, \code{\link{dcDAGdomainSim}}
+#' @seealso \code{\link{dcRDataLoader}}, \code{\link{dcEnrichment}}, \code{\link{dcDAGdomainSim}}, \code{\link{dcConverter}}
 #' @include dcDAGannotate.r
 #' @examples
 #' \dontrun{
-#' # 1) load obo.GOMF (as 'igraph' object)
-#' g <- dcRDataLoader('obo.GOMF')
+#' # 1) load onto.GOMF (as 'Onto' object)
+#' g <- dcRDataLoader('onto.GOMF')
 #'
 #' # 2) load SCOP superfamilies annotated by GOMF (as 'Anno' object)
 #' Anno <- dcRDataLoader('SCOP.sf2GOMF')
@@ -34,6 +34,7 @@
 #' dag <- dcDAGannotate(g, annotations, path.mode="shortest_paths", verbose=TRUE)
 #'
 #' # 5) color-code nodes/terms according to the number of annotations
+#' if(class(dag)=='Onto') dag <- dcConverter(dag, from='Onto', to='igraph')
 #' data <- sapply(V(dag)$annotations, length)
 #' names(data) <- V(dag)$name
 #' dnet::visDAG(g=dag, data=data, node.info="both")
@@ -44,13 +45,13 @@ dcDAGannotate <- function (g, annotations, path.mode=c("all_paths","shortest_pat
     
     path.mode <- match.arg(path.mode)
     
-    if(class(g)=="graphNEL"){
-        ig <- igraph.from.graphNEL(g)
+    if(class(g)=="Onto"){
+        ig <- dcConverter(g, from='Onto', to='igraph', verbose=F)
     }else{
         ig <- g
     }
     if (class(ig) != "igraph"){
-        stop("The function must apply to either 'igraph' or 'graphNEL' object.\n")
+        stop("The function must apply to either 'igraph' or 'Onto' object.\n")
     }
     
     if (class(annotations) != "Anno"){
@@ -141,6 +142,10 @@ dcDAGannotate <- function (g, annotations, path.mode=c("all_paths","shortest_pat
     counts <- sapply(domain_annotations, length)
     IC <- -1*log10(counts/max(counts))
     V(dag)$IC <- IC
+    
+    if(class(g)=="Onto"){
+        dag <- dcConverter(dag, from='igraph', to='Onto', verbose=F)
+    }
     
     return(dag)
 }

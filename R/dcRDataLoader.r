@@ -2,7 +2,7 @@
 #'
 #' \code{dcRDataLoader} is supposed to load RData that are used by package dcGOR.
 #'
-#' @param RData which built-in RData to load. If NOT NA, this RData will be always loaded. It can be: domains (including 'SCOP.sf', 'SCOP.fa'), ontologies (including 'obo.GOBP', 'obo.GOMF', 'obo.GOCC', 'obo.DO', 'obo.HPPA', 'obo.HPMI', 'obo.HPON', 'obo.MP', 'obo.EC', 'obo.KW', 'obo.UP'), annotations (including 'SCOP.sf2GOBP', 'SCOP.sf2GOMF', 'SCOP.sf2GOCC', 'SCOP.sf2DO', 'SCOP.sf2HPPA', 'SCOP.sf2HPMI', 'SCOP.sf2HPON', 'SCOP.sf2MP', 'SCOP.sf2EC', 'SCOP.sf2KW', 'SCOP.sf2UP', 'SCOP.fa2GOBP', 'SCOP.fa2GOMF', 'SCOP.fa2GOCC', 'SCOP.fa2DO', 'SCOP.fa2HPPA', 'SCOP.fa2HPMI', 'SCOP.fa2HPON', 'SCOP.fa2MP', 'SCOP.fa2EC', 'SCOP.fa2KW', 'SCOP.fa2UP'), and domainome in eukaryotic genomes (including 'Ancestral_domainome', 'eTOL'). On the meanings, please refer to the Documentations
+#' @param RData which built-in RData to load. If NOT NA, this RData will be always loaded. It can be: domains (including 'SCOP.sf', 'SCOP.fa'), ontologies (including 'onto.GOBP', 'onto.GOMF', 'onto.GOCC', 'onto.DO', 'onto.HPPA', 'onto.HPMI', 'onto.HPON', 'onto.MP', 'onto.EC', 'onto.KW', 'onto.UP'), annotations (including 'SCOP.sf2GOBP', 'SCOP.sf2GOMF', 'SCOP.sf2GOCC', 'SCOP.sf2DO', 'SCOP.sf2HPPA', 'SCOP.sf2HPMI', 'SCOP.sf2HPON', 'SCOP.sf2MP', 'SCOP.sf2EC', 'SCOP.sf2KW', 'SCOP.sf2UP', 'SCOP.fa2GOBP', 'SCOP.fa2GOMF', 'SCOP.fa2GOCC', 'SCOP.fa2DO', 'SCOP.fa2HPPA', 'SCOP.fa2HPMI', 'SCOP.fa2HPON', 'SCOP.fa2MP', 'SCOP.fa2EC', 'SCOP.fa2KW', 'SCOP.fa2UP'), and domainome in eukaryotic genomes (including 'Ancestral_domainome', 'eTOL'). On the meanings, please refer to the Documentations
 #' @param domain domain part of annotation RData to load. When RData is NA and this plus next are NOT NA, then this plus next one are used to specify which annotation RData to load. In addition to NA, it can also be: 'SCOP.sf', 'SCOP.fa'
 #' @param ontology ontology part of annotation RData to load. This only works together with the previous 'domain' parameter. In addition to NA, it can also be: 'GOBP', 'GOMF', 'GOCC', 'DO', 'HPPA', 'HPMI', 'HPON', 'MP', 'EC', 'KW', 'UP'
 #' @param verbose logical to indicate whether the messages will be displayed in the screen. By default, it sets to TRUE for display
@@ -16,14 +16,14 @@
 #' @examples
 #' # Always, load from specified RData directly
 #' SCOP.sf <- dcRDataLoader(RData='SCOP.sf')
-#' obo.GOMF <- dcRDataLoader(RData='obo.GOMF')
+#' onto.GOMF <- dcRDataLoader(RData='onto.GOMF')
 #' # But for annotaion data, there are two ways to do so:
 #' # 1) in a direct way
 #' SCOP.sf2GOMF <- dcRDataLoader(RData='SCOP.sf2GOMF')
 #' # 2) in an indirect way: specify both domain and ontology
 #' SCOP.sf2GOMF <- dcRDataLoader(domain='SCOP.sf', ontology='GOMF')
 
-dcRDataLoader <- function(RData=c(NA,'SCOP.sf','SCOP.fa','obo.GOBP','obo.GOMF','obo.GOCC','obo.DO','obo.HPPA','obo.HPMI','obo.HPON','obo.MP','obo.EC','obo.KW','obo.UP','SCOP.sf2GOBP','SCOP.sf2GOMF','SCOP.sf2GOCC','SCOP.sf2DO','SCOP.sf2HPPA','SCOP.sf2HPMI','SCOP.sf2HPON','SCOP.sf2MP','SCOP.sf2EC','SCOP.sf2KW','SCOP.sf2UP','SCOP.fa2GOBP','SCOP.fa2GOMF','SCOP.fa2GOCC','SCOP.fa2DO','SCOP.fa2HPPA','SCOP.fa2HPMI','SCOP.fa2HPON','SCOP.fa2MP','SCOP.fa2EC','SCOP.fa2KW','SCOP.fa2UP','Ancestral_domainome','eTOL'), domain=c(NA,'SCOP.sf','SCOP.fa'), ontology=c(NA,'GOBP','GOMF','GOCC','DO','HPPA','HPMI','HPON','MP','EC','KW','UP'), verbose=T, RData.location="http://supfam.org/dcGOR/data")
+dcRDataLoader <- function(RData=c(NA,'SCOP.sf','SCOP.fa','onto.GOBP','onto.GOMF','onto.GOCC','onto.DO','onto.HPPA','onto.HPMI','onto.HPON','onto.MP','onto.EC','onto.KW','onto.UP','SCOP.sf2GOBP','SCOP.sf2GOMF','SCOP.sf2GOCC','SCOP.sf2DO','SCOP.sf2HPPA','SCOP.sf2HPMI','SCOP.sf2HPON','SCOP.sf2MP','SCOP.sf2EC','SCOP.sf2KW','SCOP.sf2UP','SCOP.fa2GOBP','SCOP.fa2GOMF','SCOP.fa2GOCC','SCOP.fa2DO','SCOP.fa2HPPA','SCOP.fa2HPMI','SCOP.fa2HPON','SCOP.fa2MP','SCOP.fa2EC','SCOP.fa2KW','SCOP.fa2UP','Ancestral_domainome','eTOL'), domain=c(NA,'SCOP.sf','SCOP.fa'), ontology=c(NA,'GOBP','GOMF','GOCC','DO','HPPA','HPMI','HPON','MP','EC','KW','UP'), verbose=T, RData.location="http://supfam.org/dcGOR/data")
 {
 
     ## match.arg matches arg against a table of candidate values as specified by choices, where NA means to take the first one

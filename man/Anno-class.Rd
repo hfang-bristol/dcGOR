@@ -12,15 +12,17 @@ Class Anno
 \section{Slots}{
 
 \describe{
-\item{\code{annoData}}{An object of class AnnoData, containing data
-matrix with the column number equal to nrow(termData) and the row
-number equal to nrow(domainData).}
+\item{\code{annoData}}{An object of S4 class \code{\link{AnnoData}},
+containing data matrix with the column number equal to nrow(termData)
+and the row number equal to nrow(domainData).}
 
-\item{\code{termData}}{An object of class InfoDataFrame, describing
-information on columns in annoData.}
+\item{\code{termData}}{An object of S4 class
+\code{\link{InfoDataFrame}}, describing information on columns in
+annoData.}
 
-\item{\code{domainData}}{An object of class InfoDataFrame, describing
-information on rows in annoData.}
+\item{\code{domainData}}{An object of S4 class
+\code{\link{InfoDataFrame}}, describing information on rows in
+annoData.}
 }}
 \section{Creation}{
 An object of this class can be created via:

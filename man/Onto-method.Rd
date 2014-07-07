@@ -1,0 +1,74 @@
+\docType{methods}
+\name{Onto-method}
+\alias{Onto-method}
+\alias{[,Onto,ANY,ANY,ANY-method}
+\alias{[,Onto-method}
+\alias{adjMatrix}
+\alias{adjMatrix,Onto-method}
+\alias{dim,Onto-method}
+\alias{matrix2Onto}
+\alias{nInfo}
+\alias{nInfo,Onto-method}
+\alias{nodeInfo}
+\alias{nodeInfo,Onto-method}
+\alias{nodeNames}
+\alias{nodeNames,Onto-method}
+\alias{show,Onto-method}
+\alias{term_distance}
+\alias{term_distance,Onto-method}
+\alias{term_id}
+\alias{term_id,Onto-method}
+\alias{term_name}
+\alias{term_name,Onto-method}
+\alias{term_namespace}
+\alias{term_namespace,Onto-method}
+\title{Methods defined for S4 class Onto}
+\usage{
+\S4method{dim}{Onto}(x)
+
+\S4method{adjMatrix}{Onto}(x)
+
+\S4method{nodeInfo}{Onto}(x)
+
+\S4method{nInfo}{Onto}(object)
+
+\S4method{nodeNames}{Onto}(object)
+
+\S4method{term_id}{Onto}(object)
+
+\S4method{term_name}{Onto}(object)
+
+\S4method{term_namespace}{Onto}(object)
+
+\S4method{term_distance}{Onto}(object)
+
+\S4method{show}{Onto}(object)
+
+\S4method{[}{Onto,ANY,ANY,ANY}(x, i, j, ..., drop = FALSE)
+}
+\arguments{
+\item{x}{an object of class \code{Onto}}
+
+\item{object}{an object of class \code{Onto}}
+
+\item{i}{an index}
+
+\item{j}{an index}
+
+\item{...}{additional parameters}
+
+\item{drop}{For matrices and arrays.  If \code{TRUE} the
+result is coerced to the lowest possible dimension (see
+the examples).  This only works for extracting elements,
+not for the replacement.  See \code{\link{drop}} for
+further details.  }
+}
+\description{
+Methods defined for class \code{Onto}.
+}
+\seealso{
+\code{\link{Onto-class}}
+}
+\keyword{S4}
+\keyword{methods}
+

@@ -7,9 +7,9 @@
 Class AnnoData
 }
 \description{
-\code{AnnoData} is union of other classes: either matrix,
-or data.frame or dgCMatrix (a sparse matrix in the package
-Matrix). It is used as a virtual class
+\code{AnnoData} is union of other classes: either matrix or
+dgCMatrix (a sparse matrix in the package Matrix). It is
+used as a virtual class
 }
 \seealso{
 \code{\link{Anno-class}}

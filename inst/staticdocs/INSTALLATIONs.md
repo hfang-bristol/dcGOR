@@ -47,6 +47,6 @@ Notes: to install the package `dcGOR` under [latest development version](https:/
 
     library(devtools)
     for(pkg in c("dcGOR","dnet")){
-        if(!(pkg %in% rownames(installed.packages()))) remove.packages(pkg)
+        if(pkg %in% rownames(installed.packages())) remove.packages(pkg)
         install_github(pkg, username="hfang-bristol")
     }

@@ -177,8 +177,8 @@ setAs("data.frame", "InfoDataFrame", function(from) new("InfoDataFrame",data=fro
     )
     lbls[names(labels)] <- labels
     ## create a simplified object for extracting names
-    idx <- .selectSomeIndex(Data(object), maxToShow=4)
-    idy <- .selectSomeIndex(Data(object), byrow=FALSE, maxToShow=4)
+    idx <- .selectSomeIndex(Data(object), maxToShow=6)
+    idy <- .selectSomeIndex(Data(object), byrow=FALSE, maxToShow=6)
     Data <- Data(object)[c(idx[[1]], idx[[3]]), c(idy[[1]], idy[[3]]), drop=FALSE]
     rnms <- rownames(Data)
     nms <- c(rnms[idx[[1]]], idx[[2]], if (!is.null(idx[[1]])) rnms[-idx[[1]]] else NULL)
@@ -238,7 +238,7 @@ setMethod("[", signature(x="InfoDataFrame"),
 ################################################################################
 ################################################################################
 #' @title Definition for VIRTUAL S4 class AnnoData
-#' @description \code{AnnoData} is union of other classes: either matrix, or data.frame or dgCMatrix (a sparse matrix in the package Matrix). It is used as a virtual class
+#' @description \code{AnnoData} is union of other classes: either matrix or dgCMatrix (a sparse matrix in the package Matrix). It is used as a virtual class
 #' @return Class AnnoData
 #' @import Matrix
 #' @import methods
@@ -251,16 +251,16 @@ setMethod("[", signature(x="InfoDataFrame"),
 #' @rdname AnnoData-class
 #' @aliases AnnoData
 #' @exportClass AnnoData
-setClassUnion("AnnoData", c("matrix", "data.frame", "dgCMatrix"))
+setClassUnion("AnnoData", c("matrix", "dgCMatrix"))
 
 ################################################################################
 ################################################################################
 #' @title Definition for S4 class Anno
 #' @description \code{Anno} has 3 slots: annoData, termData and domainData
 #' @return Class Anno
-#' @slot annoData An object of class AnnoData, containing data matrix with the column number equal to nrow(termData) and the row number equal to nrow(domainData).
-#' @slot termData An object of class InfoDataFrame, describing information on columns in annoData.
-#' @slot domainData An object of class InfoDataFrame, describing information on rows in annoData.
+#' @slot annoData An object of S4 class \code{\link{AnnoData}}, containing data matrix with the column number equal to nrow(termData) and the row number equal to nrow(domainData).
+#' @slot termData An object of S4 class \code{\link{InfoDataFrame}}, describing information on columns in annoData.
+#' @slot domainData An object of S4 class \code{\link{InfoDataFrame}}, describing information on rows in annoData.
 #' @section Creation:
 #' An object of this class can be created via: \code{new("Anno", annoData, termData, domainData)}
 #' @section Methods:
@@ -468,11 +468,11 @@ setMethod("show",
         cat("An object of S4 class '", class(object), "'\n", sep="")
         adim <- dim(object)
         if (length(adim)>1){
-            cat("annoData:", if (length(adim)>1) paste(adim[[1]], "domains,",adim[[2]], "terms") else NULL, "\n")
+            cat("@annoData:", if (length(adim)>1) paste(adim[[1]], "domains,",adim[[2]], "terms") else NULL, "\n")
         }
         ## termData
         if( dim(termData(object))[1] != 0 ){
-            cat("termData (", class(termData(object)), ")\n", sep="")
+            cat("@termData (", class(termData(object)), ")\n", sep="")
             .showInfoDataFrame(
                 termData(object), 
                 labels=list(
@@ -482,11 +482,11 @@ setMethod("show",
                 )
             )
         }else{
-            cat("termData (NULL)\n", sep="")
+            cat("@termData (NULL)\n", sep="")
         }
         ## domainData
         if( dim(domainData(object))[1] != 0 ){
-            cat("domainData (", class(domainData(object)), ")\n", sep="")
+            cat("@domainData (", class(domainData(object)), ")\n", sep="")
             .showInfoDataFrame(
                 domainData(object), 
                 labels=list(
@@ -496,7 +496,7 @@ setMethod("show",
                 )
             )
         }else{
-            cat("domainData (NULL)\n", sep="")
+            cat("@domainData (NULL)\n", sep="")
         }
     }
 )
@@ -541,7 +541,6 @@ setMethod("[", signature(x="Anno"),
         x <- new("Anno", annoData=aD, termData=tD, domainData=dD)
     }
 )
-
 
 ################################################################################
 ################################################################################
@@ -789,5 +788,305 @@ setMethod("write", "Eoutput",
         }
         
         invisible(out)
+    }
+)
+
+
+################################################################################
+################################################################################
+#' @title Definition for VIRTUAL S4 class AdjData
+#' @description \code{AdjData} is union of other classes: either matrix or dgCMatrix (a sparse matrix in the package Matrix). It is used as a virtual class
+#' @return Class AdjData
+#' @import Matrix
+#' @import methods
+#' @docType class
+#' @keywords S4 classes
+#' @name AdjData-class
+#' @rdname AdjData-class
+#' @seealso \code{\link{Onto-class}}
+
+#' @rdname AdjData-class
+#' @aliases AdjData
+#' @exportClass AdjData
+setClassUnion("AdjData", c("matrix", "dgCMatrix"))
+
+################################################################################
+################################################################################
+#' @title Definition for S4 class Onto
+#' @description \code{Onto} has 2 slots: nodeInfo and adjMatrix
+#' @return Class Onto
+#' @slot nodeInfo An object of S4 class \code{\link{InfoDataFrame}}, describing information on nodes/terms.
+#' @slot adjMatrix An object of S4 class \code{\link{AdjData}}, containing adjacency data matrix, with rows for parent (arrow-outbound) and columns for children (arrow-inbound)
+#' @section Creation:
+#' An object of this class can be created via: \code{new("Onto", nodeInfo, adjMatrix)}
+#' @section Methods:
+#' Class-specific methods:
+#' \itemize{
+#' \item{\code{dim()}: }{retrieve the dimension in the object}
+#' \item{\code{adjMatrix()}: }{retrieve the slot 'adjMatrix' in the object}
+#' \item{\code{nodeInfo()}: }{retrieve the slot 'nodeInfo' (as class InfoDataFrame) in the object}
+#' \item{\code{nInfo()}: }{retrieve nodeInfo (as data.frame) in the object}
+#' \item{\code{nodeNames()}: }{retrieve node/term names (ie, row names of nodeInfo) in the object}
+#' \item{\code{term_id()}: }{retrieve term id (ie, column 'term_id' of nodeInfo) in the object, if any}
+#' \item{\code{term_name()}: }{retrieve term id (ie, column 'term_name' of nodeInfo) in the object, if any}
+#' \item{\code{term_namespace()}: }{retrieve term id (ie, column 'term_namespace' of nodeInfo) in the object, if any}
+#' \item{\code{term_distance()}: }{retrieve term id (ie, column 'term_distance' of nodeInfo) in the object, if any}
+#' }
+#' Standard generic methods:
+#' \itemize{
+#' \item{\code{str()}: }{compact display of the content in the object}
+#' \item{\code{show()}: }{abbreviated display of the object}
+#' \item{\code{as(matrix, "Onto")}: }{convert a matrix (or data.frame) to an object of class Onto}
+#' \item{\code{[i]}: }{get the subset of the same class}
+#' }
+#' @section Access:
+#' Ways to access information on this class:
+#' \itemize{
+#' \item{\code{showClass("Onto")}: }{show the class definition}
+#' \item{\code{showMethods(classes="Onto")}: }{show the method definition upon this class}
+#' \item{\code{getSlots("Onto")}: }{get the name and class of each slot in this class}
+#' \item{\code{slotNames("Onto")}: }{get the name of each slot in this class}
+#' \item{\code{selectMethod(f, signature="Onto")}: }{retrieve the definition code for the method 'f' defined in this class}
+#' }
+#' @import methods
+#' @docType class
+#' @keywords S4 classes
+#' @name Onto-class
+#' @seealso \code{\link{Onto-method}}
+#' @examples
+#' # create an object of class Onto, only given a matrix
+#' adjM <- matrix(runif(25),nrow=5,ncol=5)
+#' as(adjM, "Onto")
+#'
+#' # create an object of class Onto, given a matrix plus information on nodes
+#' # 1) create nodeI: an object of class InfoDataFrame
+#' data <- data.frame(term_id=paste("Term", 1:5, sep="_"), term_name=I(LETTERS[1:5]), term_namespace=rep("Namespace",5), term_distance=1:5, row.names=paste("Term", 1:5, sep="_"))
+#' nodeI <- new("InfoDataFrame", data=data)
+#' nodeI
+#' # 2) create an object of class Onto
+#' # VERY IMPORTANT: make sure having consistent names between nodeInfo and adjMatrix
+#' adjM <- matrix(runif(25),nrow=5,ncol=5)
+#' colnames(adjM) <- rownames(adjM) <- rowNames(nodeI)
+#' x <- new("Onto", adjMatrix=adjM, nodeInfo=nodeI)
+#' x
+#' # 3) look at various methods defined on class Onto
+#' dim(x)
+#' adjMatrix(x)
+#' nodeInfo(x)
+#' nInfo(x)
+#' nodeNames(x)
+#' term_id(x)
+#' term_namespace(x)
+#' term_distance(x)
+#' # 4) get the subset
+#' x[1:2]
+
+#' @rdname Onto-class
+#' @aliases Onto
+#' @exportClass Onto
+setClass(
+    Class="Onto",
+    representation(
+        nodeInfo = "InfoDataFrame",
+        adjMatrix = "AdjData"
+    ),
+    prototype = prototype(
+        nodeInfo = new("InfoDataFrame",dimLabels=c("termNames", "termColumns")),
+        adjMatrix = matrix()
+    ),
+    validity = function(object){
+        msg <- NULL
+        # dimension for adjMatrix
+        adim <- dim(object)
+        if(adim[1]!=adim[2]){
+            msg <- append(msg, "dimensions differ for adjacent matrix")
+        }
+        if( dim(nodeInfo(object))[1] != 0 ){
+            if (adim[1] != dim(nodeInfo(object))[1]){
+                msg <- append(msg, "term numbers differ between nodeInfo and adjMatrix")
+            }
+            if (!identical(nodeNames(object), rownames(adjMatrix(object)))){
+                msg <- append(msg, "term names differ between nodeInfo and adjMatrix")
+            }
+        }
+        if (is.null(msg)) TRUE else msg
+    }
+)
+
+########################################
+#' @title Methods defined for S4 class Onto
+#' @description Methods defined for class \code{Onto}.
+#' @param x an object of class \code{Onto}
+#' @param object an object of class \code{Onto}
+#' @param i an index
+#' @param j an index
+#' @param ... additional parameters
+#' @docType methods
+#' @keywords S4 methods
+#' @name Onto-method
+#' @rdname Onto-method
+#' @seealso \code{\link{Onto-class}}
+
+#' @rdname Onto-method
+#' @aliases dim,Onto-method
+#' @export
+setMethod("dim", "Onto", function(x) dim(x@adjMatrix))
+
+setGeneric("adjMatrix", function(x) standardGeneric("adjMatrix"))
+#' @rdname Onto-method
+#' @aliases adjMatrix
+#' @export
+setMethod("adjMatrix", "Onto", function(x) x@adjMatrix)
+
+setGeneric("nodeInfo", function(x) standardGeneric("nodeInfo"))
+#' @rdname Onto-method
+#' @aliases nodeInfo
+#' @export
+setMethod("nodeInfo", "Onto", function(x) x@nodeInfo)
+
+setGeneric("nInfo", function(object) standardGeneric("nInfo"))
+#' @rdname Onto-method
+#' @aliases nInfo
+#' @export
+setMethod("nInfo", signature(object="Onto"), function(object){
+    data <- Data(nodeInfo(object))
+    if(sum(dim(data))==0){
+        cat("No data is available\n", sep="")
+    }else{
+        data
+    }
+})
+
+setGeneric("nodeNames", function(object) standardGeneric("nodeNames"))
+#' @rdname Onto-method
+#' @aliases nodeNames
+#' @export
+setMethod("nodeNames", signature(object="Onto"), function(object) rowNames(nodeInfo(object)))
+
+setGeneric("term_id", function(object) standardGeneric("term_id"))
+#' @rdname Onto-method
+#' @aliases term_id
+#' @export
+setMethod("term_id", signature(object="Onto"),
+    function(object){
+        if(is.null(nInfo(object)$term_id)){
+            stop(sprintf("This method '%s' cannot be used for this object '%s' of S4 class '%s'", "term_id()", deparse(substitute(object)), class(object)))
+        }else{
+            as.vector(nInfo(object)$term_id)
+        }
+    }
+)
+
+setGeneric("term_name", function(object) standardGeneric("term_name"))
+#' @rdname Onto-method
+#' @aliases term_name
+#' @export
+setMethod("term_name", signature(object="Onto"),
+    function(object){
+        if(is.null(nInfo(object)$term_name)){
+            stop(sprintf("This method '%s' cannot be used for this object '%s' of S4 class '%s'", "term_name()", deparse(substitute(object)), class(object)))
+        }else{
+            as.vector(nInfo(object)$term_name)
+        }
+    }
+)
+
+setGeneric("term_namespace", function(object) standardGeneric("term_namespace"))
+#' @rdname Onto-method
+#' @aliases term_namespace
+#' @export
+setMethod("term_namespace", signature(object="Onto"),
+    function(object){
+        if(is.null(nInfo(object)$term_namespace)){
+            stop(sprintf("This method '%s' cannot be used for this object '%s' of S4 class '%s'", "term_namespace()", deparse(substitute(object)), class(object)))
+        }else{
+            as.vector(nInfo(object)$term_namespace)
+        }
+    }
+)
+
+setGeneric("term_distance", function(object) standardGeneric("term_distance"))
+#' @rdname Onto-method
+#' @aliases term_distance
+#' @export
+setMethod("term_distance", signature(object="Onto"),
+    function(object){
+        if(is.null(nInfo(object)$term_distance)){
+            stop(sprintf("This method '%s' cannot be used for this object '%s' of S4 class '%s'", "term_distance()", deparse(substitute(object)), class(object)))
+        }else{
+            as.vector(nInfo(object)$term_distance)
+        }
+    }
+)
+
+#' @rdname Onto-method
+#' @name matrix2Onto
+setAs("matrix", "Onto", function(from) {
+    ## for nodeInfo    
+    rn <- rownames(from)
+    if(is.null(rn)){
+        rn <- 1:nrow(from)
+        rownames(from) <- rn
+    }
+    nodeI <- new("InfoDataFrame", data=data.frame(term_id=rn, row.names=rn))
+    ## for Onto
+    new("Onto", adjMatrix=from, nodeInfo=nodeI)
+})
+
+#' @rdname Onto-method
+#' @export
+setMethod("show", 
+    signature=signature(object="Onto"),
+    function(object) {
+        cat("An object of S4 class '", class(object), "'\n", sep="")
+        adim <- dim(object)
+        if (length(adim)>1){
+            cat("@adjMatrix:", if (length(adim)>1) paste(adim[[1]], "terms (parents/from),",adim[[2]], "terms (children/to)") else NULL, "\n")
+        }
+        ## nodeInfo
+        if( dim(nodeInfo(object))[1] != 0 ){
+            cat("@nodeInfo (", class(nodeInfo(object)), ")\n", sep="")
+            .showInfoDataFrame(
+                nodeInfo(object), 
+                labels=list(
+                    object="nodeInfo",
+                    termNames="nodeNames",
+                    varLabels="nodeAttr"
+                )
+            )
+        }else{
+            cat("nodeInfo (NULL)\n", sep="")
+        }
+    }
+)
+
+#' @rdname Onto-method
+#' @aliases [,Onto-method
+#' @export
+setMethod("[", signature(x="Onto"), 
+    function(x, i, j, ..., drop = FALSE) {
+        if (missing(drop)){
+            drop <- FALSE
+        }
+        if (missing(i) && missing(j)) {
+            if (length(list(...))!=0){
+                stop("specify terms to subset")
+            }
+            return(x)
+        }
+        
+        if (!missing(i)) {
+            nD <- nodeInfo(x)[i,,..., drop=drop]
+        }else{
+            nD <- nodeInfo(x)
+        }
+        
+        if (!missing(i)){
+            aD <- adjMatrix(x)[i,i]
+        }else{
+            aD <- adjMatrix(x)
+        }
+        
+        x <- new("Onto", adjMatrix=aD, nodeInfo=nD)
     }
 )

@@ -38,7 +38,7 @@
 #' }
 #' @export
 #' @importFrom dnet dDAGinduce visDAG dDAGlevel dDAGroot
-#' @seealso \code{\link{dcRDataLoader}}, \code{\link{dcDAGannotate}}, \code{\link{Eoutput-class}}, \code{\link{visEnrichment}}
+#' @seealso \code{\link{dcRDataLoader}}, \code{\link{dcDAGannotate}}, \code{\link{Eoutput-class}}, \code{\link{visEnrichment}}, \code{\link{dcConverter}}
 #' @include dcEnrichment.r
 #' @examples
 #' \dontrun{
@@ -86,7 +86,10 @@ dcEnrichment <- function(data, domain=c("SCOP.sf","SCOP.fa"), ontology=c("GOBP",
 
     #########
     ## load ontology information
-    g <- dcRDataLoader(paste('obo.', ontology, sep=''), RData.location=RData.location)
+    g <- dcRDataLoader(paste('onto.', ontology, sep=''), RData.location=RData.location)
+    if(class(g)=="Onto"){
+        g <- dcConverter(g, from='Onto', to='igraph', verbose=F)
+    }
     
     #########
     ## load domain information

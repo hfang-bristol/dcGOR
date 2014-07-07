@@ -199,6 +199,7 @@ visEnrichment(eOutput)
 }
 \seealso{
 \code{\link{dcRDataLoader}}, \code{\link{dcDAGannotate}},
-\code{\link{Eoutput-class}}, \code{\link{visEnrichment}}
+\code{\link{Eoutput-class}}, \code{\link{visEnrichment}},
+\code{\link{dcConverter}}
 }
 

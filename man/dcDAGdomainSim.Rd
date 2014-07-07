@@ -9,9 +9,10 @@ dcDAGdomainSim(g, domains = NULL, method.domain = c("BM.average",
 parallel = TRUE, multicores = NULL, verbose = TRUE)
 }
 \arguments{
-\item{g}{an object of class "igraph" or "graphNEL". It
-must contain a vertex attribute called 'annotations' for
-storing annotation data (see example for howto)}
+\item{g}{an object of class "igraph" or
+\code{\link{Onto}}. It must contain an node attribute
+called 'annotations' for storing annotation data (see
+example for howto)}
 
 \item{domains}{the domains between which pair-wise
 semantic similarity is calculated. If NULL, all domains
@@ -119,8 +120,8 @@ results in the complete subgraph.
 }
 \examples{
 \dontrun{
-# 1) load obo.GOMF (as 'igraph' object)
-g <- dcRDataLoader('obo.GOMF')
+# 1) load onto.GOMF (as 'Onto' object)
+g <- dcRDataLoader('onto.GOMF')
 
 # 2) load SCOP superfamilies annotated by GOMF (as 'Anno' object)
 Anno <- dcRDataLoader('SCOP.sf2GOMF')
@@ -130,7 +131,7 @@ dag <- dcDAGannotate(g, annotations=Anno, path.mode="shortest_paths",
 verbose=TRUE)
 
 # 4) calculate pair-wise semantic similarity between 5 randomly chosen domains
-alldomains <- unique(unlist(V(dag)$annotations))
+alldomains <- unique(unlist(nInfo(dag)$annotations))
 domains <- sample(alldomains,5)
 sim <- dcDAGdomainSim(g=dag, domains=domains,
 method.domain="BM.average", method.term="Resnik", parallel=FALSE,
@@ -139,6 +140,7 @@ sim
 }
 }
 \seealso{
-\code{\link{dcRDataLoader}}, \code{\link{dcDAGannotate}}
+\code{\link{dcRDataLoader}}, \code{\link{dcDAGannotate}},
+\code{\link{dcConverter}}
 }
 

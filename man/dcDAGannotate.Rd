@@ -7,10 +7,11 @@ dcDAGannotate(g, annotations, path.mode = c("all_paths",
 "all_shortest_paths"), verbose = TRUE)
 }
 \arguments{
-\item{g}{an object of class "igraph" or "graphNEL"}
+\item{g}{an object of class "igraph" or
+\code{\link{Onto}}}
 
-\item{annotations}{an object of class "Anno", that is,
-the vertices/nodes for which annotation data are
+\item{annotations}{an object of class \code{\link{Anno}},
+that is, the vertices/nodes for which annotation data are
 provided}
 
 \item{path.mode}{the mode of paths induced by
@@ -27,13 +28,14 @@ true for display}
 }
 \value{
 \itemize{ \item{\code{subg}: an induced subgraph, an object
-of class "igraph". In addition to the original attributes
-to nodes and edges, the return subgraph is also appended by
-new node attributes: "annotations", which contains a list
-of domains either as original annotations or inherited
-annotations; "IC", which stands for information content
-defined as negative 10-based log-transformed frequency of
-domains annotated to that term.} }
+of class "igraph" or "Onto" (the same as input). In
+addition to the original attributes to nodes and edges, the
+return subgraph is also appended by new node attributes:
+"annotations", which contains a list of domains either as
+original annotations or inherited annotations; "IC", which
+stands for information content defined as negative 10-based
+log-transformed frequency of domains annotated to that
+term.} }
 }
 \description{
 \code{dcDAGannotate} is supposed to produce a subgraph
@@ -56,8 +58,8 @@ results in the complete subgraph.
 }
 \examples{
 \dontrun{
-# 1) load obo.GOMF (as 'igraph' object)
-g <- dcRDataLoader('obo.GOMF')
+# 1) load onto.GOMF (as 'Onto' object)
+g <- dcRDataLoader('onto.GOMF')
 
 # 2) load SCOP superfamilies annotated by GOMF (as 'Anno' object)
 Anno <- dcRDataLoader('SCOP.sf2GOMF')
@@ -74,6 +76,8 @@ dag <- dcDAGannotate(g, annotations, path.mode="shortest_paths",
 verbose=TRUE)
 
 # 5) color-code nodes/terms according to the number of annotations
+if(class(dag)=='Onto') dag <- dcConverter(dag, from='Onto',
+to='igraph')
 data <- sapply(V(dag)$annotations, length)
 names(data) <- V(dag)$name
 dnet::visDAG(g=dag, data=data, node.info="both")
@@ -81,6 +85,6 @@ dnet::visDAG(g=dag, data=data, node.info="both")
 }
 \seealso{
 \code{\link{dcRDataLoader}}, \code{\link{dcEnrichment}},
-\code{\link{dcDAGdomainSim}}
+\code{\link{dcDAGdomainSim}}, \code{\link{dcConverter}}
 }
 

@@ -17,7 +17,8 @@ necessarily have to be binary (non-zeros will be used as
 a weight, but should be non-negative for easy
 interpretation).}
 
-\item{g}{an object of class "igraph" or "graphNEL"}
+\item{g}{an object of class "igraph" or
+\code{\link{Onto}}}
 
 \item{method}{the method used to calculate RWR. It can be
 'direct' for directly applying RWR, 'indirect' for
@@ -128,8 +129,8 @@ better to use 'indrect' method (for a single run).
 }
 \examples{
 \dontrun{
-# 1) load obo.GOMF (as 'igraph' object)
-g <- dcRDataLoader('obo.GOMF')
+# 1) load onto.GOMF (as 'Onto' object)
+g <- dcRDataLoader('onto.GOMF')
 
 # 2) load SCOP superfamilies annotated by GOMF (as 'Anno' object)
 Anno <- dcRDataLoader('SCOP.sf2GOMF')
@@ -139,7 +140,7 @@ dag <- dcDAGannotate(g, annotations=Anno, path.mode="shortest_paths",
 verbose=TRUE)
 
 # 4) calculate pair-wise semantic similarity between 10 randomly chosen domains
-alldomains <- unique(unlist(V(dag)$annotations))
+alldomains <- unique(unlist(nInfo(dag)$annotations))
 domains <- sample(alldomains,10)
 sim <- dcDAGdomainSim(g=dag, domains=domains,
 method.domain="BM.average", method.term="Resnik", parallel=FALSE,
@@ -163,6 +164,6 @@ iContact
 }
 \seealso{
 \code{\link{dcRDataLoader}}, \code{\link{dcDAGannotate}},
-\code{\link{dcDAGdomainSim}}
+\code{\link{dcDAGdomainSim}}, \code{\link{dcConverter}}
 }
 

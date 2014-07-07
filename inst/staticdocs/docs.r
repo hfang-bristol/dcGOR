@@ -8,6 +8,7 @@ list(
             c(
                 'dcDAGannotate',
                 'dcRDataLoader',
+                'dcConverter',
                 'dcEnrichment',
                 'visEnrichment',
                 'dcDAGdomainSim',
@@ -22,24 +23,27 @@ list(
                 'AnnoData-class',
                 'Anno-class',
                 'Anno-method',
+                'AdjData-class',
+                'Onto-class',
+                'Onto-method',
                 'Eoutput-class',
                 'Eoutput-method'
             )
         ),
         sd_section("Ontologies mainly including open biomedical ontology (obo)",
-            "These ontologies each are represented as a direct acyclic graph (DAG). DAG is stored as an object of class 'igraph'.",
+            "These ontologies each are represented as a direct acyclic graph (DAG). DAG is stored as an object of class 'Onto'.",
             c(
-                "obo.GOBP",
-                "obo.GOMF",
-                "obo.GOCC",
-                "obo.DO",
-                "obo.HPPA",
-                "obo.HPMI",
-                "obo.HPON",
-                "obo.MP",
-                "obo.EC",
-                "obo.KW",
-                "obo.UP"
+                "onto.GOBP",
+                "onto.GOMF",
+                "onto.GOCC",
+                "onto.DO",
+                "onto.HPPA",
+                "onto.HPMI",
+                "onto.HPON",
+                "onto.MP",
+                "onto.EC",
+                "onto.KW",
+                "onto.UP"
             )
         ),
         sd_section("SCOP domain superfamilies and their annotations by ontologies",

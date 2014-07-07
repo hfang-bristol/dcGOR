@@ -98,7 +98,10 @@ visEnrichment <- function (e, nodes_query=NULL, data.type=c("adjp","pvalue","zsc
     
     ######################################################################################
     ## load ontology (as an 'igraph' object)
-    g <- dcRDataLoader(paste('obo.', e@ontology, sep=''), verbose=F)
+    g <- dcRDataLoader(paste('onto.', e@ontology, sep=''), verbose=F)
+    if(class(g)=="Onto"){
+        g <- dcConverter(g, from='Onto', to='igraph', verbose=F)
+    }
     
     if(is.null(nodes_query)){
         nodes_query <- names(sort(adjp(e))[1:10])
