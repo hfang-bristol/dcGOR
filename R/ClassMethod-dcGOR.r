@@ -279,7 +279,8 @@ setClassUnion("AnnoData", c("matrix", "dgCMatrix"))
 #' \itemize{
 #' \item{\code{str()}: }{compact display of the content in the object}
 #' \item{\code{show()}: }{abbreviated display of the object}
-#' \item{\code{as(matrix, "Anno")}: }{convert a matrix (or data.frame) to an object of class Anno}
+#' \item{\code{as(matrix, "Anno")}: }{convert a matrix to an object of class Anno}
+#' \item{\code{as(dgCMatrix, "Anno")}: }{convert a dgCMatrix (a sparse matrix) to an object of class Anno}
 #' \item{\code{[i,j]}: }{get the subset of the same class}
 #' }
 #' @section Access:
@@ -461,6 +462,21 @@ setAs("matrix", "Anno", function(from) {
 })
 
 #' @rdname Anno-method
+#' @name dgCMatrix2Anno
+setAs("dgCMatrix", "Anno", function(from) {
+    ## for domainData
+    rn <- rownames(from)
+    if(is.null(rn)) rn <- 1:nrow(from)
+    domainData <- new("InfoDataFrame", data=data.frame(names=rn))
+    ## for termData    
+    cn <- colnames(from)
+    if(is.null(cn)) cn <- 1:ncol(from)
+    termData <- new("InfoDataFrame", data=data.frame(names=cn))
+    ## for Anno
+    new("Anno", annoData=from, domainData=domainData, termData=termData)
+})
+
+#' @rdname Anno-method
 #' @export
 setMethod("show", 
     signature=signature(object="Anno"),
@@ -595,19 +611,19 @@ setMethod("[", signature(x="Anno"),
 #' data <- sample(rowNames(SCOP.sf), 20)
 #' 
 #' # 2) perform enrichment analysis, producing an object of S4 class 'Eoutput'
-#' eOutput <- dcEnrichment(data, domain="SCOP.sf", ontology="GOMF")
-#' eOutput
+#' eoutput <- dcEnrichment(data, domain="SCOP.sf", ontology="GOMF")
+#' eoutput
 #'
 #' # 3) write into the file 'Eoutput.txt' in your local directory
-#' write(eOutput, file='Eoutput.txt')
+#' write(eoutput, file='Eoutput.txt')
 #'
 #' # 4) view the top 5 significant terms
-#' view(eOutput, top_num=5, sortBy="pvalue", details=TRUE)
+#' view(eoutput, top_num=5, sortBy="pvalue", details=TRUE)
 #'
 #' # 4) retrieve several slots directly
-#' zscore(eOutput)[1:5]
-#' pvalue(eOutput)[1:5]
-#' adjp(eOutput)[1:5]
+#' zscore(eoutput)[1:5]
+#' pvalue(eoutput)[1:5]
+#' adjp(eoutput)[1:5]
 #' }
 
 #' @rdname Eoutput-class
@@ -816,7 +832,7 @@ setClassUnion("AdjData", c("matrix", "dgCMatrix"))
 #' @description \code{Onto} has 2 slots: nodeInfo and adjMatrix
 #' @return Class Onto
 #' @slot nodeInfo An object of S4 class \code{\link{InfoDataFrame}}, describing information on nodes/terms.
-#' @slot adjMatrix An object of S4 class \code{\link{AdjData}}, containing adjacency data matrix, with rows for parent (arrow-outbound) and columns for children (arrow-inbound)
+#' @slot adjMatrix An object of S4 class \code{\link{AdjData}}, containing adjacency data matrix (for a direct graph), with rows for parent (arrow-outbound) and columns for children (arrow-inbound)
 #' @section Creation:
 #' An object of this class can be created via: \code{new("Onto", nodeInfo, adjMatrix)}
 #' @section Methods:
@@ -836,7 +852,8 @@ setClassUnion("AdjData", c("matrix", "dgCMatrix"))
 #' \itemize{
 #' \item{\code{str()}: }{compact display of the content in the object}
 #' \item{\code{show()}: }{abbreviated display of the object}
-#' \item{\code{as(matrix, "Onto")}: }{convert a matrix (or data.frame) to an object of class Onto}
+#' \item{\code{as(matrix, "Onto")}: }{convert a matrix to an object of class Onto}
+#' \item{\code{as(dgCMatrix, "Onto")}: }{convert a dgCMatrix (a sparse matrix) to an object of class Onto}
 #' \item{\code{[i]}: }{get the subset of the same class}
 #' }
 #' @section Access:
@@ -1033,6 +1050,22 @@ setAs("matrix", "Onto", function(from) {
     new("Onto", adjMatrix=from, nodeInfo=nodeI)
 })
 
+
+#' @rdname Onto-method
+#' @name dgCMatrix2Onto
+setAs("dgCMatrix", "Onto", function(from) {
+    ## for nodeInfo    
+    rn <- rownames(from)
+    if(is.null(rn)){
+        rn <- 1:nrow(from)
+        rownames(from) <- rn
+    }
+    nodeI <- new("InfoDataFrame", data=data.frame(term_id=rn, row.names=rn))
+    ## for Onto
+    new("Onto", adjMatrix=from, nodeInfo=nodeI)
+})
+
+
 #' @rdname Onto-method
 #' @export
 setMethod("show", 
@@ -1041,13 +1074,13 @@ setMethod("show",
         cat("An object of S4 class '", class(object), "'\n", sep="")
         adim <- dim(object)
         if (length(adim)>1){
-            cat("@adjMatrix:", if (length(adim)>1) paste(adim[[1]], "terms (parents/from),",adim[[2]], "terms (children/to)") else NULL, "\n")
+            cat("@adjMatrix:", if (length(adim)>1) paste(adim[[1]], "a direct matrix of terms (parents/from),",adim[[2]], "terms (children/to)") else NULL, "\n")
         }
         ## nodeInfo
         if( dim(nodeInfo(object))[1] != 0 ){
             cat("@nodeInfo (", class(nodeInfo(object)), ")\n", sep="")
             .showInfoDataFrame(
-                nodeInfo(object), 
+                nodeInfo(object),
                 labels=list(
                     object="nodeInfo",
                     termNames="nodeNames",
@@ -1088,5 +1121,284 @@ setMethod("[", signature(x="Onto"),
         }
         
         x <- new("Onto", adjMatrix=aD, nodeInfo=nD)
+    }
+)
+
+
+################################################################################
+################################################################################
+#' @title Definition for S4 class Dnetwork
+#' @description \code{Dnetwork} is an S4 class to store a domain network, such as the one from semantic similairty between pairs of domains by \code{\link{dcDAGdomainSim}}. It has 2 slots: nodeInfo and adjMatrix
+#' @return Class Dnetwork
+#' @slot nodeInfo An object of S4 class \code{\link{InfoDataFrame}}, describing information on nodes/domains.
+#' @slot adjMatrix An object of S4 class \code{\link{AdjData}}, containing symmetric adjacency data matrix for an indirect domain network
+#' @section Creation:
+#' An object of this class can be created via: \code{new("Dnetwork", nodeInfo, adjMatrix)}
+#' @section Methods:
+#' Class-specific methods:
+#' \itemize{
+#' \item{\code{dim()}: }{retrieve the dimension in the object}
+#' \item{\code{adjMatrix()}: }{retrieve the slot 'adjMatrix' in the object}
+#' \item{\code{nodeInfo()}: }{retrieve the slot 'nodeInfo' (as class InfoDataFrame) in the object}
+#' \item{\code{nInfo()}: }{retrieve nodeInfo (as data.frame) in the object}
+#' \item{\code{nodeNames()}: }{retrieve node/term names (ie, row names of nodeInfo) in the object}
+#' \item{\code{id()}: }{retrieve domain id (ie, column 'id' of nodeInfo) in the object, if any}
+#' \item{\code{level()}: }{retrieve domain level (ie, column 'level' of nodeInfo) in the object, if any}
+#' \item{\code{description()}: }{retrieve domain description (ie, column 'description' of nodeInfo) in the object, if any}
+#' }
+#' Standard generic methods:
+#' \itemize{
+#' \item{\code{str()}: }{compact display of the content in the object}
+#' \item{\code{show()}: }{abbreviated display of the object}
+#' \item{\code{as(matrix, "Dnetwork")}: }{convert a matrix to an object of class Dnetwork}
+#' \item{\code{as(dgCMatrix, "Dnetwork")}: }{convert a dgCMatrix (a sparse matrix) to an object of class Dnetwork}
+#' \item{\code{[i]}: }{get the subset of the same class}
+#' }
+#' @section Access:
+#' Ways to access information on this class:
+#' \itemize{
+#' \item{\code{showClass("Dnetwork")}: }{show the class definition}
+#' \item{\code{showMethods(classes="Dnetwork")}: }{show the method definition upon this class}
+#' \item{\code{getSlots("Dnetwork")}: }{get the name and class of each slot in this class}
+#' \item{\code{slotNames("Dnetwork")}: }{get the name of each slot in this class}
+#' \item{\code{selectMethod(f, signature="Dnetwork")}: }{retrieve the definition code for the method 'f' defined in this class}
+#' }
+#' @import methods
+#' @docType class
+#' @keywords S4 classes
+#' @name Dnetwork-class
+#' @seealso \code{\link{Dnetwork-method}}
+#' @examples
+#' # create an object of class Dnetwork, only given a matrix
+#' adjM <- matrix(runif(25),nrow=5,ncol=5)
+#' as(adjM, "Dnetwork")
+#'
+#' # create an object of class Dnetwork, given a matrix plus information on nodes
+#' # 1) create nodeI: an object of class InfoDataFrame
+#' data <- data.frame(id=paste("Domain", 1:5, sep="_"), level=rep("SCOP",5), description=I(LETTERS[1:5]), row.names=paste("Domain", 1:5, sep="_"))
+#' nodeI <- new("InfoDataFrame", data=data)
+#' nodeI
+#' # 2) create an object of class Dnetwork
+#' # VERY IMPORTANT: make sure having consistent names between nodeInfo and adjMatrix
+#' adjM <- matrix(runif(25),nrow=5,ncol=5)
+#' colnames(adjM) <- rownames(adjM) <- rowNames(nodeI)
+#' x <- new("Dnetwork", adjMatrix=adjM, nodeInfo=nodeI)
+#' x
+#' # 3) look at various methods defined on class Dnetwork
+#' dim(x)
+#' adjMatrix(x)
+#' nodeInfo(x)
+#' nInfo(x)
+#' nodeNames(x)
+#' id(x)
+#' level(x)
+#' description(x)
+#' # 4) get the subset
+#' x[1:2]
+
+#' @rdname Dnetwork-class
+#' @aliases Dnetwork
+#' @exportClass Dnetwork
+setClass(
+    Class="Dnetwork",
+    representation(
+        nodeInfo = "InfoDataFrame",
+        adjMatrix = "AdjData"
+    ),
+    prototype = prototype(
+        nodeInfo = new("InfoDataFrame",dimLabels=c("domainNames", "domainColumns")),
+        adjMatrix = matrix()
+    ),
+    validity = function(object){
+        msg <- NULL
+        # dimension for adjMatrix
+        adim <- dim(object)
+        if(adim[1]!=adim[2]){
+            msg <- append(msg, "dimensions differ for adjacent matrix")
+        }
+        if( dim(nodeInfo(object))[1] != 0 ){
+            if (adim[1] != dim(nodeInfo(object))[1]){
+                msg <- append(msg, "domain numbers differ between nodeInfo and adjMatrix")
+            }
+            if (!identical(nodeNames(object), rownames(adjMatrix(object)))){
+                msg <- append(msg, "domain names differ between nodeInfo and adjMatrix")
+            }
+        }
+        if (is.null(msg)) TRUE else msg
+    }
+)
+
+########################################
+#' @title Methods defined for S4 class Dnetwork
+#' @description Methods defined for class \code{Dnetwork}.
+#' @param x an object of class \code{Dnetwork}
+#' @param object an object of class \code{Dnetwork}
+#' @param i an index
+#' @param j an index
+#' @param ... additional parameters
+#' @docType methods
+#' @keywords S4 methods
+#' @name Dnetwork-method
+#' @rdname Dnetwork-method
+#' @seealso \code{\link{Dnetwork-class}}
+
+#' @rdname Dnetwork-method
+#' @aliases dim,Dnetwork-method
+#' @export
+setMethod("dim", "Dnetwork", function(x) dim(x@adjMatrix))
+
+#' @rdname Dnetwork-method
+#' @aliases adjMatrix,Dnetwork-method
+#' @export
+setMethod("adjMatrix", "Dnetwork", function(x) x@adjMatrix)
+
+#' @rdname Dnetwork-method
+#' @aliases nodeInfo,Dnetwork-method
+#' @export
+setMethod("nodeInfo", "Dnetwork", function(x) x@nodeInfo)
+
+#' @rdname Dnetwork-method
+#' @aliases nInfo,Dnetwork-method
+#' @export
+setMethod("nInfo", signature(object="Dnetwork"), function(object){
+    data <- Data(nodeInfo(object))
+    if(sum(dim(data))==0){
+        cat("No data is available\n", sep="")
+    }else{
+        data
+    }
+})
+
+#' @rdname Dnetwork-method
+#' @aliases nodeNames,Dnetwork-method
+#' @export
+setMethod("nodeNames", signature(object="Dnetwork"), function(object) rowNames(nodeInfo(object)))
+
+setGeneric("id", function(object) standardGeneric("id"))
+#' @rdname Dnetwork-method
+#' @aliases id
+#' @export
+setMethod("id", signature(object="Dnetwork"),
+    function(object){
+        if(is.null(nInfo(object)$id)){
+            stop(sprintf("This method '%s' cannot be used for this object '%s' of S4 class '%s'", "id()", deparse(substitute(object)), class(object)))
+        }else{
+            as.vector(nInfo(object)$id)
+        }
+    }
+)
+
+setGeneric("level", function(object) standardGeneric("level"))
+#' @rdname Dnetwork-method
+#' @aliases level
+#' @export
+setMethod("level", signature(object="Dnetwork"),
+    function(object){
+        if(is.null(nInfo(object)$level)){
+            stop(sprintf("This method '%s' cannot be used for this object '%s' of S4 class '%s'", "level()", deparse(substitute(object)), class(object)))
+        }else{
+            as.vector(nInfo(object)$level)
+        }
+    }
+)
+
+setGeneric("description", function(object) standardGeneric("description"))
+#' @rdname Dnetwork-method
+#' @aliases description
+#' @export
+setMethod("description", signature(object="Dnetwork"),
+    function(object){
+        if(is.null(nInfo(object)$description)){
+            stop(sprintf("This method '%s' cannot be used for this object '%s' of S4 class '%s'", "description()", deparse(substitute(object)), class(object)))
+        }else{
+            as.vector(nInfo(object)$description)
+        }
+    }
+)
+
+#' @rdname Dnetwork-method
+#' @name matrix2Dnetwork
+setAs("matrix", "Dnetwork", function(from) {
+    ## for nodeInfo
+    rn <- rownames(from)
+    if(is.null(rn)){
+        rn <- 1:nrow(from)
+        rownames(from) <- rn
+    }
+    nodeI <- new("InfoDataFrame", data=data.frame(id=rn, row.names=rn))
+    ## for Dnetwork
+    new("Dnetwork", adjMatrix=from, nodeInfo=nodeI)
+})
+
+#' @rdname Dnetwork-method
+#' @name dgCMatrix2Dnetwork
+setAs("dgCMatrix", "Dnetwork", function(from) {
+    ## for nodeInfo    
+    rn <- rownames(from)
+    if(is.null(rn)){
+        rn <- 1:nrow(from)
+        rownames(from) <- rn
+    }
+    nodeI <- new("InfoDataFrame", data=data.frame(id=rn, row.names=rn))
+    ## for Dnetwork
+    new("Dnetwork", adjMatrix=from, nodeInfo=nodeI)
+})
+
+
+#' @rdname Dnetwork-method
+#' @export
+setMethod("show", 
+    signature=signature(object="Dnetwork"),
+    function(object) {
+        cat("An object of S4 class '", class(object), "'\n", sep="")
+        adim <- dim(object)
+        if (length(adim)>1){
+            cat("@adjMatrix:", if (length(adim)>1) paste(adim[[1]], "a weighted symmetric matrix of domains,",adim[[2]], "domains") else NULL, "\n")
+        }
+        ## nodeInfo
+        if( dim(nodeInfo(object))[1] != 0 ){
+            cat("@nodeInfo (", class(nodeInfo(object)), ")\n", sep="")
+            .showInfoDataFrame(
+                nodeInfo(object),
+                labels=list(
+                    object="nodeInfo",
+                    termNames="nodeNames",
+                    varLabels="nodeAttr"
+                )
+            )
+        }else{
+            cat("nodeInfo (NULL)\n", sep="")
+        }
+    }
+)
+
+#' @rdname Dnetwork-method
+#' @aliases [,Dnetwork-method
+#' @export
+setMethod("[", signature(x="Dnetwork"), 
+    function(x, i, j, ..., drop = FALSE) {
+        if (missing(drop)){
+            drop <- FALSE
+        }
+        if (missing(i) && missing(j)) {
+            if (length(list(...))!=0){
+                stop("specify domains to subset")
+            }
+            return(x)
+        }
+        
+        if (!missing(i)) {
+            nD <- nodeInfo(x)[i,,..., drop=drop]
+        }else{
+            nD <- nodeInfo(x)
+        }
+        
+        if (!missing(i)){
+            aD <- adjMatrix(x)[i,i]
+        }else{
+            aD <- adjMatrix(x)
+        }
+        
+        x <- new("Dnetwork", adjMatrix=aD, nodeInfo=nD)
     }
 )

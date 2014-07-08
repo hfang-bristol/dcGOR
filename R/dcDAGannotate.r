@@ -1,6 +1,6 @@
 #' Function to generate a subgraph of a direct acyclic graph (DAG) induced by the input annotation data
 #'
-#' \code{dcDAGannotate} is supposed to produce a subgraph induced by the input annotation data, given a direct acyclic graph (DAG; an ontology). The input is a graph of "igraph" or "graphNET" object, a list of the vertices containing annotation data, and the mode defining the paths to the root of DAG. The induced subgraph contains vertices (with annotation data) and their ancestors along with the defined paths to the root of DAG. The annotations at these vertices (including their ancestors) are also updated according to the true-path rule: a domain annotated to a term should also be annotated by its all ancestor terms.
+#' \code{dcDAGannotate} is supposed to produce a subgraph induced by the input annotation data, given a direct acyclic graph (DAG; an ontology). The input is a graph of "igraph" or "Onto" object, a list of the vertices containing annotation data, and the mode defining the paths to the root of DAG. The induced subgraph contains vertices (with annotation data) and their ancestors along with the defined paths to the root of DAG. The annotations at these vertices (including their ancestors) are also updated according to the true-path rule: a domain annotated to a term should also be annotated by its all ancestor terms.
 #'
 #' @param g an object of class "igraph" or \code{\link{Onto}}
 #' @param annotations an object of class \code{\link{Anno}}, that is, the vertices/nodes for which annotation data are provided

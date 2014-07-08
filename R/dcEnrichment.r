@@ -48,15 +48,15 @@
 #' data <- sample(rowNames(SCOP.sf), 20)
 #' 
 #' # 2) perform enrichment analysis, producing an object of S4 class 'Eoutput'
-#' eOutput <- dcEnrichment(data, domain="SCOP.sf", ontology="GOMF")
-#' eOutput
+#' eoutput <- dcEnrichment(data, domain="SCOP.sf", ontology="GOMF")
+#' eoutput
 #'
 #' # 3) view the top 10 significance terms 
-#' view(eOutput, top_num=10, sortBy="pvalue", details=TRUE)
+#' view(eoutput, top_num=10, sortBy="pvalue", details=TRUE)
 #'
 #' # 4) visualise the top 10 significant terms in the ontology hierarchy
 #' # color-coded according to 10-based negative logarithm of adjusted p-values (adjp)
-#' visEnrichment(eOutput)
+#' visEnrichment(eoutput)
 #' }
 
 dcEnrichment <- function(data, domain=c("SCOP.sf","SCOP.fa"), ontology=c("GOBP","GOMF","GOCC","DO","HPPA","HPMI","HPON","MP","EC","KW","UP"), sizeRange=c(10,1000), min.overlap=3, which_distance=NULL, test=c("HypergeoTest","FisherTest","BinomialTest"), p.adjust.method=c("BH", "BY", "bonferroni", "holm", "hochberg", "hommel"), ontology.algorithm=c("none","pc","elim","lea"), elim.pvalue=1e-2, lea.depth=2, verbose=T, RData.location="http://supfam.org/dcGOR/data")
@@ -618,7 +618,7 @@ dcEnrichment <- function(data, domain=c("SCOP.sf","SCOP.fa"), ontology=c("GOBP",
     names(annotations) <- V(dag)$term_id
     annotations <- annotations[names(gs)]
     
-    eOutput <- new("Eoutput",
+    eoutput <- new("Eoutput",
                     domain    = domain,
                     ontology  = ontology,
                     term_info = set_info,
@@ -630,5 +630,5 @@ dcEnrichment <- function(data, domain=c("SCOP.sf","SCOP.fa"), ontology=c("GOBP",
                     adjp      = adjpvals
                  )
 
-    invisible(eOutput)
+    invisible(eoutput)
 }

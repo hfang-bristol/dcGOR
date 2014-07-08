@@ -186,15 +186,15 @@ SCOP.sf <- dcRDataLoader('SCOP.sf')
 data <- sample(rowNames(SCOP.sf), 20)
 
 # 2) perform enrichment analysis, producing an object of S4 class 'Eoutput'
-eOutput <- dcEnrichment(data, domain="SCOP.sf", ontology="GOMF")
-eOutput
+eoutput <- dcEnrichment(data, domain="SCOP.sf", ontology="GOMF")
+eoutput
 
 # 3) view the top 10 significance terms
-view(eOutput, top_num=10, sortBy="pvalue", details=TRUE)
+view(eoutput, top_num=10, sortBy="pvalue", details=TRUE)
 
 # 4) visualise the top 10 significant terms in the ontology hierarchy
 # color-coded according to 10-based negative logarithm of adjusted p-values (adjp)
-visEnrichment(eOutput)
+visEnrichment(eoutput)
 }
 }
 \seealso{

@@ -5,6 +5,7 @@
 \alias{[,Onto-method}
 \alias{adjMatrix}
 \alias{adjMatrix,Onto-method}
+\alias{dgCMatrix2Onto}
 \alias{dim,Onto-method}
 \alias{matrix2Onto}
 \alias{nInfo}

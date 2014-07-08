@@ -3,7 +3,7 @@
 #' \code{dcRWRpipeline} is supposed to estimate sample relationships (ie. contact strength between samples) from an input domain-sample matrix and an input graph (such as a domain-domain semantic network). The pipeline includes: 1) random walk restart (RWR) of the input graph using the input matrix as seeds; 2) calculation of contact strength (inner products of RWR-smoothed columns of input matrix); 3) estimation of the contact signficance by a randomalisation procedure. It supports two methods how to use RWR: 'direct' for directly applying RWR in the given seeds; 'indirectly' for first pre-computing affinity matrix of the input graph, and then deriving the affinity score. Parallel computing is also supported for Linux or Mac operating systems.
 #'
 #' @param data an input domain-sample data matrix used for seeds. Each value in input domain-sample matrix does not necessarily have to be binary (non-zeros will be used as a weight, but should be non-negative for easy interpretation). 
-#' @param g an object of class "igraph" or \code{\link{Onto}}
+#' @param g an object of class "igraph" or \code{\link{Dnetwork}}
 #' @param method the method used to calculate RWR. It can be 'direct' for directly applying RWR, 'indirect' for indirectly applying RWR (first pre-compute affinity matrix and then derive the affinity score)
 #' @param normalise the way to normalise the adjacency matrix of the input graph. It can be 'laplacian' for laplacian normalisation, 'row' for row-wise normalisation, 'column' for column-wise normalisation, or 'none'
 #' @param restart the restart probability used for RWR. The restart probability takes the value from 0 to 1, controlling the range from the starting nodes/seeds that the walker will explore. The higher the value, the more likely the walker is to visit the nodes centered on the starting nodes. At the extreme when the restart probability is zero, the walker moves freely to the neighbors at each step without restarting from seeds, i.e., following a random walk (RW)
@@ -46,20 +46,16 @@
 #' # 4) calculate pair-wise semantic similarity between 10 randomly chosen domains 
 #' alldomains <- unique(unlist(nInfo(dag)$annotations))
 #' domains <- sample(alldomains,10)
-#' sim <- dcDAGdomainSim(g=dag, domains=domains, method.domain="BM.average", method.term="Resnik", parallel=FALSE, verbose=TRUE)
-#' sim
+#' dnetwork <- dcDAGdomainSim(g=dag, domains=domains, method.domain="BM.average", method.term="Resnik", parallel=FALSE, verbose=TRUE)
+#' dnetwork
 #' 
-#' # 5) convert the above semantic similarity to a network (as an 'igraph' object)
-#' adjmatrix <- as.matrix(sim)
-#' network <- igraph::graph.adjacency(adjmatrix, mode="undirected", weighted=TRUE, diag=FALSE)
-#' 
-#' # 6) estimate RWR dating based sample relationships
+#' # 5) estimate RWR dating based sample relationships
 #' # define sets of seeds as data
 #' # each seed with equal weight (i.e. all non-zero entries are '1')
 #' data <- data.frame(aSeeds=c(1,0,1,0,1), bSeeds=c(0,0,1,0,1))
-#' rownames(data) <- V(network)$name[1:5]
+#' rownames(data) <- id(dnetwork)[1:5]
 #' # calcualte their two contact graph
-#' iContact <- dcRWRpipeline(data=data, g=network, parallel=FALSE)
+#' iContact <- dcRWRpipeline(data=data, g=dnetwork, parallel=FALSE)
 #' iContact
 #' }
 
@@ -97,14 +93,15 @@ dcRWRpipeline <- function(data, g, method=c("indirect","direct"), normalise=c("l
     if(is.null(cnames)){
         cnames <- seq(1,ncol(data))
     }
+    
     ## check input graph
-    if(class(g)=="Onto"){
-        ig <- dcConverter(g, from='Onto', to='igraph', verbose=F)
+    if(class(g)=="Dnetwork"){
+        ig <- dcConverter(g, from='Dnetwork', to='igraph', verbose=F)
     }else{
         ig <- g
     }
     if (class(ig) != "igraph"){
-        stop("The function must apply to either 'igraph' or 'Onto' object.\n")
+        stop("The function must apply to either 'igraph' or 'Dnetwork' object.\n")
     }
     
     

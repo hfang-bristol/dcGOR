@@ -32,14 +32,14 @@ domains_both <- intersect(rowNames(domains_leca), rowNames(domains_human))
 data <- domains_human_unique
 
 ## 1) GOMF enrichment analysis, producing an object of S4 class 'Eoutput'
-eOutput <- dcEnrichment(data, domain="SCOP.sf", ontology="GOMF")
-eOutput
+eoutput <- dcEnrichment(data, domain="SCOP.sf", ontology="GOMF")
+eoutput
 ### write into a local file <a href="GOMF_enrichments.txt">GOMF_enrichments.txt</a>
-write(eOutput, file='GOMF_enrichments.txt')
+write(eoutput, file='GOMF_enrichments.txt')
 ### view the top 10 significant terms
-view(eOutput, top_num=10, sortBy="pvalue", details=TRUE)
+view(eoutput, top_num=10, sortBy="pvalue", details=TRUE)
 ### visualise the top 10 significant terms in GOMF DAG
 #### color-coded according to 10-based negative logarithm of adjusted p-values (adjp)
-visEnrichment(eOutput)
+visEnrichment(eoutput)
 #### color-coded according to zscore
-visEnrichment(eOutput, data.type='zscore')
+visEnrichment(eoutput, data.type='zscore')

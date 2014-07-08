@@ -3,10 +3,13 @@ CHANGES IN VERSION 1.0.1
 
 NEW FEATURES
     
-    o Add an S4 class 'Onto' to store ontologies (replace with 'igraph')
+    o Add an S4 class 'Onto' to store ontologies (instead of using 'igraph' previously)
     
     o Add an S4 class 'Eoutput' to store enrichment analysis outputs
+    
+    o Add an S4 class 'Dnetwork' to store domain networks (eg semantic similarity between domains)
 
+    o Add the function 'dcConverter' allowing for conversion between classes 'Onto' and 'igraph'
 
 
 CHANGES IN VERSION 1.0.0

@@ -41,7 +41,7 @@ term.} }
 \code{dcDAGannotate} is supposed to produce a subgraph
 induced by the input annotation data, given a direct
 acyclic graph (DAG; an ontology). The input is a graph of
-"igraph" or "graphNET" object, a list of the vertices
+"igraph" or "Onto" object, a list of the vertices
 containing annotation data, and the mode defining the paths
 to the root of DAG. The induced subgraph contains vertices
 (with annotation data) and their ancestors along with the

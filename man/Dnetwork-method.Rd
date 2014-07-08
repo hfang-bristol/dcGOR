@@ -1,0 +1,67 @@
+\docType{methods}
+\name{Dnetwork-method}
+\alias{Dnetwork-method}
+\alias{[,Dnetwork,ANY,ANY,ANY-method}
+\alias{[,Dnetwork-method}
+\alias{adjMatrix,Dnetwork-method}
+\alias{description}
+\alias{description,Dnetwork-method}
+\alias{dgCMatrix2Dnetwork}
+\alias{dim,Dnetwork-method}
+\alias{id}
+\alias{id,Dnetwork-method}
+\alias{level}
+\alias{level,Dnetwork-method}
+\alias{matrix2Dnetwork}
+\alias{nInfo,Dnetwork-method}
+\alias{nodeInfo,Dnetwork-method}
+\alias{nodeNames,Dnetwork-method}
+\alias{show,Dnetwork-method}
+\title{Methods defined for S4 class Dnetwork}
+\usage{
+\S4method{dim}{Dnetwork}(x)
+
+\S4method{adjMatrix}{Dnetwork}(x)
+
+\S4method{nodeInfo}{Dnetwork}(x)
+
+\S4method{nInfo}{Dnetwork}(object)
+
+\S4method{nodeNames}{Dnetwork}(object)
+
+\S4method{id}{Dnetwork}(object)
+
+\S4method{level}{Dnetwork}(object)
+
+\S4method{description}{Dnetwork}(object)
+
+\S4method{show}{Dnetwork}(object)
+
+\S4method{[}{Dnetwork,ANY,ANY,ANY}(x, i, j, ..., drop = FALSE)
+}
+\arguments{
+\item{x}{an object of class \code{Dnetwork}}
+
+\item{object}{an object of class \code{Dnetwork}}
+
+\item{i}{an index}
+
+\item{j}{an index}
+
+\item{...}{additional parameters}
+
+\item{drop}{For matrices and arrays.  If \code{TRUE} the
+result is coerced to the lowest possible dimension (see
+the examples).  This only works for extracting elements,
+not for the replacement.  See \code{\link{drop}} for
+further details.  }
+}
+\description{
+Methods defined for class \code{Dnetwork}.
+}
+\seealso{
+\code{\link{Dnetwork-class}}
+}
+\keyword{S4}
+\keyword{methods}
+

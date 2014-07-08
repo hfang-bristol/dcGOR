@@ -1,46 +1,70 @@
 \name{dcConverter}
 \alias{dcConverter}
-\title{Function to convert an object between classes 'Onto' and 'igraph'}
+\title{Function to convert an object between graph classes}
 \usage{
-dcConverter(obj, from = c("Onto", "igraph"), to = c("igraph", "Onto"),
-verbose = TRUE)
+dcConverter(obj, from = c("Onto", "igraph", "Dnetwork"), to =
+c("igraph",
+"Onto", "Dnetwork"), verbose = TRUE)
 }
 \arguments{
-\item{obj}{an object of class "Onto" or "igraph"}
+\item{obj}{an object of class "Onto", "igraph" or
+"Dnetwork"}
 
 \item{from}{a character specifying the class converted
-from. It can be one of "Onto" and "igraph"}
+from. It can be one of "Onto", "igraph" and "Dnetwork"}
 
 \item{to}{a character specifying the class converted to.
-It can be one of "igraph" and "Onto"}
+It can be one of "Onto", "igraph" and "Dnetwork"}
 
 \item{verbose}{logical to indicate whether the messages
 will be displayed in the screen. By default, it sets to
 true for display}
 }
 \value{
-an object of class "Onto" or "igraph"
+an object of class "Onto", "igraph" or "Dnetwork"
 }
 \description{
 \code{dcConverter} is supposed to convert an object between
-classes 'Onto' and 'igraph'.
+classes 'Onto' and 'igraph', or between 'Dnetwork' and
+'igraph'.
 }
 \note{
-none
+Conversion is also supported between classes 'Onto' and
+'igraph', or between 'Dnetwork' and 'igraph'
 }
 \examples{
-# 1) load onto.GOMF (as 'Onto' object)
+\dontrun{
+# 1) conversion between 'Onto' and 'igraph'
+# 1a) load onto.GOMF (as 'Onto' object)
 on <- dcRDataLoader('onto.GOMF')
 on
-
-# 2) convert the object from 'Onto' to 'igraph' class
+# 1b) convert the object from 'Onto' to 'igraph' class
 ig <- dcConverter(on, from='Onto', to='igraph')
 ig
-
-# 3) convert the object from 'igraph' to 'Onto' class
+# 1c) convert the object from 'igraph' to 'Onto' class
 dcConverter(ig, from='igraph', to='Onto')
+
+# 2) conversion between 'Dnetwork' and 'igraph'
+# 2a) computer a domain semantic network (as 'Dnetwork' object)
+g <- dcRDataLoader('onto.GOMF')
+Anno <- dcRDataLoader('SCOP.sf2GOMF')
+dag <- dcDAGannotate(g, annotations=Anno, path.mode="shortest_paths",
+verbose=FALSE)
+alldomains <- unique(unlist(nInfo(dag)$annotations))
+domains <- sample(alldomains,5) # randomly sample 5 domains
+dnetwork <- dcDAGdomainSim(g=dag, domains=domains,
+method.domain="BM.average", method.term="Resnik", parallel=FALSE,
+verbose=FALSE)
+dnetwork
+# 2b) convert the object from 'Dnetwork' to 'igraph' class
+ig <- dcConverter(dnetwork, from='Dnetwork', to='igraph')
+ig
+# 2c) convert the object from 'igraph' to 'Dnetwork' class
+dcConverter(ig, from='igraph', to='Dnetwork')
+}
 }
 \seealso{
-\code{\link{dcRDataLoader}}, \code{\link{Onto-class}}
+\code{\link{dcRDataLoader}}, \code{\link{Onto-class}},
+\code{\link{Dnetwork-class}}
 }
 

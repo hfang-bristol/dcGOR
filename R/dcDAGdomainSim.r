@@ -2,7 +2,7 @@
 #'
 #' \code{dcDAGdomainSim} is supposed to calculate pair-wise semantic similarity between domains based on a direct acyclic graph (DAG) with annotated data. It first calculates semantic similarity between terms and then derives semantic similarity between domains from terms-term semantic similarity. Parallel computing is also supported for Linux or Mac operating systems.
 #'
-#' @param g an object of class "igraph" or \code{\link{Onto}}. It must contain an node attribute called 'annotations' for storing annotation data (see example for howto)
+#' @param g an object of class "igraph" or \code{\link{Onto}}. It must contain a node attribute called 'annotations' for storing annotation data (see example for howto)
 #' @param domains the domains between which pair-wise semantic similarity is calculated. If NULL, all domains annotatable in the input dag will be used for calcluation, which is very prohibitively expensive!
 #' @param method.domain the method used for how to derive semantic similarity between domains from semantic similarity between terms. It can be "average" for average similarity between any two terms (one from domain 1, the other from domain 2), "max" for the maximum similarity between any two terms, "BM.average" for best-matching (BM) based average similarity (i.e. for each term of either domain, first calculate maximum similarity to any term in the other domain, then take average of maximum similarity; the final BM-based average similiary is the pre-calculated average between two domains in pair), "BM.max" for BM based maximum similarity (i.e. the same as "BM.average", but the final BM-based maximum similiary is the maximum of the pre-calculated average between two domains in pair), "BM.complete" for BM-based complete-linkage similarity (inspired by complete-linkage concept: the least of any maximum similarity between a term of one domain and a term of the other domain). When comparing BM-based similarity between domains, "BM.average" and "BM.max" are sensitive to the number of terms invovled; instead, "BM.complete" is much robust in this aspect. By default, it uses "BM.average".
 #' @param method.term the method used to measure semantic similarity between terms. It can be "Resnik" for information content (IC) of most informative information ancestor (MICA) (see \url{http://arxiv.org/pdf/cmp-lg/9511007.pdf}), "Lin" for 2*IC at MICA divided by the sum of IC at pairs of terms (see \url{http://webdocs.cs.ualberta.ca/~lindek/papers/sim.pdf}), "Schlicker" for weighted version of 'Lin' by the 1-prob(MICA) (see \url{http://www.ncbi.nlm.nih.gov/pubmed/16776819}), "Jiang" for 1 - difference between the sum of IC at pairs of terms and 2*IC at MICA (see \url{http://arxiv.org/pdf/cmp-lg/9709008.pdf}), "Pesquita" for graph information content similarity related to Tanimoto-Jacard index (ie. summed information content of common ancestors divided by summed information content of all ancestors of term1 and term2 (see \url{http://www.ncbi.nlm.nih.gov/pubmed/18460186}))
@@ -11,12 +11,17 @@
 #' @param parallel logical to indicate whether parallel computation with multicores is used. By default, it sets to true, but not necessarily does so. Partly because parallel backends available will be system-specific (now only Linux or Mac OS). Also, it will depend on whether these two packages "foreach" and "doMC" have been installed. It can be installed via: \code{source("http://bioconductor.org/biocLite.R"); biocLite(c("foreach","doMC"))}. If not yet installed, this option will be disabled
 #' @param multicores an integer to specify how many cores will be registered as the multicore parallel backend to the 'foreach' package. If NULL, it will use a half of cores available in a user's computer. This option only works when parallel computation is enabled
 #' @param verbose logical to indicate whether the messages will be displayed in the screen. By default, it sets to true for display
-#' @return It returns a sparse matrix containing pair-wise semantic similarity between input domains. This sparse matrix can be converted to the full matrix via the function \code{as.matrix}
+#' @return 
+#' an object of S4 class \code{\link{Dnetwork}}. It is a weighted and undirect graph, with following slots:
+#' \itemize{
+#'  \item{\code{nodeInfo}: an object of S4 class, describing information on nodes/domains}
+#'  \item{\code{adjMatrix}: an object of S4 class \code{\link{AdjData}}, containing symmetric adjacency data matrix for pair-wise semantic similarity between domains}
+#' }
 #' @note For the mode "shortest_paths", the induced subgraph is the most concise, and thus informative for visualisation when there are many nodes in query, while the mode "all_paths" results in the complete subgraph.
 #' @export
-#' @importFrom dnet dDAGinduce dDAGtip visDAG dDAGtermSim dCheckParallel
+#' @importFrom dnet dDAGinduce dDAGtip dDAGtermSim dCheckParallel visNet
 #' @import Matrix
-#' @seealso \code{\link{dcRDataLoader}}, \code{\link{dcDAGannotate}}, \code{\link{dcConverter}}
+#' @seealso \code{\link{dcRDataLoader}}, \code{\link{dcDAGannotate}}, \code{\link{dcConverter}}, \code{\link{Dnetwork-class}}
 #' @include dcDAGdomainSim.r
 #' @examples
 #' \dontrun{
@@ -27,13 +32,25 @@
 #' Anno <- dcRDataLoader('SCOP.sf2GOMF')
 #'
 #' # 3) prepare for ontology appended with annotation information
-#' dag <- dcDAGannotate(g, annotations=Anno, path.mode="shortest_paths", verbose=TRUE)
+#' dag <- dcDAGannotate(g, annotations=Anno, path.mode="shortest_paths", verbose=FALSE)
 #'
-#' # 4) calculate pair-wise semantic similarity between 5 randomly chosen domains
+#' # 4) calculate pair-wise semantic similarity between 6 randomly chosen domains
 #' alldomains <- unique(unlist(nInfo(dag)$annotations))
-#' domains <- sample(alldomains,5)
-#' sim <- dcDAGdomainSim(g=dag, domains=domains, method.domain="BM.average", method.term="Resnik", parallel=FALSE, verbose=TRUE)
-#' sim
+#' domains <- sample(alldomains,6)
+#' dnetwork <- dcDAGdomainSim(g=dag, domains=domains, method.domain="BM.average", method.term="Resnik", parallel=FALSE, verbose=TRUE)
+#' dnetwork
+#'
+#' # 5) convert it to an object of class 'igraph'
+#' ig <- dcConverter(dnetwork, from='Dnetwork', to='igraph')
+#' ig
+#'
+#' # 6) visualise the domain network
+#' ## extract edge weight (with 2-digit precision)
+#' x <- signif(E(ig)$weight, digits=2)
+#' ## rescale into an interval [1,4] as edge width
+#' edge.width <- 1 + (x-min(x))/(max(x)-min(x))*3
+#' ## do visualisation
+#' dnet::visNet(g=ig, vertex.shape="sphere", edge.width=edge.width, edge.label=x, edge.label.cex=0.7)
 #' }
 
 dcDAGdomainSim <- function (g, domains=NULL, method.domain=c("BM.average","BM.max","BM.complete","average","max"), method.term=c("Resnik","Lin","Schlicker","Jiang","Pesquita"), force=TRUE, fast=TRUE, parallel=TRUE, multicores=NULL, verbose=TRUE)
@@ -381,6 +398,9 @@ dcDAGdomainSim <- function (g, domains=NULL, method.domain=c("BM.average","BM.ma
     
     rownames(sim) <- colnames(sim) <- domains
     
+    ## create an object of class Dnetwork
+    dnetwork <- as(sim, "Dnetwork")
+    
     ####################################################################################
     endT <- Sys.time()
     if(verbose){
@@ -391,5 +411,5 @@ dcDAGdomainSim <- function (g, domains=NULL, method.domain=c("BM.average","BM.ma
     runTime <- as.numeric(difftime(strptime(endT, "%Y-%m-%d %H:%M:%S"), strptime(startT, "%Y-%m-%d %H:%M:%S"), units="secs"))
     message(paste(c("Runtime in total is: ",runTime," secs\n"), collapse=""), appendLF=T)
     
-    invisible(sim)
+    invisible(dnetwork)
 }

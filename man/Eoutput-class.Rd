@@ -84,19 +84,19 @@ SCOP.sf <- dcRDataLoader('SCOP.sf')
 data <- sample(rowNames(SCOP.sf), 20)
 
 # 2) perform enrichment analysis, producing an object of S4 class 'Eoutput'
-eOutput <- dcEnrichment(data, domain="SCOP.sf", ontology="GOMF")
-eOutput
+eoutput <- dcEnrichment(data, domain="SCOP.sf", ontology="GOMF")
+eoutput
 
 # 3) write into the file 'Eoutput.txt' in your local directory
-write(eOutput, file='Eoutput.txt')
+write(eoutput, file='Eoutput.txt')
 
 # 4) view the top 5 significant terms
-view(eOutput, top_num=5, sortBy="pvalue", details=TRUE)
+view(eoutput, top_num=5, sortBy="pvalue", details=TRUE)
 
 # 4) retrieve several slots directly
-zscore(eOutput)[1:5]
-pvalue(eOutput)[1:5]
-adjp(eOutput)[1:5]
+zscore(eoutput)[1:5]
+pvalue(eoutput)[1:5]
+adjp(eoutput)[1:5]
 }
 }
 \seealso{

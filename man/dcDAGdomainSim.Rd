@@ -10,7 +10,7 @@ parallel = TRUE, multicores = NULL, verbose = TRUE)
 }
 \arguments{
 \item{g}{an object of class "igraph" or
-\code{\link{Onto}}. It must contain an node attribute
+\code{\link{Onto}}. It must contain a node attribute
 called 'annotations' for storing annotation data (see
 example for howto)}
 
@@ -98,10 +98,13 @@ will be displayed in the screen. By default, it sets to
 true for display}
 }
 \value{
-It returns a sparse matrix containing pair-wise semantic
-similarity between input domains. This sparse matrix can be
-converted to the full matrix via the function
-\code{as.matrix}
+an object of S4 class \code{\link{Dnetwork}}. It is a
+weighted and undirect graph, with following slots:
+\itemize{ \item{\code{nodeInfo}: an object of S4 class,
+describing information on nodes/domains}
+\item{\code{adjMatrix}: an object of S4 class
+\code{\link{AdjData}}, containing symmetric adjacency data
+matrix for pair-wise semantic similarity between domains} }
 }
 \description{
 \code{dcDAGdomainSim} is supposed to calculate pair-wise
@@ -128,19 +131,32 @@ Anno <- dcRDataLoader('SCOP.sf2GOMF')
 
 # 3) prepare for ontology appended with annotation information
 dag <- dcDAGannotate(g, annotations=Anno, path.mode="shortest_paths",
-verbose=TRUE)
+verbose=FALSE)
 
-# 4) calculate pair-wise semantic similarity between 5 randomly chosen domains
+# 4) calculate pair-wise semantic similarity between 6 randomly chosen domains
 alldomains <- unique(unlist(nInfo(dag)$annotations))
-domains <- sample(alldomains,5)
-sim <- dcDAGdomainSim(g=dag, domains=domains,
+domains <- sample(alldomains,6)
+dnetwork <- dcDAGdomainSim(g=dag, domains=domains,
 method.domain="BM.average", method.term="Resnik", parallel=FALSE,
 verbose=TRUE)
-sim
+dnetwork
+
+# 5) convert it to an object of class 'igraph'
+ig <- dcConverter(dnetwork, from='Dnetwork', to='igraph')
+ig
+
+# 6) visualise the domain network
+## extract edge weight (with 2-digit precision)
+x <- signif(E(ig)$weight, digits=2)
+## rescale into an interval [1,4] as edge width
+edge.width <- 1 + (x-min(x))/(max(x)-min(x))*3
+## do visualisation
+dnet::visNet(g=ig, vertex.shape="sphere", edge.width=edge.width,
+edge.label=x, edge.label.cex=0.7)
 }
 }
 \seealso{
 \code{\link{dcRDataLoader}}, \code{\link{dcDAGannotate}},
-\code{\link{dcConverter}}
+\code{\link{dcConverter}}, \code{\link{Dnetwork-class}}
 }
 

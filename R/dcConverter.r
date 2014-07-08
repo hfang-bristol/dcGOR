@@ -1,30 +1,45 @@
-#' Function to convert an object between classes 'Onto' and 'igraph'
+#' Function to convert an object between graph classes
 #'
-#' \code{dcConverter} is supposed to convert an object between classes 'Onto' and 'igraph'.
+#' \code{dcConverter} is supposed to convert an object between classes 'Onto' and 'igraph', or between 'Dnetwork' and 'igraph'.
 #'
-#' @param obj an object of class "Onto" or "igraph"
-#' @param from a character specifying the class converted from. It can be one of "Onto" and "igraph"
-#' @param to a character specifying the class converted to. It can be one of "igraph" and "Onto"
+#' @param obj an object of class "Onto", "igraph" or "Dnetwork"
+#' @param from a character specifying the class converted from. It can be one of "Onto", "igraph" and "Dnetwork"
+#' @param to a character specifying the class converted to. It can be one of "Onto", "igraph" and "Dnetwork"
 #' @param verbose logical to indicate whether the messages will be displayed in the screen. By default, it sets to true for display
-#' @return an object of class "Onto" or "igraph"
-#' @note none
+#' @return an object of class "Onto", "igraph" or "Dnetwork"
+#' @note Conversion is also supported between classes 'Onto' and 'igraph', or between 'Dnetwork' and 'igraph'
 #' @export
-#' @seealso \code{\link{dcRDataLoader}}, \code{\link{Onto-class}}
+#' @seealso \code{\link{dcRDataLoader}}, \code{\link{Onto-class}}, \code{\link{Dnetwork-class}}
 #' @include dcConverter.r
 #' @examples
-#' # 1) load onto.GOMF (as 'Onto' object)
+#' \dontrun{
+#' # 1) conversion between 'Onto' and 'igraph'
+#' # 1a) load onto.GOMF (as 'Onto' object)
 #' on <- dcRDataLoader('onto.GOMF')
 #' on
-#'
-#' # 2) convert the object from 'Onto' to 'igraph' class
+#' # 1b) convert the object from 'Onto' to 'igraph' class
 #' ig <- dcConverter(on, from='Onto', to='igraph')
 #' ig
-#'
-#' # 3) convert the object from 'igraph' to 'Onto' class
+#' # 1c) convert the object from 'igraph' to 'Onto' class
 #' dcConverter(ig, from='igraph', to='Onto')
+#'
+#' # 2) conversion between 'Dnetwork' and 'igraph'
+#' # 2a) computer a domain semantic network (as 'Dnetwork' object)
+#' g <- dcRDataLoader('onto.GOMF')
+#' Anno <- dcRDataLoader('SCOP.sf2GOMF')
+#' dag <- dcDAGannotate(g, annotations=Anno, path.mode="shortest_paths", verbose=FALSE)
+#' alldomains <- unique(unlist(nInfo(dag)$annotations))
+#' domains <- sample(alldomains,5) # randomly sample 5 domains
+#' dnetwork <- dcDAGdomainSim(g=dag, domains=domains, method.domain="BM.average", method.term="Resnik", parallel=FALSE, verbose=FALSE)
+#' dnetwork
+#' # 2b) convert the object from 'Dnetwork' to 'igraph' class
+#' ig <- dcConverter(dnetwork, from='Dnetwork', to='igraph')
+#' ig
+#' # 2c) convert the object from 'igraph' to 'Dnetwork' class
+#' dcConverter(ig, from='igraph', to='Dnetwork')
+#' }
 
-
-dcConverter <- function (obj, from=c("Onto","igraph"), to=c("igraph","Onto"), verbose=TRUE)
+dcConverter <- function (obj, from=c("Onto","igraph","Dnetwork"), to=c("igraph","Onto","Dnetwork"), verbose=TRUE)
 {
     
     from <- match.arg(from)
@@ -32,6 +47,10 @@ dcConverter <- function (obj, from=c("Onto","igraph"), to=c("igraph","Onto"), ve
     
     if (class(obj) != from){
         stop(sprintf("The class of your input object '%s' is '%s', mismatched as you intended (from='%s').\n", deparse(substitute(obj)), class(obj), from))
+    }
+    
+    if ((from=="Onto" & to=="Dnetwork") | (from=="Dnetwork" & to=="Onto")){
+        stop(sprintf("Conversion between '%s' and '%s' is not supported.\n", from, to))
     }
     
     if(from==to){
@@ -43,17 +62,34 @@ dcConverter <- function (obj, from=c("Onto","igraph"), to=c("igraph","Onto"), ve
         
         ## get node data frame
         data <- igraph::get.data.frame(obj, what="vertices")
-        nodeI <- new("InfoDataFrame", data=data[,-1])
+        
+        ## make sure it is data.frame after removing the first column
+        if(ncol(data)==2){
+            df <- data.frame(data[,2])
+            colnames(df) <- colnames(data)[2]
+            rownames(df) <- rownames(data)
+            nodeI <- new("InfoDataFrame", data=df)
+        }else{
+            nodeI <- new("InfoDataFrame", data=data.frame(data[,-1]))
+        }
+        
         ## get adjacency matrix
         if ("weight" %in% list.edge.attributes(obj)){
             adjM <- igraph::get.adjacency(obj, type="both", attr="weight", edges=F, names=T, sparse=getIgraphOpt("sparsematrices"))
         }else{
             adjM <- igraph::get.adjacency(obj, type="both", attr=NULL, edges=F, names=T, sparse=getIgraphOpt("sparsematrices"))
         }
-        ## for Onto
-        objConverted <- new("Onto", adjMatrix=adjM, nodeInfo=nodeI)
         
-    }else if(from=="Onto"){
+        ## convert to either "Onto" or "Dnetwork"
+        if(to=="Onto"){
+            ## for Onto
+            objConverted <- new("Onto", adjMatrix=adjM, nodeInfo=nodeI)
+        }else if(to=="Dnetwork"){
+            ## for Dnetwork
+            objConverted <- new("Dnetwork", adjMatrix=adjM, nodeInfo=nodeI)
+        }
+        
+    }else if(from=="Onto" | from=="Dnetwork"){
         
         ## node info
         nodes <- nInfo(obj)
@@ -63,6 +99,11 @@ dcConverter <- function (obj, from=c("Onto","igraph"), to=c("igraph","Onto"), ve
         ## adjacency matrix
         adjM <- adjMatrix(obj)
         tmp <- which(adjM!=0, arr.ind=T)
+        
+        ## un-direct graph for "Dnetwork"
+        if(from=="Dnetwork"){
+            tmp <- tmp[tmp[,1]<tmp[,2],]
+        }
         
         ## weighted or not
         weight_flag <- T
@@ -75,8 +116,16 @@ dcConverter <- function (obj, from=c("Onto","igraph"), to=c("igraph","Onto"), ve
             relations <- data.frame(from=nodenames[tmp[,1]], to=nodenames[tmp[,2]])
         }
         
-        ## for igraph
-        objConverted <- igraph::graph.data.frame(d=relations, directed=T, vertices=nodes)
+        ## convert to "igraph"
+        if(from=="Onto"){
+            ## for Onto
+            objConverted <- igraph::graph.data.frame(d=relations, directed=T, vertices=nodes)
+        }else if(from=="Dnetwork"){
+            ## for Dnetwork
+            objConverted <- igraph::graph.data.frame(d=relations, directed=F, vertices=nodes)
+            
+            #objConverted <- igraph::graph.adjacency(as.matrix(adjM), mode="undirected", weighted=TRUE, diag=FALSE)
+        }
         
     }
     

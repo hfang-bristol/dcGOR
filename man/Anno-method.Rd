@@ -7,6 +7,7 @@
 \alias{annoData,Anno-method}
 \alias{dData}
 \alias{dData,Anno-method}
+\alias{dgCMatrix2Anno}
 \alias{dim,Anno-method}
 \alias{domainData}
 \alias{domainData,Anno-method}

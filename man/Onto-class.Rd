@@ -16,8 +16,8 @@ Class Onto
 \code{\link{InfoDataFrame}}, describing information on nodes/terms.}
 
 \item{\code{adjMatrix}}{An object of S4 class \code{\link{AdjData}},
-containing adjacency data matrix, with rows for parent (arrow-outbound)
-and columns for children (arrow-inbound)}
+containing adjacency data matrix (for a direct graph), with rows for
+parent (arrow-outbound) and columns for children (arrow-inbound)}
 }}
 \section{Creation}{
 An object of this class can be created via:
@@ -45,7 +45,9 @@ if any} } Standard generic methods: \itemize{
 \item{\code{str()}: }{compact display of the content in
 the object} \item{\code{show()}: }{abbreviated display of
 the object} \item{\code{as(matrix, "Onto")}: }{convert a
-matrix (or data.frame) to an object of class Onto}
+matrix to an object of class Onto}
+\item{\code{as(dgCMatrix, "Onto")}: }{convert a dgCMatrix
+(a sparse matrix) to an object of class Onto}
 \item{\code{[i]}: }{get the subset of the same class} }
 }
 

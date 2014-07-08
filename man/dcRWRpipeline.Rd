@@ -18,7 +18,7 @@ a weight, but should be non-negative for easy
 interpretation).}
 
 \item{g}{an object of class "igraph" or
-\code{\link{Onto}}}
+\code{\link{Dnetwork}}}
 
 \item{method}{the method used to calculate RWR. It can be
 'direct' for directly applying RWR, 'indirect' for
@@ -142,23 +142,18 @@ verbose=TRUE)
 # 4) calculate pair-wise semantic similarity between 10 randomly chosen domains
 alldomains <- unique(unlist(nInfo(dag)$annotations))
 domains <- sample(alldomains,10)
-sim <- dcDAGdomainSim(g=dag, domains=domains,
+dnetwork <- dcDAGdomainSim(g=dag, domains=domains,
 method.domain="BM.average", method.term="Resnik", parallel=FALSE,
 verbose=TRUE)
-sim
+dnetwork
 
-# 5) convert the above semantic similarity to a network (as an 'igraph' object)
-adjmatrix <- as.matrix(sim)
-network <- igraph::graph.adjacency(adjmatrix, mode="undirected",
-weighted=TRUE, diag=FALSE)
-
-# 6) estimate RWR dating based sample relationships
+# 5) estimate RWR dating based sample relationships
 # define sets of seeds as data
 # each seed with equal weight (i.e. all non-zero entries are '1')
 data <- data.frame(aSeeds=c(1,0,1,0,1), bSeeds=c(0,0,1,0,1))
-rownames(data) <- V(network)$name[1:5]
+rownames(data) <- id(dnetwork)[1:5]
 # calcualte their two contact graph
-iContact <- dcRWRpipeline(data=data, g=network, parallel=FALSE)
+iContact <- dcRWRpipeline(data=data, g=dnetwork, parallel=FALSE)
 iContact
 }
 }

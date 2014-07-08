@@ -1,0 +1,103 @@
+\docType{class}
+\name{Dnetwork-class}
+\alias{Dnetwork}
+\alias{Dnetwork-class}
+\title{Definition for S4 class Dnetwork}
+\value{
+Class Dnetwork
+}
+\description{
+\code{Dnetwork} is an S4 class to store a domain network,
+such as the one from semantic similairty between pairs of
+domains by \code{\link{dcDAGdomainSim}}. It has 2 slots:
+nodeInfo and adjMatrix
+}
+\section{Slots}{
+
+\describe{
+\item{\code{nodeInfo}}{An object of S4 class
+\code{\link{InfoDataFrame}}, describing information on nodes/domains.}
+
+\item{\code{adjMatrix}}{An object of S4 class \code{\link{AdjData}},
+containing symmetric adjacency data matrix for an indirect domain
+network}
+}}
+\section{Creation}{
+An object of this class can be created via:
+\code{new("Dnetwork", nodeInfo, adjMatrix)}
+}
+
+\section{Methods}{
+Class-specific methods: \itemize{ \item{\code{dim()}:
+}{retrieve the dimension in the object}
+\item{\code{adjMatrix()}: }{retrieve the slot 'adjMatrix'
+in the object} \item{\code{nodeInfo()}: }{retrieve the
+slot 'nodeInfo' (as class InfoDataFrame) in the object}
+\item{\code{nInfo()}: }{retrieve nodeInfo (as data.frame)
+in the object} \item{\code{nodeNames()}: }{retrieve
+node/term names (ie, row names of nodeInfo) in the
+object} \item{\code{id()}: }{retrieve domain id (ie,
+column 'id' of nodeInfo) in the object, if any}
+\item{\code{level()}: }{retrieve domain level (ie, column
+'level' of nodeInfo) in the object, if any}
+\item{\code{description()}: }{retrieve domain description
+(ie, column 'description' of nodeInfo) in the object, if
+any} } Standard generic methods: \itemize{
+\item{\code{str()}: }{compact display of the content in
+the object} \item{\code{show()}: }{abbreviated display of
+the object} \item{\code{as(matrix, "Dnetwork")}:
+}{convert a matrix to an object of class Dnetwork}
+\item{\code{as(dgCMatrix, "Dnetwork")}: }{convert a
+dgCMatrix (a sparse matrix) to an object of class
+Dnetwork} \item{\code{[i]}: }{get the subset of the same
+class} }
+}
+
+\section{Access}{
+Ways to access information on this class: \itemize{
+\item{\code{showClass("Dnetwork")}: }{show the class
+definition} \item{\code{showMethods(classes="Dnetwork")}:
+}{show the method definition upon this class}
+\item{\code{getSlots("Dnetwork")}: }{get the name and
+class of each slot in this class}
+\item{\code{slotNames("Dnetwork")}: }{get the name of
+each slot in this class} \item{\code{selectMethod(f,
+signature="Dnetwork")}: }{retrieve the definition code
+for the method 'f' defined in this class} }
+}
+\examples{
+# create an object of class Dnetwork, only given a matrix
+adjM <- matrix(runif(25),nrow=5,ncol=5)
+as(adjM, "Dnetwork")
+
+# create an object of class Dnetwork, given a matrix plus information on nodes
+# 1) create nodeI: an object of class InfoDataFrame
+data <- data.frame(id=paste("Domain", 1:5, sep="_"),
+level=rep("SCOP",5), description=I(LETTERS[1:5]),
+row.names=paste("Domain", 1:5, sep="_"))
+nodeI <- new("InfoDataFrame", data=data)
+nodeI
+# 2) create an object of class Dnetwork
+# VERY IMPORTANT: make sure having consistent names between nodeInfo and adjMatrix
+adjM <- matrix(runif(25),nrow=5,ncol=5)
+colnames(adjM) <- rownames(adjM) <- rowNames(nodeI)
+x <- new("Dnetwork", adjMatrix=adjM, nodeInfo=nodeI)
+x
+# 3) look at various methods defined on class Dnetwork
+dim(x)
+adjMatrix(x)
+nodeInfo(x)
+nInfo(x)
+nodeNames(x)
+id(x)
+level(x)
+description(x)
+# 4) get the subset
+x[1:2]
+}
+\seealso{
+\code{\link{Dnetwork-method}}
+}
+\keyword{S4}
+\keyword{classes}
+
