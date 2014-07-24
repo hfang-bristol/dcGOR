@@ -1353,7 +1353,7 @@ setMethod("show",
         cat("An object of S4 class '", class(object), "'\n", sep="")
         adim <- dim(object)
         if (length(adim)>1){
-            cat("@adjMatrix:", if (length(adim)>1) paste(adim[[1]], "a weighted symmetric matrix of domains,",adim[[2]], "domains") else NULL, "\n")
+            cat("@adjMatrix:", if (length(adim)>1) paste("a weighted symmetric matrix of", adim[[1]], "domains X",adim[[2]], "domains") else NULL, "\n")
         }
         ## nodeInfo
         if( dim(nodeInfo(object))[1] != 0 ){
@@ -1402,3 +1402,428 @@ setMethod("[", signature(x="Dnetwork"),
         x <- new("Dnetwork", adjMatrix=aD, nodeInfo=nD)
     }
 )
+
+
+################################################################################
+################################################################################
+#' @title Definition for S4 class Cnetwork
+#' @description \code{Cnetwork} is an S4 class to store a contact network, such as the one from RWR-based contact between samples/terms by \code{\link{dcRWRpipeline}}. It has 2 slots: nodeInfo and adjMatrix
+#' @return Class Cnetwork
+#' @slot nodeInfo An object of S4 class \code{\link{InfoDataFrame}}, describing information on nodes/domains.
+#' @slot adjMatrix An object of S4 class \code{\link{AdjData}}, containing symmetric adjacency data matrix for an indirect domain network
+#' @section Creation:
+#' An object of this class can be created via: \code{new("Cnetwork", nodeInfo, adjMatrix)}
+#' @section Methods:
+#' Class-specific methods:
+#' \itemize{
+#' \item{\code{dim()}: }{retrieve the dimension in the object}
+#' \item{\code{adjMatrix()}: }{retrieve the slot 'adjMatrix' in the object}
+#' \item{\code{nodeInfo()}: }{retrieve the slot 'nodeInfo' (as class InfoDataFrame) in the object}
+#' \item{\code{nInfo()}: }{retrieve nodeInfo (as data.frame) in the object}
+#' \item{\code{nodeNames()}: }{retrieve node/term names (ie, row names of nodeInfo) in the object}
+#' }
+#' Standard generic methods:
+#' \itemize{
+#' \item{\code{str()}: }{compact display of the content in the object}
+#' \item{\code{show()}: }{abbreviated display of the object}
+#' \item{\code{as(matrix, "Cnetwork")}: }{convert a matrix to an object of class Cnetwork}
+#' \item{\code{as(dgCMatrix, "Cnetwork")}: }{convert a dgCMatrix (a sparse matrix) to an object of class Cnetwork}
+#' \item{\code{[i]}: }{get the subset of the same class}
+#' }
+#' @section Access:
+#' Ways to access information on this class:
+#' \itemize{
+#' \item{\code{showClass("Cnetwork")}: }{show the class definition}
+#' \item{\code{showMethods(classes="Cnetwork")}: }{show the method definition upon this class}
+#' \item{\code{getSlots("Cnetwork")}: }{get the name and class of each slot in this class}
+#' \item{\code{slotNames("Cnetwork")}: }{get the name of each slot in this class}
+#' \item{\code{selectMethod(f, signature="Cnetwork")}: }{retrieve the definition code for the method 'f' defined in this class}
+#' }
+#' @import methods
+#' @docType class
+#' @keywords S4 classes
+#' @name Cnetwork-class
+#' @seealso \code{\link{Cnetwork-method}}
+#' @examples
+#' # create an object of class Cnetwork, only given a matrix
+#' adjM <- matrix(runif(25),nrow=5,ncol=5)
+#' as(adjM, "Cnetwork")
+#'
+#' # create an object of class Cnetwork, given a matrix plus information on nodes
+#' # 1) create nodeI: an object of class InfoDataFrame
+#' data <- data.frame(id=paste("Domain", 1:5, sep="_"), level=rep("SCOP",5), description=I(LETTERS[1:5]), row.names=paste("Domain", 1:5, sep="_"))
+#' nodeI <- new("InfoDataFrame", data=data)
+#' nodeI
+#' # 2) create an object of class Cnetwork
+#' # VERY IMPORTANT: make sure having consistent names between nodeInfo and adjMatrix
+#' adjM <- matrix(runif(25),nrow=5,ncol=5)
+#' colnames(adjM) <- rownames(adjM) <- rowNames(nodeI)
+#' x <- new("Cnetwork", adjMatrix=adjM, nodeInfo=nodeI)
+#' x
+#' # 3) look at various methods defined on class Cnetwork
+#' dim(x)
+#' adjMatrix(x)
+#' nodeInfo(x)
+#' nInfo(x)
+#' nodeNames(x)
+#' # 4) get the subset
+#' x[1:2]
+
+#' @rdname Cnetwork-class
+#' @aliases Cnetwork
+#' @exportClass Cnetwork
+setClass(
+    Class="Cnetwork",
+    representation(
+        nodeInfo = "InfoDataFrame",
+        adjMatrix = "AdjData"
+    ),
+    prototype = prototype(
+        nodeInfo = new("InfoDataFrame",dimLabels=c("sampleNames", "sampleColumns")),
+        adjMatrix = matrix()
+    ),
+    validity = function(object){
+        msg <- NULL
+        # dimension for adjMatrix
+        adim <- dim(object)
+        if(adim[1]!=adim[2]){
+            msg <- append(msg, "dimensions differ for adjacent matrix")
+        }
+        if( dim(nodeInfo(object))[1] != 0 ){
+            if (adim[1] != dim(nodeInfo(object))[1]){
+                msg <- append(msg, "sample numbers differ between nodeInfo and adjMatrix")
+            }
+            if (!identical(nodeNames(object), rownames(adjMatrix(object)))){
+                msg <- append(msg, "sample names differ between nodeInfo and adjMatrix")
+            }
+        }
+        if (is.null(msg)) TRUE else msg
+    }
+)
+
+########################################
+#' @title Methods defined for S4 class Cnetwork
+#' @description Methods defined for class \code{Cnetwork}.
+#' @param x an object of class \code{Cnetwork}
+#' @param object an object of class \code{Cnetwork}
+#' @param i an index
+#' @param j an index
+#' @param ... additional parameters
+#' @docType methods
+#' @keywords S4 methods
+#' @name Cnetwork-method
+#' @rdname Cnetwork-method
+#' @seealso \code{\link{Cnetwork-class}}
+
+#' @rdname Cnetwork-method
+#' @aliases dim,Cnetwork-method
+#' @export
+setMethod("dim", "Cnetwork", function(x) dim(x@adjMatrix))
+
+#' @rdname Cnetwork-method
+#' @aliases adjMatrix,Cnetwork-method
+#' @export
+setMethod("adjMatrix", "Cnetwork", function(x) x@adjMatrix)
+
+#' @rdname Cnetwork-method
+#' @aliases nodeInfo,Cnetwork-method
+#' @export
+setMethod("nodeInfo", "Cnetwork", function(x) x@nodeInfo)
+
+#' @rdname Cnetwork-method
+#' @aliases nInfo,Cnetwork-method
+#' @export
+setMethod("nInfo", signature(object="Cnetwork"), function(object){
+    data <- Data(nodeInfo(object))
+    if(sum(dim(data))==0){
+        cat("No data is available\n", sep="")
+    }else{
+        data
+    }
+})
+
+#' @rdname Cnetwork-method
+#' @aliases nodeNames,Cnetwork-method
+#' @export
+setMethod("nodeNames", signature(object="Cnetwork"), function(object) rowNames(nodeInfo(object)))
+
+#' @rdname Cnetwork-method
+#' @name matrix2Cnetwork
+setAs("matrix", "Cnetwork", function(from) {
+    ## for nodeInfo
+    rn <- rownames(from)
+    if(is.null(rn)){
+        rn <- 1:nrow(from)
+        rownames(from) <- rn
+    }
+    nodeI <- new("InfoDataFrame", data=data.frame(id=rn, row.names=rn))
+    ## for Cnetwork
+    new("Cnetwork", adjMatrix=from, nodeInfo=nodeI)
+})
+
+#' @rdname Cnetwork-method
+#' @name dgCMatrix2Cnetwork
+setAs("dgCMatrix", "Cnetwork", function(from) {
+    ## for nodeInfo    
+    rn <- rownames(from)
+    if(is.null(rn)){
+        rn <- 1:nrow(from)
+        rownames(from) <- rn
+    }
+    nodeI <- new("InfoDataFrame", data=data.frame(name=rn, row.names=rn))
+    ## for Cnetwork
+    new("Cnetwork", adjMatrix=from, nodeInfo=nodeI)
+})
+
+
+#' @rdname Cnetwork-method
+#' @export
+setMethod("show", 
+    signature=signature(object="Cnetwork"),
+    function(object) {
+        cat("An object of S4 class '", class(object), "'\n", sep="")
+        adim <- dim(object)
+        if (length(adim)>1){
+            cat("@adjMatrix:", if (length(adim)>1) paste("a weighted symmetric matrix of", adim[[1]], "samples/terms X",adim[[2]], "samples/terms") else NULL, "\n")
+        }
+        ## nodeInfo
+        if( dim(nodeInfo(object))[1] != 0 ){
+            cat("@nodeInfo (", class(nodeInfo(object)), ")\n", sep="")
+            .showInfoDataFrame(
+                nodeInfo(object),
+                labels=list(
+                    object="nodeInfo",
+                    termNames="nodeNames",
+                    varLabels="nodeAttr"
+                )
+            )
+        }else{
+            cat("nodeInfo (NULL)\n", sep="")
+        }
+    }
+)
+
+#' @rdname Cnetwork-method
+#' @aliases [,Cnetwork-method
+#' @export
+setMethod("[", signature(x="Cnetwork"), 
+    function(x, i, j, ..., drop = FALSE) {
+        if (missing(drop)){
+            drop <- FALSE
+        }
+        if (missing(i) && missing(j)) {
+            if (length(list(...))!=0){
+                stop("specify samples/terms to subset")
+            }
+            return(x)
+        }
+        
+        if (!missing(i)) {
+            nD <- nodeInfo(x)[i,,..., drop=drop]
+        }else{
+            nD <- nodeInfo(x)
+        }
+        
+        if (!missing(i)){
+            aD <- adjMatrix(x)[i,i]
+        }else{
+            aD <- adjMatrix(x)
+        }
+        
+        x <- new("Cnetwork", adjMatrix=aD, nodeInfo=nD)
+    }
+)
+
+
+################################################################################
+################################################################################
+#' @title Definition for S4 class Coutput
+#' @description \code{Coutput} is an S4 class to store output by \code{\link{dcRWRpipeline}}.
+#' @return Class Coutput
+#' @slot ratio A symmetrix matrix, containing ratio
+#' @slot zscore A symmetrix matrix, containing z-scores
+#' @slot pvalue A symmetrix matrix, containing p-values
+#' @slot adjp A symmetrix matrix, containing adjusted p-values
+#' @slot cnetwork An object of S4 class \code{\link{Cnetwork}}, storing contact network.
+#' @section Creation:
+#' An object of this class can be created via: \code{new("Coutput", ratio, zscore, pvalue, adjp, cnetwork)}
+#' @section Methods:
+#' Class-specific methods:
+#' \itemize{
+#' \item{\code{ratio()}: }{retrieve the slot 'ratio' in the object}
+#' \item{\code{zscore()}: }{retrieve the slot 'zscore' in the object}
+#' \item{\code{pvalue()}: }{retrieve the slot 'pvalue' in the object}
+#' \item{\code{adjp()}: }{retrieve the slot 'adjp' in the object}
+#' \item{\code{cnetwork()}: }{retrieve the slot 'cnetwork' in the object}
+#' \item{\code{write()}: }{write the object into a local file}
+#' }
+#' Standard generic methods:
+#' \itemize{
+#' \item{\code{str()}: }{compact display of the content in the object}
+#' \item{\code{show()}: }{abbreviated display of the object}
+#' }
+#' @section Access:
+#' Ways to access information on this class:
+#' \itemize{
+#' \item{\code{showClass("Coutput")}: }{show the class definition}
+#' \item{\code{showMethods(classes="Coutput")}: }{show the method definition upon this class}
+#' \item{\code{getSlots("Coutput")}: }{get the name and class of each slot in this class}
+#' \item{\code{slotNames("Coutput")}: }{get the name of each slot in this class}
+#' \item{\code{selectMethod(f, signature="Coutput")}: }{retrieve the definition code for the method 'f' defined in this class}
+#' }
+#' @import methods
+#' @docType class
+#' @keywords S4 classes
+#' @name Coutput-class
+#' @rdname Coutput-class
+#' @seealso \code{\link{Coutput-method}}
+#' @examples
+#' \dontrun{
+#' # 1) load onto.GOMF (as 'Onto' object)
+#' g <- dcRDataLoader('onto.GOMF')
+#'
+#' # 2) load SCOP superfamilies annotated by GOMF (as 'Anno' object)
+#' Anno <- dcRDataLoader('SCOP.sf2GOMF')
+#'
+#' # 3) prepare for ontology appended with annotation information
+#' dag <- dcDAGannotate(g, annotations=Anno, path.mode="shortest_paths", verbose=TRUE)
+#'
+#' # 4) calculate pair-wise semantic similarity between 10 randomly chosen domains 
+#' alldomains <- unique(unlist(nInfo(dag)$annotations))
+#' domains <- sample(alldomains,10)
+#' dnetwork <- dcDAGdomainSim(g=dag, domains=domains, method.domain="BM.average", method.term="Resnik", parallel=FALSE, verbose=TRUE)
+#' dnetwork
+#' 
+#' # 5) estimate RWR dating based sample/term relationships
+#' # define sets of seeds as data
+#' # each seed with equal weight (i.e. all non-zero entries are '1')
+#' data <- data.frame(aSeeds=c(1,0,1,0,1), bSeeds=c(0,0,1,0,1))
+#' rownames(data) <- id(dnetwork)[1:5]
+#' # calcualte their two contact graph
+#' coutput <- dcRWRpipeline(data=data, g=dnetwork, parallel=FALSE)
+#' coutput
+#'
+#' # 6) write into the file 'Coutput.txt' in your local directory
+#' write(coutput, file='Coutput.txt', saveBy="adjp")
+#'
+#' # 7) retrieve several slots directly
+#' ratio(coutput)
+#' zscore(coutput)
+#' pvalue(coutput)
+#' adjp(coutput)
+#' cnetwork(coutput)
+#' }
+
+#' @rdname Coutput-class
+#' @aliases Coutput
+#' @exportClass Coutput
+setClass(
+    Class="Coutput",
+    representation(
+        ratio    = "matrix",
+        zscore   = "matrix",
+        pvalue   = "matrix",
+        adjp     = "matrix",
+        cnetwork = "Cnetwork"
+    ),
+    prototype = prototype(
+        ratio    = matrix(),
+        zscore   = matrix(),
+        pvalue   = matrix(),
+        adjp     = matrix(),
+        cnetwork = new("Cnetwork")
+    ),
+    validity = function(object){
+        if(dim(object@ratio)[1]!=dim(object@zscore)[1]){
+            return("Dimension is not matched")
+        }else{
+            return(TRUE)
+        }
+    }
+)
+
+########################################
+#' @title Methods defined for S4 class Coutput
+#' @description Methods defined for S4 class \code{Coutput}.
+#' @param object an object of S4 class \code{Coutput}. Usually this is an output from \code{\link{dcRWRpipeline}}
+#' @param x an object of S4 class \code{Coutput}. Usually this is part of the output from \code{\link{dcRWRpipeline}}
+#' @param saveBy which statistics will be saved. It can be "pvalue" for p value, "adjp" for adjusted p value, "zscore" for z-score, "ratio" for ratio
+#' @param file a character specifying a file name written into. By default, it is 'Coutput.txt'
+#' @param verbose logical to indicate whether the messages will be displayed in the screen. By default, it sets to true for display
+#' @return
+#' write(x) also returns a symmetrix matrix storing the specific statistics
+#' @docType methods
+#' @keywords S4 methods
+#' @name Coutput-method
+#' @rdname Coutput-method
+#' @seealso \code{\link{Coutput-class}}
+
+#' @rdname Coutput-method
+#' @aliases show,Coutput-method
+#' @export
+setMethod("show", "Coutput",
+    function(object) {
+        cat(sprintf("An object of S4 class '%s', containing following slots:", class(object)), "\n", sep="")
+        cat(sprintf("  @ratio: a matrix of %d X %d, containing ratio", dim(object@ratio)[1], dim(object@ratio)[2]), "\n", sep="")
+        cat(sprintf("  @zscore: a matrix of %d X %d, containing z-scores", dim(object@zscore)[1], dim(object@zscore)[2]), "\n", sep="")
+        cat(sprintf("  @pvalue: a matrix of %d X %d, containing p-values", dim(object@pvalue)[1], dim(object@pvalue)[2]), "\n", sep="")
+        cat(sprintf("  @adjp: a matrix of %d X %d, containing adjusted p-values", dim(object@adjp)[1], dim(object@adjp)[2]), "\n", sep="")
+        cat(sprintf("  @cnetwork: an object of S4 class 'Cnetwork', containing %d interacting nodes", dim(object@cnetwork)[1]), "\n", sep="")
+    }
+)
+
+setGeneric("ratio", function(x) standardGeneric("ratio"))
+#' @rdname Coutput-method
+#' @aliases ratio
+#' @export
+setMethod("ratio", "Coutput", function(x) x@ratio)
+
+#' @rdname Coutput-method
+#' @aliases zscore,Coutput-method
+#' @export
+setMethod("zscore", "Coutput", function(x) x@zscore)
+
+#' @rdname Coutput-method
+#' @aliases pvalue,Coutput-method
+#' @export
+setMethod("pvalue", "Coutput", function(x) x@pvalue)
+
+#' @rdname Coutput-method
+#' @aliases adjp,Coutput-method
+#' @export
+setMethod("adjp", "Coutput", function(x) x@adjp)
+
+setGeneric("cnetwork", function(x) standardGeneric("cnetwork"))
+#' @rdname Coutput-method
+#' @aliases cnetwork
+#' @export
+setMethod("cnetwork", "Coutput", function(x) x@cnetwork)
+
+#' @rdname Coutput-method
+#' @aliases write,Coutput-method
+#' @export
+setMethod("write", "Coutput", 
+    function(x, file="Coutput.txt", saveBy=c("adjp","pvalue","zscore","ratio"), verbose=T){
+        if(file=='' || is.na(file) || is.null(file)){
+            file <- "Coutput.txt"
+        }
+        
+        saveBy <- match.arg(saveBy)
+        switch(saveBy, 
+            adjp={res <- x@adjp},
+            pvalue={res <- x@pvalue},
+            zscore={res <- x@zscore},
+            ratio={res <- x@ratio}
+        )
+        
+        res <- cbind(rownames(res), res)
+        write.table(res, file=file, col.names=T, row.names=F, sep="\t")
+        
+        if(verbose){
+            message(sprintf("A file ('%s') has been written into your local directory ('%s')", file, getwd()), appendLF=T)
+        }
+        
+        invisible(res)
+    }
+)
+

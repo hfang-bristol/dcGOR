@@ -2,15 +2,17 @@
 \alias{visEnrichment}
 \title{Function to visualise enrichment analysis outputs in the context of the ontology hierarchy}
 \usage{
-visEnrichment(e, nodes_query = NULL, data.type = c("adjp", "pvalue",
-"zscore"), height = 7, width = 7, margin = rep(0.1, 4),
-colormap = c("yr", "bwr", "jet", "gbr", "wyr", "br", "rainbow", "wb",
-"lightyellow-orange"), ncolors = 40, zlim = NULL, colorbar = T,
-colorbar.fraction = 0.1, newpage = T,
-layout.orientation = c("left_right", "top_bottom", "bottom_top",
-"right_left"), node.info = c("both", "none", "term_id", "term_name",
-"full_term_name"), graph.node.attrs = NULL, graph.edge.attrs = NULL,
-node.attrs = NULL)
+visEnrichment(e, nodes_query = NULL, path.mode =
+c("all_shortest_paths",
+"shortest_paths", "all_paths"), data.type = c("adjp", "pvalue",
+"zscore"),
+height = 7, width = 7, margin = rep(0.1, 4), colormap = c("yr", "bwr",
+"jet", "gbr", "wyr", "br", "rainbow", "wb", "lightyellow-orange"),
+ncolors = 40, zlim = NULL, colorbar = T, colorbar.fraction = 0.1,
+newpage = T, layout.orientation = c("left_right", "top_bottom",
+"bottom_top", "right_left"), node.info = c("both", "none", "term_id",
+"term_name", "full_term_name"), graph.node.attrs = NULL,
+graph.edge.attrs = NULL, node.attrs = NULL)
 }
 \arguments{
 \item{e}{an object of S4 class \code{\link{Eoutput}}}
@@ -18,8 +20,15 @@ node.attrs = NULL)
 \item{nodes_query}{a verctor containing a list of
 nodes/terms in query. These nodes are used to produce a
 subgraph of the ontology DAG induced by them. If NULL,
-the top 10 significant terms (in terms of adjusted
+the top 5 significant terms (in terms of adjusted
 p-value) will be used}
+
+\item{path.mode}{the mode of paths induced by nodes in
+query. It can be "all_paths" for all possible paths to
+the root, "shortest_paths" for only one path to the root
+(for each node in query), "all_shortest_paths" for all
+shortest paths to the root (i.e. for each node, find all
+shortest paths with the equal lengths)}
 
 \item{data.type}{a character telling which data type for
 nodes in query is used to color-code nodes. It can be one
@@ -107,13 +116,14 @@ An object of class 'Ragraph'
 analysis outputs (represented as an 'Eoutput' object) in
 the context of the ontology hierarchy (direct acyclic
 graph; DAG). Only part of DAG induced by those nodes/terms
-specified in query nodes will be visualised. Nodes in query
-are framed in black (by default), and all nodes (in query
-plus induced) will be color-coded according to a given
-data.type ('zscore'; otherwise taking the form of 10-based
-negative logarithm for 'adjp' or 'pvalue'). If no nodes in
-query, the top 10 significant terms (in terms of adjusted
-p-value) will be used for visualisation
+specified in query nodes (and the mode defining the paths
+to the root of DAG) will be visualised. Nodes in query are
+framed in black (by default), and all nodes (in query plus
+induced) will be color-coded according to a given data.type
+('zscore'; otherwise taking the form of 10-based negative
+logarithm for 'adjp' or 'pvalue'). If no nodes in query,
+the top 5 significant terms (in terms of adjusted p-value)
+will be used for visualisation
 }
 \note{
 A list of global node attributes used in
@@ -183,6 +193,7 @@ node.attrs=list(color=nodes.highlight))
 }
 }
 \seealso{
-\code{\link{dcEnrichment}}
+\code{\link{dcEnrichment}}, \code{\link{dcRDataLoader}},
+\code{\link{dcConverter}}
 }
 

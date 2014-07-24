@@ -1,0 +1,62 @@
+\docType{methods}
+\name{Coutput-method}
+\alias{Coutput-method}
+\alias{adjp,Coutput-method}
+\alias{cnetwork}
+\alias{cnetwork,Coutput-method}
+\alias{pvalue,Coutput-method}
+\alias{ratio}
+\alias{ratio,Coutput-method}
+\alias{show,Coutput-method}
+\alias{write,Coutput-method}
+\alias{zscore,Coutput-method}
+\title{Methods defined for S4 class Coutput}
+\usage{
+\S4method{show}{Coutput}(object)
+
+\S4method{ratio}{Coutput}(x)
+
+\S4method{zscore}{Coutput}(x)
+
+\S4method{pvalue}{Coutput}(x)
+
+\S4method{adjp}{Coutput}(x)
+
+\S4method{cnetwork}{Coutput}(x)
+
+\S4method{write}{Coutput}(x, file = "Coutput.txt", saveBy = c("adjp",
+"pvalue", "zscore", "ratio"), verbose = T)
+}
+\arguments{
+\item{object}{an object of S4 class \code{Coutput}.
+Usually this is an output from
+\code{\link{dcRWRpipeline}}}
+
+\item{x}{an object of S4 class \code{Coutput}. Usually
+this is part of the output from
+\code{\link{dcRWRpipeline}}}
+
+\item{saveBy}{which statistics will be saved. It can be
+"pvalue" for p value, "adjp" for adjusted p value,
+"zscore" for z-score, "ratio" for ratio}
+
+\item{file}{a character specifying a file name written
+into. By default, it is 'Coutput.txt'}
+
+\item{verbose}{logical to indicate whether the messages
+will be displayed in the screen. By default, it sets to
+true for display}
+}
+\value{
+write(x) also returns a symmetrix matrix storing the
+specific statistics
+}
+\description{
+Methods defined for S4 class \code{Coutput}.
+}
+\seealso{
+\code{\link{Coutput-class}}
+}
+\keyword{S4}
+\keyword{methods}
+

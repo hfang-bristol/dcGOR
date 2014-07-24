@@ -147,14 +147,14 @@ method.domain="BM.average", method.term="Resnik", parallel=FALSE,
 verbose=TRUE)
 dnetwork
 
-# 5) estimate RWR dating based sample relationships
+# 5) estimate RWR dating based sample/term relationships
 # define sets of seeds as data
 # each seed with equal weight (i.e. all non-zero entries are '1')
 data <- data.frame(aSeeds=c(1,0,1,0,1), bSeeds=c(0,0,1,0,1))
 rownames(data) <- id(dnetwork)[1:5]
 # calcualte their two contact graph
-iContact <- dcRWRpipeline(data=data, g=dnetwork, parallel=FALSE)
-iContact
+coutput <- dcRWRpipeline(data=data, g=dnetwork, parallel=FALSE)
+coutput
 }
 }
 \seealso{

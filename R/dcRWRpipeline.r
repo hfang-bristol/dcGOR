@@ -49,14 +49,14 @@
 #' dnetwork <- dcDAGdomainSim(g=dag, domains=domains, method.domain="BM.average", method.term="Resnik", parallel=FALSE, verbose=TRUE)
 #' dnetwork
 #' 
-#' # 5) estimate RWR dating based sample relationships
+#' # 5) estimate RWR dating based sample/term relationships
 #' # define sets of seeds as data
 #' # each seed with equal weight (i.e. all non-zero entries are '1')
 #' data <- data.frame(aSeeds=c(1,0,1,0,1), bSeeds=c(0,0,1,0,1))
 #' rownames(data) <- id(dnetwork)[1:5]
 #' # calcualte their two contact graph
-#' iContact <- dcRWRpipeline(data=data, g=dnetwork, parallel=FALSE)
-#' iContact
+#' coutput <- dcRWRpipeline(data=data, g=dnetwork, parallel=FALSE)
+#' coutput
 #' }
 
 dcRWRpipeline <- function(data, g, method=c("indirect","direct"), normalise=c("laplacian","row","column","none"), restart=0.75, normalise.affinity.matrix=c("none","quantile"), permutation=c("random","degree"), num.permutation=100, p.adjust.method=c("BH","BY","bonferroni","holm","hochberg","hommel"), adjp.cutoff=0.05, parallel=TRUE, multicores=NULL, verbose=T)
@@ -77,6 +77,12 @@ dcRWRpipeline <- function(data, g, method=c("indirect","direct"), normalise=c("l
     ## check input data
     if(is.matrix(data) | is.data.frame(data)){
         data <- as.matrix(data)
+        
+        ## remove all columns, each only containing zeros
+        ind <- which(apply(data, 2, sum)!=0)
+        data <- data[,ind]
+        #################################################
+        
         if(ncol(data)<2){
             stop("The input data must be matrix with at least two columns.\n")
         }
@@ -295,7 +301,14 @@ dcRWRpipeline <- function(data, g, method=c("indirect","direct"), normalise=c("l
     adjmatrix[flag] <- zscore[flag]
     adjmatrix <- as.matrix(adjmatrix)
     icontact <- igraph::graph.adjacency(adjmatrix, mode="undirected", weighted=T, diag=F, add.colnames=NULL, add.rownames=NA)
-
+    ## remove isolated nodes
+    icontact <- igraph::delete.vertices(icontact, which(igraph::degree(icontact)==0))
+    ## convert to an object of class 'Cnetwork'
+    cnetwork <- dcConverter(icontact, from='igraph', to='Cnetwork')
+    
+    ## create an object of class Cnetwork
+    #cnetwork <- as(adjmatrix, "Cnetwork")
+    
     ####################################################################################
     endT <- Sys.time()
     if(verbose){
@@ -306,15 +319,13 @@ dcRWRpipeline <- function(data, g, method=c("indirect","direct"), normalise=c("l
     runTime <- as.numeric(difftime(strptime(endT, "%Y-%m-%d %H:%M:%S"), strptime(startT, "%Y-%m-%d %H:%M:%S"), units="secs"))
     message(paste(c("Runtime in total is: ",runTime," secs\n"), collapse=""), appendLF=T)
     
-    iContact <- list(ratio      = ratio, 
+    coutput <- new("Coutput",
+                     ratio      = ratio, 
                      zscore     = zscore, 
-                     pval       = pval,
-                     adjpval    = adjpval, 
-                     icontact   = icontact, 
-                     Amatrix    = sAmatrix,
-                     call       = match.call()
-                    )
-    class(iContact) <- "iContact"
-    
-    invisible(iContact)
+                     pvalue     = pval,
+                     adjp       = adjpval,
+                     cnetwork   = cnetwork
+                 )
+
+    invisible(coutput)
 }

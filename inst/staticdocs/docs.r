@@ -29,7 +29,11 @@ list(
                 'Eoutput-class',
                 'Eoutput-method',
                 'Dnetwork-class',
-                'Dnetwork-method'
+                'Dnetwork-method',
+                'Cnetwork-class',
+                'Cnetwork-method',
+                'Coutput-class',
+                'Coutput-method'
             )
         ),
         sd_section("Ontologies mainly including open biomedical ontology (obo)",

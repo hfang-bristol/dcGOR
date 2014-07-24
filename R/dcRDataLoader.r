@@ -49,9 +49,10 @@ dcRDataLoader <- function(RData=c(NA,'SCOP.sf','SCOP.fa','onto.GOBP','onto.GOMF'
             ###############################
             
             ## check the eligibility for pairs of input domain and ontology
-            all.ontologies <- c("GOBP","GOMF","GOCC")
+            all.ontologies <- c('GOBP','GOMF','GOCC','DO','HPPA','HPMI','HPON','MP','EC','KW','UP')
             possible.ontologies <- switch(domain,
-                               SCOP.sf = all.ontologies[c(1:3)]
+                               SCOP.sf = all.ontologies[c(1:11)],
+                               SCOP.fa = all.ontologies[c(1:11)],
                                )
             if(!(ontology %in% possible.ontologies)){
                 stop(sprintf("The input pair of domain (%s) and ontology (%s) are not supported.\nThe supported ontologies in domain (%s): %s.\n", domain, ontology, domain, paste(possible.ontologies,collapse=", ")))

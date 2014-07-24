@@ -1,0 +1,55 @@
+\docType{methods}
+\name{Cnetwork-method}
+\alias{Cnetwork-method}
+\alias{[,Cnetwork,ANY,ANY,ANY-method}
+\alias{[,Cnetwork-method}
+\alias{adjMatrix,Cnetwork-method}
+\alias{dgCMatrix2Cnetwork}
+\alias{dim,Cnetwork-method}
+\alias{matrix2Cnetwork}
+\alias{nInfo,Cnetwork-method}
+\alias{nodeInfo,Cnetwork-method}
+\alias{nodeNames,Cnetwork-method}
+\alias{show,Cnetwork-method}
+\title{Methods defined for S4 class Cnetwork}
+\usage{
+\S4method{dim}{Cnetwork}(x)
+
+\S4method{adjMatrix}{Cnetwork}(x)
+
+\S4method{nodeInfo}{Cnetwork}(x)
+
+\S4method{nInfo}{Cnetwork}(object)
+
+\S4method{nodeNames}{Cnetwork}(object)
+
+\S4method{show}{Cnetwork}(object)
+
+\S4method{[}{Cnetwork,ANY,ANY,ANY}(x, i, j, ..., drop = FALSE)
+}
+\arguments{
+\item{x}{an object of class \code{Cnetwork}}
+
+\item{object}{an object of class \code{Cnetwork}}
+
+\item{i}{an index}
+
+\item{j}{an index}
+
+\item{...}{additional parameters}
+
+\item{drop}{For matrices and arrays.  If \code{TRUE} the
+result is coerced to the lowest possible dimension (see
+the examples).  This only works for extracting elements,
+not for the replacement.  See \code{\link{drop}} for
+further details.  }
+}
+\description{
+Methods defined for class \code{Cnetwork}.
+}
+\seealso{
+\code{\link{Cnetwork-class}}
+}
+\keyword{S4}
+\keyword{methods}
+

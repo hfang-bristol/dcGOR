@@ -2,35 +2,38 @@
 \alias{dcConverter}
 \title{Function to convert an object between graph classes}
 \usage{
-dcConverter(obj, from = c("Onto", "igraph", "Dnetwork"), to =
-c("igraph",
-"Onto", "Dnetwork"), verbose = TRUE)
+dcConverter(obj, from = c("Onto", "igraph", "Dnetwork", "Cnetwork"),
+to = c("igraph", "Onto", "Dnetwork", "Cnetwork"), verbose = TRUE)
 }
 \arguments{
-\item{obj}{an object of class "Onto", "igraph" or
-"Dnetwork"}
+\item{obj}{an object of class "Onto", "igraph",
+"Dnetwork" or "Cnetwork"}
 
 \item{from}{a character specifying the class converted
-from. It can be one of "Onto", "igraph" and "Dnetwork"}
+from. It can be one of "Onto", "igraph", "Dnetwork" and
+"Dnetwork"}
 
 \item{to}{a character specifying the class converted to.
-It can be one of "Onto", "igraph" and "Dnetwork"}
+It can be one of "Onto", "igraph", "Dnetwork" and
+"Dnetwork"}
 
 \item{verbose}{logical to indicate whether the messages
 will be displayed in the screen. By default, it sets to
 true for display}
 }
 \value{
-an object of class "Onto", "igraph" or "Dnetwork"
+an object of class "Onto", "igraph", "Dnetwork" or
+"Cnetwork"
 }
 \description{
 \code{dcConverter} is supposed to convert an object between
 classes 'Onto' and 'igraph', or between 'Dnetwork' and
-'igraph'.
+'igraph', or between 'Cnetwork' and 'igraph'.
 }
 \note{
 Conversion is also supported between classes 'Onto' and
-'igraph', or between 'Dnetwork' and 'igraph'
+'igraph', or between 'Dnetwork' and 'igraph', or between
+'Cnetwork' and 'igraph'
 }
 \examples{
 \dontrun{
@@ -65,6 +68,6 @@ dcConverter(ig, from='igraph', to='Dnetwork')
 }
 \seealso{
 \code{\link{dcRDataLoader}}, \code{\link{Onto-class}},
-\code{\link{Dnetwork-class}}
+\code{\link{Dnetwork-class}}, \code{\link{Cnetwork-class}}
 }
 

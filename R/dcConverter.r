@@ -1,15 +1,15 @@
 #' Function to convert an object between graph classes
 #'
-#' \code{dcConverter} is supposed to convert an object between classes 'Onto' and 'igraph', or between 'Dnetwork' and 'igraph'.
+#' \code{dcConverter} is supposed to convert an object between classes 'Onto' and 'igraph', or between 'Dnetwork' and 'igraph', or between 'Cnetwork' and 'igraph'.
 #'
-#' @param obj an object of class "Onto", "igraph" or "Dnetwork"
-#' @param from a character specifying the class converted from. It can be one of "Onto", "igraph" and "Dnetwork"
-#' @param to a character specifying the class converted to. It can be one of "Onto", "igraph" and "Dnetwork"
+#' @param obj an object of class "Onto", "igraph", "Dnetwork" or "Cnetwork"
+#' @param from a character specifying the class converted from. It can be one of "Onto", "igraph", "Dnetwork" and "Dnetwork"
+#' @param to a character specifying the class converted to. It can be one of "Onto", "igraph", "Dnetwork" and "Dnetwork"
 #' @param verbose logical to indicate whether the messages will be displayed in the screen. By default, it sets to true for display
-#' @return an object of class "Onto", "igraph" or "Dnetwork"
-#' @note Conversion is also supported between classes 'Onto' and 'igraph', or between 'Dnetwork' and 'igraph'
+#' @return an object of class "Onto", "igraph", "Dnetwork" or "Cnetwork"
+#' @note Conversion is also supported between classes 'Onto' and 'igraph', or between 'Dnetwork' and 'igraph', or between 'Cnetwork' and 'igraph'
 #' @export
-#' @seealso \code{\link{dcRDataLoader}}, \code{\link{Onto-class}}, \code{\link{Dnetwork-class}}
+#' @seealso \code{\link{dcRDataLoader}}, \code{\link{Onto-class}}, \code{\link{Dnetwork-class}}, \code{\link{Cnetwork-class}}
 #' @include dcConverter.r
 #' @examples
 #' \dontrun{
@@ -39,7 +39,7 @@
 #' dcConverter(ig, from='igraph', to='Dnetwork')
 #' }
 
-dcConverter <- function (obj, from=c("Onto","igraph","Dnetwork"), to=c("igraph","Onto","Dnetwork"), verbose=TRUE)
+dcConverter <- function (obj, from=c("Onto","igraph","Dnetwork","Cnetwork"), to=c("igraph","Onto","Dnetwork","Cnetwork"), verbose=TRUE)
 {
     
     from <- match.arg(from)
@@ -49,8 +49,12 @@ dcConverter <- function (obj, from=c("Onto","igraph","Dnetwork"), to=c("igraph",
         stop(sprintf("The class of your input object '%s' is '%s', mismatched as you intended (from='%s').\n", deparse(substitute(obj)), class(obj), from))
     }
     
-    if ((from=="Onto" & to=="Dnetwork") | (from=="Dnetwork" & to=="Onto")){
+    if(from!="igraph" & to!="igraph"){
         stop(sprintf("Conversion between '%s' and '%s' is not supported.\n", from, to))
+    }
+    
+    if ((from=="Onto" & to=="Dnetwork") | (from=="Dnetwork" & to=="Onto")){
+        #stop(sprintf("Conversion between '%s' and '%s' is not supported.\n", from, to))
     }
     
     if(from==to){
@@ -69,6 +73,8 @@ dcConverter <- function (obj, from=c("Onto","igraph","Dnetwork"), to=c("igraph",
             colnames(df) <- colnames(data)[2]
             rownames(df) <- rownames(data)
             nodeI <- new("InfoDataFrame", data=df)
+        }else if(ncol(data)==1){
+            nodeI <- new("InfoDataFrame", data=data)
         }else{
             nodeI <- new("InfoDataFrame", data=data.frame(data[,-1]))
         }
@@ -87,9 +93,12 @@ dcConverter <- function (obj, from=c("Onto","igraph","Dnetwork"), to=c("igraph",
         }else if(to=="Dnetwork"){
             ## for Dnetwork
             objConverted <- new("Dnetwork", adjMatrix=adjM, nodeInfo=nodeI)
+        }else if(to=="Cnetwork"){
+            ## for Cnetwork
+            objConverted <- new("Cnetwork", adjMatrix=adjM, nodeInfo=nodeI)
         }
         
-    }else if(from=="Onto" | from=="Dnetwork"){
+    }else if(from=="Onto" | from=="Dnetwork" | from=="Cnetwork"){
         
         ## node info
         nodes <- nInfo(obj)
@@ -101,7 +110,7 @@ dcConverter <- function (obj, from=c("Onto","igraph","Dnetwork"), to=c("igraph",
         tmp <- which(adjM!=0, arr.ind=T)
         
         ## un-direct graph for "Dnetwork"
-        if(from=="Dnetwork"){
+        if(from=="Dnetwork" | from=="Cnetwork"){
             tmp <- tmp[tmp[,1]<tmp[,2],]
         }
         
@@ -120,7 +129,7 @@ dcConverter <- function (obj, from=c("Onto","igraph","Dnetwork"), to=c("igraph",
         if(from=="Onto"){
             ## for Onto
             objConverted <- igraph::graph.data.frame(d=relations, directed=T, vertices=nodes)
-        }else if(from=="Dnetwork"){
+        }else if(from=="Dnetwork" | from=="Cnetwork"){
             ## for Dnetwork
             objConverted <- igraph::graph.data.frame(d=relations, directed=F, vertices=nodes)
             
