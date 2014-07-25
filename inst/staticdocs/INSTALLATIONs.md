@@ -37,7 +37,7 @@ Notes: below are `R command lines (NOT shell command lines in Terminal)`.
 First, install dependant/imported/suggested packages:
 
     source("http://bioconductor.org/biocLite.R")
-    biocLite(c("hexbin","ape","supraHex","graph","Rgraphviz","igraph","foreach","doMC","devtools"))
+    biocLite(c("hexbin","ape","supraHex","graph","Rgraphviz","igraph","foreach","doMC","dnet","devtools"))
 
 Second, install the package `dcGOR` under [stable release version hosted in CRAN](http://cran.r-project.org/package=dcGOR):
 
@@ -46,7 +46,7 @@ Second, install the package `dcGOR` under [stable release version hosted in CRAN
 Notes: to install the package `dcGOR` under [latest development version hosted in GitHub](https://github.com/hfang-bristol/dcGOR), please run:
 
     library(devtools)
-    for(pkg in c("dcGOR","dnet")){
+    for(pkg in c("dcGOR")){
         if(pkg %in% rownames(installed.packages())) remove.packages(pkg)
         install_github(pkg, username="hfang-bristol")
     }

@@ -145,11 +145,12 @@ visEnrichment <- function (e, nodes_query=NULL, path.mode=c("all_shortest_paths"
         nodes.fontcolor <- rep("blue", length(nodes_query))
         names(nodes.fontcolor) <- nodes_query
         ## fontsize for text
-        nodes.fontsize <- rep(24, length(nodes_query))
+        nodes.fontsize <- rep(18, length(nodes_query))
         names(nodes.fontsize) <- nodes_query
         
         #node.attrs <- list(color=nodes.highlight, fontcolor=nodes.fontcolor, fontsize=nodes.fontsize)
-        node.attrs <- list(color=nodes.highlight)        
+        node.attrs <- list(color=nodes.highlight, fontsize=nodes.fontsize)
+        #node.attrs <- list(color=nodes.highlight)        
     }
 
     ## do visualisation

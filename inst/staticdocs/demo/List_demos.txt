@@ -1,1 +1,1 @@
-LECA   Demo for analysing ancestral domainome in Eukaryotes
+Fang   Demo for analysing ancestral domainome in Eukaryotes
