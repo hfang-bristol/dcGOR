@@ -7,11 +7,9 @@
 ###############################################################################
 library(dcGOR)
 
-#----------------------------------------------------------
-#----------------------------------------------------------
+#############################################################################
 # Derive domains unique/gained in human compared to Metazoa
-#----------------------------------------------------------
-#----------------------------------------------------------
+#############################################################################
 
 # load data as an 'Anno' object
 Ancestral_domainome <- dcRDataLoader("Ancestral_domainome")
@@ -39,11 +37,9 @@ ind <- match(domains_human_unique, rownames(df))
 out <- df[ind,]
 write.table(out, file="Domains_unique_in_human.txt", col.names=T, row.names=F, sep="\t")
 
-#---------------------------------------------------------------------------
-#---------------------------------------------------------------------------
+#############################################################################
 # Enrichment analysis for domains unique/gained in human compared to Metazoa
-#---------------------------------------------------------------------------
-#---------------------------------------------------------------------------
+#############################################################################
 
 data <- domains_human_unique
 
@@ -93,16 +89,14 @@ view(eoutput, top_num=5, sortBy="pvalue", details=TRUE)
 #### color-coded according to 10-based negative logarithm of adjusted p-values (adjp)
 visEnrichment(eoutput, path.mode="all_paths")
 
-#---------------------------------------------------------------------
-#---------------------------------------------------------------------
+#############################################################################
 # Pair-wise semantic similarity between domains unique/gained in human
-#---------------------------------------------------------------------
-#---------------------------------------------------------------------
+#############################################################################
 
 ## 1) load onto.DO (as 'Onto' object)
 g <- dcRDataLoader('onto.DO')
 g
-## 2) load SCOP superfamilies annotated by DO (as 'Anno' object)
+## 2) load SCOP superfamilies annotated by GOMF (as 'Anno' object)
 Anno <- dcRDataLoader('SCOP.sf2DO')
 Anno
 
@@ -117,7 +111,7 @@ dnetwork
 
 ## 5) heatmap the adjacency matrix of the domain network
 D <- as.matrix(adjMatrix(dnetwork))
-visHeatmapAdv(D, Rowv=F, Colv=F, dendrogram="none", colormap="bwr", zlim=c(0,1.2), KeyValueName="DO semantic similarity")
+visHeatmapAdv(D, Rowv=F, Colv=F, dendrogram="none", colormap="bwr", zlim=c(0,1.2), labRow=colnames(D), KeyValueName="DO semantic similarity", lmat=rbind(c(4,3), c(2,1)), lhei=c(1,5), lwid=c(1,3))
 
 ## 6) visualise the domain network as a graph
 ### convert it to an object of class 'igraph' (for subsequent visualisation)
@@ -133,11 +127,9 @@ vertex.label <- paste(V(ig)$name, '\n', as.character(dData(Anno)[ind,]$descripti
 ### do visualisation
 dnet::visNet(g=ig, vertex.label=vertex.label, vertex.label.color="black", vertex.label.cex=0.7, vertex.shape="sphere", edge.width=edge.width, edge.label=x, edge.label.cex=0.7)
 
-#------------------------------------------------------------
-#------------------------------------------------------------
+#############################################################################
 # Random Walk with Restart (RWR)-based contacts between terms
-#------------------------------------------------------------
-#------------------------------------------------------------
+#############################################################################
 
 ## 1) define sets of seeds: each seed with equal weight (i.e. all non-zero entries are '1')
 ### seeds are terms from GOMF
@@ -145,7 +137,7 @@ Anno <- dcRDataLoader('SCOP.sf2GOMF')
 flag <- match(domainNames(Anno), nodeNames(dnetwork))
 ind <- which(!is.na(flag))
 data <- as.matrix(annoData(Anno)[ind,])
-### GOMF terms having at least 3 annotatable domains that are also in human-unique domains above
+### GOMF terms having at least 3 annotatable domains that are also in human-unique domains above)
 ind <- apply(data,2,sum)>=3
 data <- data[,ind]
 
@@ -158,11 +150,6 @@ coutput
 write(coutput, file='Coutput_adjp.txt', saveBy="adjp")
 ## <a href="Coutput_zscore.txt">Coutput_zscore.txt</a> for contact strength z-scores
 write(coutput, file='Coutput_zscore.txt', saveBy="zscore")
-## <a href="Coutput_node_info.txt">Coutput_node_info.txt</a> for node info
-df <- tData(Anno)
-ind <- match(rownames(zscore(coutput)), rownames(df))
-out <- df[ind,]
-write.table(out, file="Coutput_node_info.txt", col.names=T, row.names=F, sep="\t")
 
 ## 4) extract contact network
 cnet <- cnetwork(coutput)
@@ -181,3 +168,4 @@ ind <- match(V(ig)$name,termNames(Anno))
 vertex.label <- paste(V(ig)$name, '\n', tData(Anno)[ind,]$Name, sep='')
 ### do visualisation
 dnet::visNet(g=ig, vertex.label=vertex.label, vertex.label.color="blue", vertex.label.cex=0.7, vertex.shape="sphere", vertex.color="blue", ,edge.width=edge.width, edge.label=x, edge.label.cex=0.7)
+

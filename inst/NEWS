@@ -18,6 +18,8 @@ NEW FEATURES
     o Add an S4 class 'Eoutput' to store enrichment analysis outputs
     
     o Add an S4 class 'Dnetwork' to store domain networks (eg semantic similarity between domains)
+    
+    o Add S4 classes 'Coutput' and 'Cnetwork' to store RWR-based contact outputs and network
 
     o Add the function 'dcConverter' allowing for conversion between classes 'Onto' and 'igraph'
 
