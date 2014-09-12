@@ -64,8 +64,9 @@ definition code for the method 'f' defined in this class}
 }
 }
 \examples{
-data <- data.frame(x=1:5, y=I(LETTERS[1:5]), row.names=paste("Term",
-1:5, sep="_"))
+# generate data on domain information on
+data <- data.frame(x=1:10, y=I(LETTERS[1:10]),
+row.names=paste("Domain", 1:10, sep="_"))
 dimLabels <- c("rowLabels", "colLabels")
 # create an object of class InfoDataFrame
 x <- new("InfoDataFrame", data=data, dimLabels=dimLabels)

@@ -32,13 +32,6 @@ dcRDataLoader <- function(RData=c(NA,'SCOP.sf','SCOP.fa','onto.GOBP','onto.GOMF'
     ontology <- match.arg(ontology)
     
     ###############################
-    ## make sure there is no "/" at the end
-    path_host <- gsub("/$", "", RData.location)
-    if(path_host=="" || length(path_host)==0 || is.na(path_host)){
-        path_host <- "http://supfam.org/dcGOR/data"
-    }
-    
-    ###############################
     if(is.na(RData)){
         if(is.na(domain) | is.na(ontology)){
             stop(sprintf("Please make sure that either 'RData' is NOT NA or both 'domain' and 'ontology' are NOT NA.\n"))
@@ -63,6 +56,12 @@ dcRDataLoader <- function(RData=c(NA,'SCOP.sf','SCOP.fa','onto.GOBP','onto.GOMF'
     }
     
     ###############################
+
+    ## make sure there is no "/" at the end
+    path_host <- gsub("/$", "", RData.location)
+    if(path_host=="" || length(path_host)==0 || is.na(path_host)){
+        path_host <- "http://supfam.org/dcGOR/data"
+    }
 
     ## load 
     load_remote <- paste(path_host, "/", RData, ".RData", sep="")

@@ -15,6 +15,14 @@ list(
                 'dcRWRpipeline'
             )
         ),
+        sd_section("Functions for built-in (customised) data building",
+            "These functions are used to build objects of S4 classes 'InfoDataFrame', 'Anno' and 'Onto' from user-customised input data (domains, ontologies and annotations).",
+            c(
+                'dcBuildInfoDataFrame',
+                'dcBuildAnno',
+                'dcBuildOnto'
+            )
+        ),
         sd_section("Definitions for S4 classes and methods",
             "These documentations are to help understand S4 classes and methods defined in the package.",
             c(
@@ -84,6 +92,24 @@ list(
                 "SCOP.fa2EC",
                 "SCOP.fa2KW",
                 "SCOP.fa2UP"
+            )
+        ),
+        sd_section("Pfam domains and their annotations by ontologies",
+            "These R objects are about Pfam domains (Pfam) and their annotations by Gene Ontology (GO).",
+            c(
+                "Pfam",
+                "Pfam2GOBP",
+                "Pfam2GOMF",
+                "Pfam2GOCC"
+            )
+        ),
+        sd_section("InterPro domains and their annotations by ontologies",
+            "These R objects are about InterPro domains (InterPro) and their annotations by Gene Ontology (GO).",
+            c(
+                "InterPro",
+                "InterPro2GOBP",
+                "InterPro2GOMF",
+                "InterPro2GOCC"
             )
         ),
         sd_section("Complete domains (domain-ome) in Eukaryotic tree of life (eTOL)",

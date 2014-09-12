@@ -68,12 +68,13 @@ view(x) returns a data frame with following components:
 \item{\code{zscore}: enrichment z-score}
 \item{\code{pvalue}: p value}
 \item{\code{adjp}: adjusted p value}
-\item{\code{term_name}: term name; optional, it is only appended when
-"details" is true}
+\item{\code{term_name}: term name}
 \item{\code{term_namespace}: term namespace; optional, it is only
 appended when "details" is true}
 \item{\code{term_distance}: term distance; optional, it is only
 appended when "details" is true}
+\item{\code{members}: members (represented as domain IDs) in overlaps;
+optional, it is only appended when "details" is true}
 }
 write(x) also returns the same data frame as view(x), in addition to a
 specified local file.

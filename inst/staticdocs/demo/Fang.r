@@ -45,31 +45,46 @@ write.table(out, file="Domains_unique_in_human.txt", col.names=T, row.names=F, s
 #---------------------------------------------------------------------------
 #---------------------------------------------------------------------------
 
+## define the input data (domains gained in human) and the background (all domains in Metazoa)
 data <- domains_human_unique
+background <- rowNames(domains_metazoa)
 
-## 1) GOMF enrichment analysis, producing an object of S4 class 'Eoutput'
-eoutput <- dcEnrichment(data, domain="SCOP.sf", ontology="GOMF")
-eoutput
-### write into a local file <a href="GOMF_enrichments.txt">GOMF_enrichments.txt</a>
-write(eoutput, file='GOMF_enrichments.txt')
-### view the top 5 significant terms
-view(eoutput, top_num=5, sortBy="pvalue", details=TRUE)
-### visualise the top 5 significant terms in GOMF DAG
-#### color-coded according to 10-based negative logarithm of adjusted p-values (adjp)
-visEnrichment(eoutput)
-#### color-coded according to zscore
-visEnrichment(eoutput, data.type='zscore')
-
-## 2) GOBP enrichment analysis, producing an object of S4 class 'Eoutput'
+## 1) GOBP enrichment analysis, producing an object of S4 class 'Eoutput'
+### By default, using all annotatable domains as the background
 eoutput <- dcEnrichment(data, domain="SCOP.sf", ontology="GOBP")
 eoutput
 ### write into a local file <a href="GOBP_enrichments.txt">GOBP_enrichments.txt</a>
 write(eoutput, file='GOBP_enrichments.txt')
 ### view the top 5 significant terms
-view(eoutput, top_num=5, sortBy="pvalue", details=TRUE)
+view(eoutput, top_num=5, sortBy="pvalue", details=FALSE)
 ### visualise the top 5 significant terms in GOMF DAG
 #### color-coded according to 10-based negative logarithm of adjusted p-values (adjp)
 visEnrichment(eoutput)
+
+## 1a) GOBP enrichment analysis, producing an object of S4 class 'Eoutput'
+### Alternatively, using all domains in Metazoa as the background (customised)
+eoutput <- dcEnrichment(data, background, domain="SCOP.sf", ontology="GOBP")
+eoutput
+### write into a local file <a href="GOBP_enrichments.txt">GOBP_enrichments.txt</a>
+write(eoutput, file='GOBP_enrichments_customised.txt')
+### view the top 5 significant terms
+view(eoutput, top_num=5, sortBy="pvalue", details=FALSE)
+### visualise the top 5 significant terms in GOMF DAG
+#### color-coded according to 10-based negative logarithm of adjusted p-values (adjp)
+visEnrichment(eoutput)
+
+## 2) GOMF enrichment analysis, producing an object of S4 class 'Eoutput'
+eoutput <- dcEnrichment(data, background, domain="SCOP.sf", ontology="GOMF")
+eoutput
+### write into a local file <a href="GOMF_enrichments.txt">GOMF_enrichments.txt</a>
+write(eoutput, file='GOMF_enrichments.txt')
+### view the top 5 significant terms
+view(eoutput, top_num=5, sortBy="pvalue", details=FALSE)
+### visualise the top 5 significant terms in GOMF DAG
+#### color-coded according to 10-based negative logarithm of adjusted p-values (adjp)
+visEnrichment(eoutput)
+#### color-coded according to zscore
+visEnrichment(eoutput, data.type='zscore')
 
 ## 3) HPPA enrichment analysis, producing an object of S4 class 'Eoutput'
 eoutput <- dcEnrichment(data, domain="SCOP.sf", ontology="HPPA")

@@ -3,21 +3,24 @@
 \alias{dcEnrichment}
 \title{Function to conduct ontology enrichment analysis given a group of domains}
 \usage{
-dcEnrichment(data, domain = c("SCOP.sf", "SCOP.fa"), ontology =
-c("GOBP",
-"GOMF", "GOCC", "DO", "HPPA", "HPMI", "HPON", "MP", "EC", "KW", "UP"),
-sizeRange = c(10, 1000), min.overlap = 3, which_distance = NULL,
-test = c("HypergeoTest", "FisherTest", "BinomialTest"),
-p.adjust.method = c("BH", "BY", "bonferroni", "holm", "hochberg",
-"hommel"),
-ontology.algorithm = c("none", "pc", "elim", "lea"), elim.pvalue =
-0.01,
-lea.depth = 2, verbose = T,
+dcEnrichment(data, background = NULL, domain = c("SCOP.sf", "SCOP.fa"),
+ontology = c("GOBP", "GOMF", "GOCC", "DO", "HPPA", "HPMI", "HPON",
+"MP",
+"EC", "KW", "UP"), sizeRange = c(10, 1000), min.overlap = 3,
+which_distance = NULL, test = c("HypergeoTest", "FisherTest",
+"BinomialTest"), p.adjust.method = c("BH", "BY", "bonferroni", "holm",
+"hochberg", "hommel"), ontology.algorithm = c("none", "pc", "elim",
+"lea"),
+elim.pvalue = 0.01, lea.depth = 2, verbose = T,
 RData.location = "http://supfam.org/dcGOR/data")
 }
 \arguments{
 \item{data}{an input vector. It contains id for a list of domains, for
 example, sunids for SCOP domains}
+
+\item{background}{a background vector. It contains id for a list of
+background domains, for example, sunids for SCOP domains. If NULL, by
+default all annotatable domains are used as background}
 
 \item{domain}{the domain identity. It can be one of 'SCOP.sf' for SCOP
 superfamilies, 'SCOP.fa' for SCOP families}
@@ -115,15 +118,19 @@ Name"), "namespace" (i.e. "Term Namespace"), "distance" (i.e. "Term
 Distance") and "IC" (i.e. "Information Content for the term based on
 annotation frequency by it")}
 \item{\code{anno}: a list of terms, each storing annotated domain
-members. Always, terms are identified by "term_id" and domain members
-identified by their ids (e.g. sunids for SCOP domains)}
+members (also within the background domains). Always, terms are
+identified by "term_id" and domain members identified by their ids
+(e.g. sunids for SCOP domains)}
 \item{\code{data}: a vector containing input data in consideration. It
-is not always the same as the input data as only those mappable are
-retained}
+is not always the same as the input data as only those mappable and
+annotatable are retained}
+\item{\code{background}: a vector containing background in
+consideration. It is not always the same as the input background as
+only those mappable/annotatable are retained}
 \item{\code{overlap}: a list of terms, each storing domains overlapped
 between domains annotated by a term and domains in the input data (i.e.
 the domains of interest). Always, terms are identified by "term_id" and
-domain members identified by their ids (e.g. sunids for SCOP domains)}
+domain members identified by their IDs (e.g. sunids for SCOP domains)}
 \item{\code{zscore}: a vector containing z-scores}
 \item{\code{pvalue}: a vector containing p-values}
 \item{\code{adjp}: a vector containing adjusted p-values. It is the p
@@ -135,7 +142,9 @@ value but after being adjusted for multiple comparisons}
 input group of domains using a specified ontology. It returns an object
 of S4 class "Eoutput". Enrichment analysis is based on either Fisher's
 exact test or Hypergeometric test. The test can respect the hierarchy
-of the ontology.
+of the ontology. The user can customise the background domains;
+otherwise, the function will use all annotatable domains as the test
+background
 }
 \note{
 The interpretation of the algorithms used to account for the hierarchy
@@ -163,11 +172,10 @@ maximum of both p-values in these two calculations.}
 }
 }
 \examples{
-\dontrun{
 # 1) load SCOP.sf (as 'InfoDataFrame' object)
 SCOP.sf <- dcRDataLoader('SCOP.sf')
-# randomly select 20 domains
-data <- sample(rowNames(SCOP.sf), 20)
+# randomly select 50 domains as a list of domains of interest
+data <- sample(rowNames(SCOP.sf), 50)
 
 # 2) perform enrichment analysis, producing an object of S4 class 'Eoutput'
 eoutput <- dcEnrichment(data, domain="SCOP.sf", ontology="GOMF")
@@ -179,7 +187,19 @@ view(eoutput, top_num=10, sortBy="pvalue", details=TRUE)
 # 4) visualise the top 10 significant terms in the ontology hierarchy
 # color-coded according to 10-based negative logarithm of adjusted p-values (adjp)
 visEnrichment(eoutput)
-}
+
+# 5) the same as above but using a customised background
+## randomly select 100 domains as background
+background <- sample(rowNames(SCOP.sf), 500)
+## perform enrichment analysis, producing an object of S4 class 'Eoutput'
+eoutput <- dcEnrichment(data, background=background, domain="SCOP.sf",
+ontology="GOMF")
+eoutput
+## view the top 10 significance terms
+view(eoutput, top_num=10, sortBy="pvalue", details=TRUE)
+## visualise the top 10 significant terms in the ontology hierarchy
+## color-coded according to 10-based negative logarithm of adjusted p-values (adjp)
+visEnrichment(eoutput)
 }
 \seealso{
 \code{\link{dcRDataLoader}}, \code{\link{dcDAGannotate}},

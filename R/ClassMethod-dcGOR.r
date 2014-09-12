@@ -44,7 +44,8 @@ require(Matrix)
 #' @rdname InfoDataFrame-class
 #' @seealso \code{\link{InfoDataFrame-method}}
 #' @examples
-#' data <- data.frame(x=1:5, y=I(LETTERS[1:5]), row.names=paste("Term", 1:5, sep="_"))
+#' # generate data on domain information on
+#' data <- data.frame(x=1:10, y=I(LETTERS[1:10]), row.names=paste("Domain", 1:10, sep="_"))
 #' dimLabels <- c("rowLabels", "colLabels")
 #' # create an object of class InfoDataFrame
 #' x <- new("InfoDataFrame", data=data, dimLabels=dimLabels)
@@ -566,8 +567,9 @@ setMethod("[", signature(x="Anno"),
 #' @slot domain A character specifying the domain identity
 #' @slot ontology A character specifying the ontology identity
 #' @slot term_info A data.frame of nTerm X 5 containing term information, where nTerm is the number of terms in consideration, and the 5 columns are "term_id" (i.e. "Term ID"), "term_name" (i.e. "Term Name"), "namespace" (i.e. "Term Namespace"), "distance" (i.e. "Term Distance") and "IC" (i.e. "Information Content for the term based on annotation frequency by it")
-#' @slot anno A list of terms, each storing annotated domains. Always, terms are identified by "term_id" and domain members identified by their ids (e.g. sunids for SCOP domains)
+#' @slot anno A list of terms, each storing annotated domains (also within the background domains). Always, terms are identified by "term_id" and domain members identified by their ids (e.g. sunids for SCOP domains)
 #' @slot data A vector containing input data in \code{\link{dcEnrichment}}. It is not always the same as the input data as only those mappable are retained
+#' @slot background A vector containing background in \code{\link{dcEnrichment}}. It is not always the same as the input background (if provided by the user) as only those mappable are retained
 #' @slot overlap A list of terms, each storing domains overlapped between domains annotated by a term and domains in the input data (i.e. the domains of interest). Always, terms are identified by "term_id" and domain members identified by their ids (e.g. sunids for SCOP domains)
 #' @slot zscore A vector of terms, containing z-scores
 #' @slot pvalue A vector of terms, containing p-values
@@ -632,26 +634,28 @@ setMethod("[", signature(x="Anno"),
 setClass(
     Class="Eoutput",
     representation(
-        domain   = "character",
-        ontology = "character",
-        term_info= "data.frame",
-        anno     = "list",
-        data     = "vector",
-        overlap  = "vector",
-        zscore   = "vector",
-        pvalue   = "vector",
-        adjp     = "vector"
+        domain      = "character",
+        ontology    = "character",
+        term_info   = "data.frame",
+        anno        = "list",
+        data        = "vector",
+        background  = "vector",
+        overlap     = "vector",
+        zscore      = "vector",
+        pvalue      = "vector",
+        adjp        = "vector"
     ),
     prototype = prototype(
-        domain   = "domain",
-        ontology = "ontology",
-        term_info= data.frame(),
-        anno     = list(),
-        data     = vector(),
-        overlap  = vector(),
-        zscore   = vector(),
-        pvalue   = vector(),
-        adjp     = vector()
+        domain      = "domain",
+        ontology    = "ontology",
+        term_info   = data.frame(),
+        anno        = list(),
+        data        = vector(),
+        background  = vector(),
+        overlap     = vector(),
+        zscore      = vector(),
+        pvalue      = vector(),
+        adjp        = vector()
     ),
     validity = function(object){
         if(!is.data.frame(object@term_info)){
@@ -683,9 +687,10 @@ setClass(
 #'  \item{\code{zscore}: enrichment z-score}
 #'  \item{\code{pvalue}: p value}
 #'  \item{\code{adjp}: adjusted p value}
-#'  \item{\code{term_name}: term name; optional, it is only appended when "details" is true}
+#'  \item{\code{term_name}: term name}
 #'  \item{\code{term_namespace}: term namespace; optional, it is only appended when "details" is true}
 #'  \item{\code{term_distance}: term distance; optional, it is only appended when "details" is true}
+#'  \item{\code{members}: members (represented as domain IDs) in overlaps; optional, it is only appended when "details" is true}
 #' }
 #' write(x) also returns the same data frame as view(x), in addition to a specified local file.
 #' @docType methods
@@ -704,7 +709,8 @@ setMethod("show", "Eoutput",
         cat(sprintf("  @ontology: '%s'", object@ontology), "\n", sep="")
         cat(sprintf("  @term_info: a data.frame of %d terms X %d information", dim(object@term_info)[1],dim(object@term_info)[2]), "\n", sep="")
         cat(sprintf("  @anno: a list of %d terms, each storing annotated domains", length(object@anno)), "\n", sep="")
-        cat(sprintf("  @data: a vector containing a group of %d input domains", length(object@data)), "\n", sep="")
+        cat(sprintf("  @data: a vector containing a group of %d input domains (annotatable)", length(object@data)), "\n", sep="")
+        cat(sprintf("  @background: a vector containing a group of %d background domains (annotatable)", length(object@background)), "\n", sep="")
         cat(sprintf("  @overlap: a list of %d terms, each containing domains overlapped with input domains", length(object@overlap)), "\n", sep="")
         cat(sprintf("  @zscore: a vector of %d terms, containing z-scores", length(object@zscore)), "\n", sep="")
         cat(sprintf("  @pvalue: a vector of %d terms, containing p-values", length(object@pvalue)), "\n", sep="")
@@ -755,13 +761,15 @@ setMethod("view", "Eoutput",
                            adjp             = x@adjp,
                            term_name        = x@term_info$term_name,
                            term_namespace   = x@term_info$term_namespace,
-                           term_distance    = x@term_info$term_distance
+                           term_distance    = x@term_info$term_distance,
+                           members          = sapply(x@overlap, function(x) paste(x,collapse=','))
                           )
+        # members          = ifelse(dim(x@term_info)[1]==1, paste(x@overlap,collapse=','), sapply(x@overlap, function(x) paste(x,collapse=',')))
     
         if(details == T){
-            res <- tab[,c(1:10)]
+            res <- tab[,c(1:11)]
         }else{
-            res <- tab[,c(1:7)]
+            res <- tab[,c(1:8)]
         }
     
         if(is.null(decreasing)){

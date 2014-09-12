@@ -25,13 +25,19 @@ Name"), "namespace" (i.e. "Term Namespace"), "distance" (i.e. "Term
 Distance") and "IC" (i.e. "Information Content for the term based on
 annotation frequency by it")}
 
-\item{\code{anno}}{A list of terms, each storing annotated domains.
-Always, terms are identified by "term_id" and domain members identified
-by their ids (e.g. sunids for SCOP domains)}
+\item{\code{anno}}{A list of terms, each storing annotated domains
+(also within the background domains). Always, terms are identified by
+"term_id" and domain members identified by their ids (e.g. sunids for
+SCOP domains)}
 
 \item{\code{data}}{A vector containing input data in
 \code{\link{dcEnrichment}}. It is not always the same as the input data
 as only those mappable are retained}
+
+\item{\code{background}}{A vector containing background in
+\code{\link{dcEnrichment}}. It is not always the same as the input
+background (if provided by the user) as only those mappable are
+retained}
 
 \item{\code{overlap}}{A list of terms, each storing domains overlapped
 between domains annotated by a term and domains in the input data (i.e.
@@ -86,7 +92,6 @@ definition code for the method 'f' defined in this class}
 }
 }
 \examples{
-\dontrun{
 # 1) load SCOP.sf (as 'InfoDataFrame' object)
 SCOP.sf <- dcRDataLoader('SCOP.sf')
 # randomly select 20 domains
@@ -106,7 +111,6 @@ view(eoutput, top_num=5, sortBy="pvalue", details=TRUE)
 zscore(eoutput)[1:5]
 pvalue(eoutput)[1:5]
 adjp(eoutput)[1:5]
-}
 }
 \seealso{
 \code{\link{Eoutput-method}}

@@ -1,8 +1,9 @@
 #' Function to conduct ontology enrichment analysis given a group of domains
 #'
-#' \code{dcEnrichment} is supposed to conduct enrichment analysis for an input group of domains using a specified ontology. It returns an object of S4 class "Eoutput". Enrichment analysis is based on either Fisher's exact test or Hypergeometric test. The test can respect the hierarchy of the ontology.
+#' \code{dcEnrichment} is supposed to conduct enrichment analysis for an input group of domains using a specified ontology. It returns an object of S4 class "Eoutput". Enrichment analysis is based on either Fisher's exact test or Hypergeometric test. The test can respect the hierarchy of the ontology. The user can customise the background domains; otherwise, the function will use all annotatable domains as the test background
 #'
 #' @param data an input vector. It contains id for a list of domains, for example, sunids for SCOP domains
+#' @param background a background vector. It contains id for a list of background domains, for example, sunids for SCOP domains. If NULL, by default all annotatable domains are used as background
 #' @param domain the domain identity. It can be one of 'SCOP.sf' for SCOP superfamilies, 'SCOP.fa' for SCOP families
 #' @param ontology the ontology identity. It can be "GOBP" for Gene Ontology Biological Process, "GOMF" for Gene Ontology Molecular Function, "GOCC" for Gene Ontology Cellular Component, "DO" for Disease Ontology, "HPPA" for Human Phenotype Phenotypic Abnormality, "HPMI" for Human Phenotype Mode of Inheritance, "HPON" for Human Phenotype ONset and clinical course, "MP" for Mammalian Phenotype, "EC" for Enzyme Commission, "KW" for UniProtKB KeyWords, "UP" for UniProtKB UniPathway. For details on the eligibility for pairs of input domain and ontology, please refer to the online Documentations at \url{http://supfam.org/dcGOR/docs.html}
 #' @param sizeRange the minimum and maximum size of members of each term in consideration. By default, it sets to a minimum of 10 but no more than 1000
@@ -21,9 +22,10 @@
 #'  \item{\code{domain}: a character specifying the domain identity}
 #'  \item{\code{ontology}: a character specifying the ontology used}
 #'  \item{\code{term_info}: a matrix of nTerm X 5 containing term information, where nTerm is the number of terms in consideration, and the 5 columns are "term_id" (i.e. "Term ID"), "term_name" (i.e. "Term Name"), "namespace" (i.e. "Term Namespace"), "distance" (i.e. "Term Distance") and "IC" (i.e. "Information Content for the term based on annotation frequency by it")}
-#'  \item{\code{anno}: a list of terms, each storing annotated domain members. Always, terms are identified by "term_id" and domain members identified by their ids (e.g. sunids for SCOP domains)}
-#'  \item{\code{data}: a vector containing input data in consideration. It is not always the same as the input data as only those mappable are retained}
-#'  \item{\code{overlap}: a list of terms, each storing domains overlapped between domains annotated by a term and domains in the input data (i.e. the domains of interest). Always, terms are identified by "term_id" and domain members identified by their ids (e.g. sunids for SCOP domains)}
+#'  \item{\code{anno}: a list of terms, each storing annotated domain members (also within the background domains). Always, terms are identified by "term_id" and domain members identified by their ids (e.g. sunids for SCOP domains)}
+#'  \item{\code{data}: a vector containing input data in consideration. It is not always the same as the input data as only those mappable and annotatable are retained}
+#'  \item{\code{background}: a vector containing background in consideration. It is not always the same as the input background as only those mappable/annotatable are retained}
+#'  \item{\code{overlap}: a list of terms, each storing domains overlapped between domains annotated by a term and domains in the input data (i.e. the domains of interest). Always, terms are identified by "term_id" and domain members identified by their IDs (e.g. sunids for SCOP domains)}
 #'  \item{\code{zscore}: a vector containing z-scores}
 #'  \item{\code{pvalue}: a vector containing p-values}
 #'  \item{\code{adjp}: a vector containing adjusted p-values. It is the p value but after being adjusted for multiple comparisons}
@@ -44,8 +46,8 @@
 #' \dontrun{
 #' # 1) load SCOP.sf (as 'InfoDataFrame' object)
 #' SCOP.sf <- dcRDataLoader('SCOP.sf')
-#' # randomly select 20 domains
-#' data <- sample(rowNames(SCOP.sf), 20)
+#' # randomly select 50 domains as a list of domains of interest
+#' data <- sample(rowNames(SCOP.sf), 50)
 #' 
 #' # 2) perform enrichment analysis, producing an object of S4 class 'Eoutput'
 #' eoutput <- dcEnrichment(data, domain="SCOP.sf", ontology="GOMF")
@@ -57,9 +59,21 @@
 #' # 4) visualise the top 10 significant terms in the ontology hierarchy
 #' # color-coded according to 10-based negative logarithm of adjusted p-values (adjp)
 #' visEnrichment(eoutput)
+#'
+#' # 5) the same as above but using a customised background
+#' ## randomly select 100 domains as background
+#' background <- sample(rowNames(SCOP.sf), 500) 
+#' ## perform enrichment analysis, producing an object of S4 class 'Eoutput'
+#' eoutput <- dcEnrichment(data, background=background, domain="SCOP.sf", ontology="GOMF")
+#' eoutput
+#' ## view the top 10 significance terms 
+#' view(eoutput, top_num=10, sortBy="pvalue", details=TRUE)
+#' ## visualise the top 10 significant terms in the ontology hierarchy
+#' ## color-coded according to 10-based negative logarithm of adjusted p-values (adjp)
+#' visEnrichment(eoutput)
 #' }
 
-dcEnrichment <- function(data, domain=c("SCOP.sf","SCOP.fa"), ontology=c("GOBP","GOMF","GOCC","DO","HPPA","HPMI","HPON","MP","EC","KW","UP"), sizeRange=c(10,1000), min.overlap=3, which_distance=NULL, test=c("HypergeoTest","FisherTest","BinomialTest"), p.adjust.method=c("BH", "BY", "bonferroni", "holm", "hochberg", "hommel"), ontology.algorithm=c("none","pc","elim","lea"), elim.pvalue=1e-2, lea.depth=2, verbose=T, RData.location="http://supfam.org/dcGOR/data")
+dcEnrichment <- function(data, background=NULL, domain=c("SCOP.sf","SCOP.fa"), ontology=c("GOBP","GOMF","GOCC","DO","HPPA","HPMI","HPON","MP","EC","KW","UP"), sizeRange=c(10,1000), min.overlap=3, which_distance=NULL, test=c("HypergeoTest","FisherTest","BinomialTest"), p.adjust.method=c("BH", "BY", "bonferroni", "holm", "hochberg", "hommel"), ontology.algorithm=c("none","pc","elim","lea"), elim.pvalue=1e-2, lea.depth=2, verbose=T, RData.location="http://supfam.org/dcGOR/data")
 {
     startT <- Sys.time()
     message(paste(c("Start at ",as.character(startT)), collapse=""), appendLF=T)
@@ -75,6 +89,8 @@ dcEnrichment <- function(data, domain=c("SCOP.sf","SCOP.fa"), ontology=c("GOBP",
     
     if (is.vector(data)){
         data <- unique(data)
+        data <- data[!is.null(data)]
+        data <- data[!is.na(data)]
     }else{
         stop("The input data must be a vector.\n")
     }
@@ -99,6 +115,32 @@ dcEnrichment <- function(data, domain=c("SCOP.sf","SCOP.fa"), ontology=c("GOBP",
     ## load annotation information
     Anno <- dcRDataLoader(domain=domain, ontology=ontology, RData.location=RData.location)
     
+    if(1){
+        ########################
+        if (is.vector(background)){
+            background <- unique(background)
+            background <- background[!is.null(background)]
+            background <- background[!is.na(background)]
+        }
+        if(length(background)>0){
+            ## check input background (only those domains in existance)
+            ind <- match(background, rowNames(Domain))
+            background <- background[!is.na(ind)]
+            ## if input background cannot be found in annotable domains, then use the all annotatable domains as background
+            if(length(background)>0){
+                
+                ## background should be: customised background plus input domains of interest
+                background <- union(background, data)
+                ###########################################
+                
+                ind <- match(domainNames(Anno), background)
+                Anno <- Anno[!is.na(ind), ]
+                #data <- intersect(data, background)
+            }
+        }
+        ########################
+    }
+    
     #########
     ## obtain the induced subgraph according to the input annotation data
     ## based on all possible paths (i.e. the complete subgraph induced)
@@ -108,7 +150,7 @@ dcEnrichment <- function(data, domain=c("SCOP.sf","SCOP.fa"), ontology=c("GOBP",
     
     ## check input data (only those domains in existance)
     ind <- match(data, rowNames(Domain))
-    domains.group <- as.numeric(data[!is.na(ind)])
+    domains.group <- data[!is.na(ind)]
     
     ## filter based on "which_distance"
     distance <- V(dag)$term_distance
@@ -252,7 +294,7 @@ dcEnrichment <- function(data, domain=c("SCOP.sf","SCOP.fa"), ontology=c("GOBP",
     terms <- V(dag)$term_id
     gs <- V(dag)$annotations
     names(gs) <- terms
-    domains.universe <- as.numeric(unique(unlist(V(dag)$annotations)))
+    domains.universe <- unique(unlist(V(dag)$annotations))
     domains.group <- intersect(domains.universe, domains.group)
     
     if(length(domains.group)==0){
@@ -618,12 +660,24 @@ dcEnrichment <- function(data, domain=c("SCOP.sf","SCOP.fa"), ontology=c("GOBP",
     names(annotations) <- V(dag)$term_id
     annotations <- annotations[names(gs)]
     
+    ########################################
+    if(1){
+        ## overlaps
+        overlaps <- lapply(overlaps, function(x){
+            ind <- match(x, rowNames(Domain))
+            names(x) <- as.character(Domain@data$description[ind])
+            x
+        })
+    }
+    ########################################
+    
     eoutput <- new("Eoutput",
                     domain    = domain,
                     ontology  = ontology,
                     term_info = set_info,
                     anno      = annotations,
-                    data      = data,
+                    data      = domains.group,
+                    background=domains.universe,
                     overlap   = overlaps,
                     zscore    = zscores,
                     pvalue    = pvals,
