@@ -195,4 +195,4 @@ edge.width <- 1 + (x-min(x))/(max(x)-min(x))*3
 ind <- match(V(ig)$name,termNames(Anno))
 vertex.label <- paste(V(ig)$name, '\n', tData(Anno)[ind,]$Name, sep='')
 ### do visualisation
-dnet::visNet(g=ig, vertex.label=vertex.label, vertex.label.color="blue", vertex.label.cex=0.7, vertex.shape="sphere", vertex.color="blue", ,edge.width=edge.width, edge.label=x, edge.label.cex=0.7)
+dnet::visNet(g=ig, vertex.label=vertex.label, vertex.label.color="blue", vertex.label.cex=0.7, vertex.shape="sphere", vertex.color="blue", edge.width=edge.width, edge.label=x, edge.label.cex=0.7)

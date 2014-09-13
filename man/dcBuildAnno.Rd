@@ -56,6 +56,7 @@ of the assigement sign '<-', then no object will be loaded onto the
 working environment.
 }
 \examples{
+\dontrun{
 # build an "Anno" object that contains SCOP domain superfamilies (sf) annotated by GOBP terms
 SCOP.sf2GOBP <-
 dcBuildAnno(domain_info.file="http://supfam.org/dcGOR/data/SCOPsf/SCOP.sf.txt",
@@ -63,6 +64,7 @@ term_info.file="http://supfam.org/dcGOR/data/SCOPsf/GO.txt",
 association.file="http://supfam.org/dcGOR/data/SCOPsf/Domain2GOBP.txt",
 output.file="SCOP.sf2GOBP")
 SCOP.sf2GOBP
+}
 }
 \seealso{
 \code{\link{Anno}}

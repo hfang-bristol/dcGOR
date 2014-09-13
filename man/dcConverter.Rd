@@ -32,6 +32,7 @@ Conversion is also supported between classes 'Onto' and 'igraph', or
 between 'Dnetwork' and 'igraph', or between 'Cnetwork' and 'igraph'
 }
 \examples{
+\dontrun{
 # 1) conversion between 'Onto' and 'igraph'
 # 1a) load onto.GOMF (as 'Onto' object)
 on <- dcRDataLoader('onto.GOMF')
@@ -59,6 +60,7 @@ ig <- dcConverter(dnetwork, from='Dnetwork', to='igraph')
 ig
 # 2c) convert the object from 'igraph' to 'Dnetwork' class
 dcConverter(ig, from='igraph', to='Dnetwork')
+}
 }
 \seealso{
 \code{\link{dcRDataLoader}}, \code{\link{Onto-class}},

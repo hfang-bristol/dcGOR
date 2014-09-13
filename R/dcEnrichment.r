@@ -4,7 +4,7 @@
 #'
 #' @param data an input vector. It contains id for a list of domains, for example, sunids for SCOP domains
 #' @param background a background vector. It contains id for a list of background domains, for example, sunids for SCOP domains. If NULL, by default all annotatable domains are used as background
-#' @param domain the domain identity. It can be one of 'SCOP.sf' for SCOP superfamilies, 'SCOP.fa' for SCOP families
+#' @param domain the domain identity. It can be one of 'SCOP.sf' for SCOP superfamilies, 'SCOP.fa' for SCOP families, 'Pfam' for Pfam domains, 'InterPro' for InterPro domains
 #' @param ontology the ontology identity. It can be "GOBP" for Gene Ontology Biological Process, "GOMF" for Gene Ontology Molecular Function, "GOCC" for Gene Ontology Cellular Component, "DO" for Disease Ontology, "HPPA" for Human Phenotype Phenotypic Abnormality, "HPMI" for Human Phenotype Mode of Inheritance, "HPON" for Human Phenotype ONset and clinical course, "MP" for Mammalian Phenotype, "EC" for Enzyme Commission, "KW" for UniProtKB KeyWords, "UP" for UniProtKB UniPathway. For details on the eligibility for pairs of input domain and ontology, please refer to the online Documentations at \url{http://supfam.org/dcGOR/docs.html}
 #' @param sizeRange the minimum and maximum size of members of each term in consideration. By default, it sets to a minimum of 10 but no more than 1000
 #' @param min.overlap the minimum number of overlaps. Only those terms that overlap with input data at least min.overlap (3 domains by default) will be processed
@@ -15,7 +15,7 @@
 #' @param elim.pvalue the parameter only used when "ontology.algorithm" is "elim". It is used to control how to declare a signficantly enriched term (and subsequently all domains in this term are eliminated from all its ancestors)
 #' @param lea.depth the parameter only used when "ontology.algorithm" is "lea". It is used to control how many maximum depth is uded to consider the children of a term (and subsequently all domains in these children term are eliminated from the use for the recalculation of the signifance at this term)
 #' @param verbose logical to indicate whether the messages will be displayed in the screen. By default, it sets to TRUE for display
-#' @param RData.location the characters to tell the location of built-in RData files. By default, it remotely locates at "http://supfam.org/dnet/data" or "https://github.com/hfang-bristol/dcGOR/data". For the user equipped with fast internet connection, this option can be just left as default. But it is always advisable to download these files locally. Especially when the user needs to run this function many times, there is no need to ask the function to remotely download every time (also it will unnecessarily increase the runtime). For examples, these files (as a whole or part of them) can be first downloaded into your current working directory, and then set this option as: \eqn{RData.location="."}. If RData to load is already part of package itself, this parameter can be ignored (since this function will try to load it via function \code{data} first)
+#' @param RData.location the characters to tell the location of built-in RData files. By default, it remotely locates at "http://supfam.org/dcGOR/data" or "https://github.com/hfang-bristol/dcGOR/data". For the user equipped with fast internet connection, this option can be just left as default. But it is always advisable to download these files locally. Especially when the user needs to run this function many times, there is no need to ask the function to remotely download every time (also it will unnecessarily increase the runtime). For examples, these files (as a whole or part of them) can be first downloaded into your current working directory, and then set this option as: \eqn{RData.location="."}. If RData to load is already part of package itself, this parameter can be ignored (since this function will try to load it via function \code{data} first)
 #' @return 
 #' an object of S4 class \code{\link{Eoutput}}, with following slots:
 #' \itemize{
@@ -44,36 +44,85 @@
 #' @include dcEnrichment.r
 #' @examples
 #' \dontrun{
-#' # 1) load SCOP.sf (as 'InfoDataFrame' object)
+#' # 1) Enrichment analysis for SCOP domain superfamilies (sf)
+#' ## 1a) load SCOP.sf (as 'InfoDataFrame' object)
 #' SCOP.sf <- dcRDataLoader('SCOP.sf')
-#' # randomly select 50 domains as a list of domains of interest
+#' ### randomly select 50 domains as a list of domains of interest
 #' data <- sample(rowNames(SCOP.sf), 50)
-#' 
-#' # 2) perform enrichment analysis, producing an object of S4 class 'Eoutput'
+#' ## 1b) perform enrichment analysis, producing an object of S4 class 'Eoutput'
 #' eoutput <- dcEnrichment(data, domain="SCOP.sf", ontology="GOMF")
 #' eoutput
-#'
-#' # 3) view the top 10 significance terms 
+#' ## 1c) view the top 10 significance terms 
 #' view(eoutput, top_num=10, sortBy="pvalue", details=TRUE)
-#'
-#' # 4) visualise the top 10 significant terms in the ontology hierarchy
-#' # color-coded according to 10-based negative logarithm of adjusted p-values (adjp)
+#' ## 1d) visualise the top 10 significant terms in the ontology hierarchy
+#' ### color-coded according to 10-based negative logarithm of adjusted p-values (adjp)
 #' visEnrichment(eoutput)
-#'
-#' # 5) the same as above but using a customised background
-#' ## randomly select 100 domains as background
+#' ## 1e) the same as above but using a customised background
+#' ### randomly select 100 domains as background
 #' background <- sample(rowNames(SCOP.sf), 500) 
-#' ## perform enrichment analysis, producing an object of S4 class 'Eoutput'
+#' ### perform enrichment analysis, producing an object of S4 class 'Eoutput'
 #' eoutput <- dcEnrichment(data, background=background, domain="SCOP.sf", ontology="GOMF")
 #' eoutput
-#' ## view the top 10 significance terms 
+#' ### view the top 10 significance terms 
 #' view(eoutput, top_num=10, sortBy="pvalue", details=TRUE)
-#' ## visualise the top 10 significant terms in the ontology hierarchy
-#' ## color-coded according to 10-based negative logarithm of adjusted p-values (adjp)
+#' ### visualise the top 10 significant terms in the ontology hierarchy
+#' ### color-coded according to 10-based negative logarithm of adjusted p-values (adjp)
+#' visEnrichment(eoutput)
+#' 
+#' ###########################################################
+#' # 2) Enrichment analysis for Pfam domains (Pfam)
+#' ## 2a) load Pfam (as 'InfoDataFrame' object)
+#' Pfam <- dcRDataLoader('Pfam')
+#' ### randomly select 100 domains as a list of domains of interest
+#' data <- sample(rowNames(Pfam), 100)
+#' ## 2b) perform enrichment analysis, producing an object of S4 class 'Eoutput'
+#' eoutput <- dcEnrichment(data, domain="Pfam", ontology="GOMF")
+#' eoutput
+#' ## 2c) view the top 10 significance terms 
+#' view(eoutput, top_num=10, sortBy="pvalue", details=TRUE)
+#' ## 2d) visualise the top 10 significant terms in the ontology hierarchy
+#' ### color-coded according to 10-based negative logarithm of adjusted p-values (adjp)
+#' visEnrichment(eoutput)
+#' ## 2e) the same as above but using a customised background
+#' ### randomly select 1000 domains as background
+#' background <- sample(rowNames(Pfam), 1000)
+#' ### perform enrichment analysis, producing an object of S4 class 'Eoutput'
+#' eoutput <- dcEnrichment(data, background=background, domain="Pfam", ontology="GOMF")
+#' eoutput
+#' ### view the top 10 significance terms 
+#' view(eoutput, top_num=10, sortBy="pvalue", details=TRUE)
+#' ### visualise the top 10 significant terms in the ontology hierarchy
+#' ### color-coded according to 10-based negative logarithm of adjusted p-values (adjp)
+#' visEnrichment(eoutput)
+#' 
+#' ###########################################################
+#' # 3) Enrichment analysis for InterPro domains (InterPro)
+#' ## 3a) load InterPro (as 'InfoDataFrame' object)
+#' InterPro <- dcRDataLoader('InterPro')
+#' ### randomly select 100 domains as a list of domains of interest
+#' data <- sample(rowNames(InterPro), 100)
+#' ## 3b) perform enrichment analysis, producing an object of S4 class 'Eoutput'
+#' eoutput <- dcEnrichment(data, domain="InterPro", ontology="GOMF")
+#' eoutput
+#' ## 3c) view the top 10 significance terms 
+#' view(eoutput, top_num=10, sortBy="pvalue", details=TRUE)
+#' ## 3d) visualise the top 10 significant terms in the ontology hierarchy
+#' ### color-coded according to 10-based negative logarithm of adjusted p-values (adjp)
+#' visEnrichment(eoutput)
+#' ## 3e) the same as above but using a customised background
+#' ### randomly select 1000 domains as background
+#' background <- sample(rowNames(InterPro), 1000)
+#' ### perform enrichment analysis, producing an object of S4 class 'Eoutput'
+#' eoutput <- dcEnrichment(data, background=background, domain="InterPro", ontology="GOMF")
+#' eoutput
+#' ### view the top 10 significance terms 
+#' view(eoutput, top_num=10, sortBy="pvalue", details=TRUE)
+#' ### visualise the top 10 significant terms in the ontology hierarchy
+#' ### color-coded according to 10-based negative logarithm of adjusted p-values (adjp)
 #' visEnrichment(eoutput)
 #' }
 
-dcEnrichment <- function(data, background=NULL, domain=c("SCOP.sf","SCOP.fa"), ontology=c("GOBP","GOMF","GOCC","DO","HPPA","HPMI","HPON","MP","EC","KW","UP"), sizeRange=c(10,1000), min.overlap=3, which_distance=NULL, test=c("HypergeoTest","FisherTest","BinomialTest"), p.adjust.method=c("BH", "BY", "bonferroni", "holm", "hochberg", "hommel"), ontology.algorithm=c("none","pc","elim","lea"), elim.pvalue=1e-2, lea.depth=2, verbose=T, RData.location="http://supfam.org/dcGOR/data")
+dcEnrichment <- function(data, background=NULL, domain=c("SCOP.sf","SCOP.fa","Pfam","InterPro"), ontology=c("GOBP","GOMF","GOCC","DO","HPPA","HPMI","HPON","MP","EC","KW","UP"), sizeRange=c(10,1000), min.overlap=3, which_distance=NULL, test=c("HypergeoTest","FisherTest","BinomialTest"), p.adjust.method=c("BH", "BY", "bonferroni", "holm", "hochberg", "hommel"), ontology.algorithm=c("none","pc","elim","lea"), elim.pvalue=1e-2, lea.depth=2, verbose=T, RData.location="http://supfam.org/dcGOR/data")
 {
     startT <- Sys.time()
     message(paste(c("Start at ",as.character(startT)), collapse=""), appendLF=T)
@@ -315,7 +364,7 @@ dcEnrichment <- function(data, background=NULL, domain=c("SCOP.sf","SCOP.fa"), o
         }
     
         pvals <- sapply(terms, function(term){
-            domains.term <- as.numeric(unique(unlist(gs[term])))
+            domains.term <- unique(unlist(gs[term]))
             p.value <- switch(test,
                 FisherTest =  doFisherTest(domains.group, domains.term, domains.universe),
                 HypergeoTest = doHypergeoTest(domains.group, domains.term, domains.universe),
@@ -324,7 +373,7 @@ dcEnrichment <- function(data, background=NULL, domain=c("SCOP.sf","SCOP.fa"), o
         })
         
         zscores <- sapply(terms, function(term){
-            domains.term <- as.numeric(unique(unlist(gs[term])))
+            domains.term <- unique(unlist(gs[term]))
             zscoreHyper(domains.group, domains.term, domains.universe)
         })
 
@@ -606,7 +655,7 @@ dcEnrichment <- function(data, background=NULL, domain=c("SCOP.sf","SCOP.fa"), o
     }
 
     overlaps <- sapply(names(gs), function(term){
-        domains.term <- as.numeric(unique(unlist(gs[term])))
+        domains.term <- unique(unlist(gs[term]))
         intersect(domains.group, domains.term)
 
     })

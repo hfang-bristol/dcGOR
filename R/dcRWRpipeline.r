@@ -110,7 +110,6 @@ dcRWRpipeline <- function(data, g, method=c("indirect","direct"), normalise=c("l
         stop("The function must apply to either 'igraph' or 'Dnetwork' object.\n")
     }
     
-    
     ####################################################
     # A function to indicate the running progress
     progress_indicate <- function(i, B, step, flag=F){

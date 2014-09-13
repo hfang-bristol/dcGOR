@@ -35,6 +35,7 @@ of the assigement sign '<-', then no object will be loaded onto the
 working environment.
 }
 \examples{
+\dontrun{
 # 1) build an "InfoDataFrame" object that contains information on SCOP domain superfamilies (sf)
 SCOP.sf <-
 dcBuildInfoDataFrame(input.file="http://supfam.org/dcGOR/data/SCOPsf/SCOP.sf.txt",
@@ -46,6 +47,7 @@ SCOP.fa <-
 dcBuildInfoDataFrame(input.file="http://supfam.org/dcGOR/data/SCOPfa/SCOP.fa.txt",
 output.file="SCOP.fa.RData")
 SCOP.fa
+}
 }
 \seealso{
 \code{\link{InfoDataFrame}}
