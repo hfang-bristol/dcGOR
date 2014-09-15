@@ -3,20 +3,20 @@
 \alias{dcBuildOnto}
 \title{Function to build an object of the S4 class Onto from input files}
 \usage{
-dcBuildOnto(relations.file, nodes.file, output.file = NULL)
+dcBuildOnto(relations.file, nodes.file, output.file = "Onto.RData")
 }
 \arguments{
 \item{relations.file}{an input file containing term relations (i.e.
 edges from parent terms to child terms). For example, a file containing
-relations between GO Biological Process (GOBP) terms can be found in
-\url{http://supfam.org/dcGOR/data/onto/igraph_GOBP_edges.txt}. As seen
+relations between GO Molecular Function (GOMF) terms can be found in
+\url{http://supfam.org/dcGOR/data/onto/igraph_GOMF_edges.txt}. As seen
 in this example, the input file must contain the header (in the first
 row) and two columns: 1st column for parent term ID, and 2nd column for
 child term ID}
 
 \item{nodes.file}{an input file containing term/node information. For
-example, a file containing GO Biological Process (GOBP) terms can be
-found in \url{http://supfam.org/dcGOR/data/onto/igraph_GOBP_nodes.txt}.
+example, a file containing GO Molecular Function (GOMF) terms can be
+found in \url{http://supfam.org/dcGOR/data/onto/igraph_GOMF_nodes.txt}.
 As seen in this example, the input file must contain the header (in the
 first row) and five columns: 1st column 'name' for node names (actually
 term ID; must be unique), 2nd column 'term_id' for term ID, 3rd
@@ -49,12 +49,12 @@ working environment.
 }
 \examples{
 \dontrun{
-# build an "Onto" object for annotations of SCOP domain superfamilies (sf) by GOBP terms
-onto.GOBP <-
-dcBuildOnto(relations.file="http://supfam.org/dcGOR/data/onto/igraph_GOBP_edges.txt",
-nodes.file="http://supfam.org/dcGOR/data/onto/igraph_GOBP_nodes.txt",
-output.file="onto.GOBP.RData")
-onto.GOBP
+# build an "Onto" object for GO Molecular Function
+onto.GOMF <-
+dcBuildOnto(relations.file="http://supfam.org/dcGOR/data/onto/igraph_GOMF_edges.txt",
+nodes.file="http://supfam.org/dcGOR/data/onto/igraph_GOMF_nodes.txt",
+output.file="onto.GOMF.RData")
+onto.GOMF
 }
 }
 \seealso{

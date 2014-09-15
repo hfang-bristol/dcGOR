@@ -2,9 +2,9 @@
 #'
 #' \code{dcBuildAnno} is supposed to build an object of of the S4 class \code{\link{Anno}}, given input files. These input files include 1) a file containing domain information, 2) a file containing term information, and 3) a file containing associations between domains and terms. 
 #'
-#' @param domain_info.file an input file containing domain information. For example, a file containing SCOP domain superfamilies (sf) can be found in \url{http://supfam.org/dcGOR/data/SCOPsf/SCOP.sf.txt}. As seen in this example, the input file must contain the header (in the first row), and entries in the first column intend to be domain ID (and must be unique)
-#' @param term_info.file an input file containing term information. For example, a file containing Gene Ontology (GO) terms can be found in \url{http://supfam.org/dcGOR/data/SCOPsf/GO.txt}. As seen in this example, the input file must contain the header (in the first row) and four columns: 1st column for term ID (must be unique), 2nd column for term name, 3rd column for term namespace, and 4th column for term distance. These four columns must be provided, but the content for the last column can be arbitrary (if it is hard to prepare)
-#' @param association.file an input file containing associations between domains and terms. For example, a file containing associations between SCOP domain superfamilies and GO Biological Process (GOBP) terms can be found in \url{http://supfam.org/dcGOR/data/SCOPsf/Domain2GOBP.txt}. As seen in this example, the input file must contain the header (in the first row) and two columns: 1st column for domain ID (corresponding to the first column in 'domain_info.file'), 2nd column for term ID (corresponding to the first column in 'term_info.file'). If there are additional columns, these columns will be ignored (like this case)
+#' @param domain_info.file an input file containing domain information. For example, a file containing InterPro domains (InterPro) can be found in \url{http://supfam.org/dcGOR/data/InterPro/InterPro.txt}. As seen in this example, the input file must contain the header (in the first row), and entries in the first column intend to be domain ID (and must be unique)
+#' @param term_info.file an input file containing term information. For example, a file containing Gene Ontology (GO) terms can be found in \url{http://supfam.org/dcGOR/data/InterPro/GO.txt}. As seen in this example, the input file must contain the header (in the first row) and four columns: 1st column for term ID (must be unique), 2nd column for term name, 3rd column for term namespace, and 4th column for term distance. These four columns must be provided, but the content for the last column can be arbitrary (if it is hard to prepare)
+#' @param association.file an input file containing associations between domains and terms. For example, a file containing associations between InterPro domains and GO Molecular Function (GOMF) terms can be found in \url{http://supfam.org/dcGOR/data/InterPro/Domain2GOMF.txt}. As seen in this example, the input file must contain the header (in the first row) and two columns: 1st column for domain ID (corresponding to the first column in 'domain_info.file'), 2nd column for term ID (corresponding to the first column in 'term_info.file'). If there are additional columns, these columns will be ignored
 #' @param output.file an output file used to save the built object as an RData-formatted file. If NULL, this file will be saved into "Anno.RData" in the current working local directory
 #' @return 
 #' Any use-specified variable that is given on the right side of the assigement sign '<-', which contains the built \code{Anno} object.
@@ -16,11 +16,11 @@
 #' @examples
 #' \dontrun{
 #' # build an "Anno" object that contains SCOP domain superfamilies (sf) annotated by GOBP terms
-#' SCOP.sf2GOBP <- dcBuildAnno(domain_info.file="http://supfam.org/dcGOR/data/SCOPsf/SCOP.sf.txt", term_info.file="http://supfam.org/dcGOR/data/SCOPsf/GO.txt", association.file="http://supfam.org/dcGOR/data/SCOPsf/Domain2GOBP.txt", output.file="SCOP.sf2GOBP")
-#' SCOP.sf2GOBP
+#' InterPro2GOMF <- dcBuildAnno(domain_info.file="http://supfam.org/dcGOR/data/InterPro/InterPro.txt", term_info.file="http://supfam.org/dcGOR/data/InterPro/GO.txt", association.file="http://supfam.org/dcGOR/data/InterPro/Domain2GOMF.txt", output.file="InterPro2GOMF.RData")
+#' InterPro2GOMF
 #' }
 
-dcBuildAnno <- function(domain_info.file, term_info.file, association.file, output.file=NULL)
+dcBuildAnno <- function(domain_info.file, term_info.file, association.file, output.file="Anno.RData")
 {
 
     if(is.null(domain_info.file) | is.na(domain_info.file)){
@@ -123,7 +123,7 @@ dcBuildAnno <- function(domain_info.file, term_info.file, association.file, outp
     save(list=output.var, file=output.file)
 
     if(file.exists(output.file)){
-        message(sprintf("An object of S4 class 'Onto' has been built and saved into '%s'.", file.path(getwd(),output.file)), appendLF=T)
+        message(sprintf("An object of S4 class 'Anno' has been built and saved into '%s'.", file.path(getwd(),output.file)), appendLF=T)
     }
 
     invisible(x)

@@ -31,9 +31,9 @@ annoData), including: "id" for InterPro ID, and "level" always equals
 }
 
 \references{
-Hunter et al. (2012) InterPro in 2011: new developments in the family
-and domain prediction database. \emph{Nucleic Acids Res}, 40(Database
-issue):D306-12.
+Hunter et al. (2012) Manual GO annotation of predictive protein
+signatures: the InterPro approach to GO curation. \emph{Database
+(Oxford)}, 2012:bar068.
 }
 
 \seealso{

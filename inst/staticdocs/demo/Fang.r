@@ -132,7 +132,7 @@ dnetwork
 
 ## 5) heatmap the adjacency matrix of the domain network
 D <- as.matrix(adjMatrix(dnetwork))
-visHeatmapAdv(D, Rowv=F, Colv=F, dendrogram="none", colormap="bwr", zlim=c(0,1.2), KeyValueName="DO semantic similarity")
+visHeatmapAdv(D, Rowv=F, Colv=F, dendrogram="none", colormap="white-lightpink-darkred", zlim=c(0,1.2), KeyValueName="DO semantic similarity")
 
 ## 6) visualise the domain network as a graph
 ### convert it to an object of class 'igraph' (for subsequent visualisation)

@@ -15,6 +15,9 @@
 #' @param elim.pvalue the parameter only used when "ontology.algorithm" is "elim". It is used to control how to declare a signficantly enriched term (and subsequently all domains in this term are eliminated from all its ancestors)
 #' @param lea.depth the parameter only used when "ontology.algorithm" is "lea". It is used to control how many maximum depth is uded to consider the children of a term (and subsequently all domains in these children term are eliminated from the use for the recalculation of the signifance at this term)
 #' @param verbose logical to indicate whether the messages will be displayed in the screen. By default, it sets to TRUE for display
+#' @param domain.RData a file name for RData-formatted file containing an object of S4 class 'InfoDataFrame' (i.g. domain). By default, it is NULL. It is only needed when the user wants to customise enrichment analysis using their own data
+#' @param ontology.RData a file name for RData-formatted file containing an object of S4 class 'Onto' (i.g. ontology). By default, it is NULL. It is only needed when the user wants to customise enrichment analysis using their own data
+#' @param annotations.RData a file name for RData-formatted file containing an object of S4 class 'Anno' (i.g. annotations). By default, it is NULL. It is only needed when the user wants to customise enrichment analysis using their own data
 #' @param RData.location the characters to tell the location of built-in RData files. By default, it remotely locates at "http://supfam.org/dcGOR/data" or "https://github.com/hfang-bristol/dcGOR/data". For the user equipped with fast internet connection, this option can be just left as default. But it is always advisable to download these files locally. Especially when the user needs to run this function many times, there is no need to ask the function to remotely download every time (also it will unnecessarily increase the runtime). For examples, these files (as a whole or part of them) can be first downloaded into your current working directory, and then set this option as: \eqn{RData.location="."}. If RData to load is already part of package itself, this parameter can be ignored (since this function will try to load it via function \code{data} first)
 #' @return 
 #' an object of S4 class \code{\link{Eoutput}}, with following slots:
@@ -58,7 +61,7 @@
 #' ### color-coded according to 10-based negative logarithm of adjusted p-values (adjp)
 #' visEnrichment(eoutput)
 #' ## 1e) the same as above but using a customised background
-#' ### randomly select 100 domains as background
+#' ### randomly select 500 domains as background
 #' background <- sample(rowNames(SCOP.sf), 500) 
 #' ### perform enrichment analysis, producing an object of S4 class 'Eoutput'
 #' eoutput <- dcEnrichment(data, background=background, domain="SCOP.sf", ontology="GOMF")
@@ -120,9 +123,32 @@
 #' ### visualise the top 10 significant terms in the ontology hierarchy
 #' ### color-coded according to 10-based negative logarithm of adjusted p-values (adjp)
 #' visEnrichment(eoutput)
+#' 
+#' ###########################################################
+#' # 4) Advanced usage: customised data for domain, ontology and annotations
+#' # 4a) create domain, ontology and annotations
+#' ## for domain
+#' domain <- dcBuildInfoDataFrame(input.file="http://supfam.org/dcGOR/data/InterPro/InterPro.txt", output.file="domain.RData")
+#' ## for ontology
+#' dcBuildOnto(relations.file="http://supfam.org/dcGOR/data/onto/igraph_GOMF_edges.txt", nodes.file="http://supfam.org/dcGOR/data/onto/igraph_GOMF_nodes.txt", output.file="ontology.RData")
+#' ## for annotations
+#' dcBuildAnno(domain_info.file="http://supfam.org/dcGOR/data/InterPro/InterPro.txt", term_info.file="http://supfam.org/dcGOR/data/InterPro/GO.txt", association.file="http://supfam.org/dcGOR/data/InterPro/Domain2GOMF.txt", output.file="annotations.RData")
+#' ## 4b) prepare data and background
+#' ### randomly select 100 domains as a list of domains of interest
+#' data <- sample(rowNames(domain), 100)
+#' ### randomly select 1000 domains as background
+#' background <- sample(rowNames(domain), 1000)
+#' ## 4c) perform enrichment analysis, producing an object of S4 class 'Eoutput'
+#' eoutput <- dcEnrichment(data, background=background, domain.RData='domain.RData', ontology.RData='ontology.RData', annotations.RData='annotations.RData')
+#' eoutput
+#' ## 4d) view the top 10 significance terms 
+#' view(eoutput, top_num=10, sortBy="pvalue", details=TRUE)
+#' ### visualise the top 10 significant terms in the ontology hierarchy
+#' ### color-coded according to 10-based negative logarithm of adjusted p-values (adjp)
+#' visEnrichment(eoutput)
 #' }
 
-dcEnrichment <- function(data, background=NULL, domain=c("SCOP.sf","SCOP.fa","Pfam","InterPro"), ontology=c("GOBP","GOMF","GOCC","DO","HPPA","HPMI","HPON","MP","EC","KW","UP"), sizeRange=c(10,1000), min.overlap=3, which_distance=NULL, test=c("HypergeoTest","FisherTest","BinomialTest"), p.adjust.method=c("BH", "BY", "bonferroni", "holm", "hochberg", "hommel"), ontology.algorithm=c("none","pc","elim","lea"), elim.pvalue=1e-2, lea.depth=2, verbose=T, RData.location="http://supfam.org/dcGOR/data")
+dcEnrichment <- function(data, background=NULL, domain=c(NA,"SCOP.sf","SCOP.fa","Pfam","InterPro"), ontology=c(NA,"GOBP","GOMF","GOCC","DO","HPPA","HPMI","HPON","MP","EC","KW","UP"), sizeRange=c(10,1000), min.overlap=3, which_distance=NULL, test=c("HypergeoTest","FisherTest","BinomialTest"), p.adjust.method=c("BH", "BY", "bonferroni", "holm", "hochberg", "hommel"), ontology.algorithm=c("none","pc","elim","lea"), elim.pvalue=1e-2, lea.depth=2, verbose=T, domain.RData=NULL, ontology.RData=NULL, annotations.RData=NULL, RData.location="http://supfam.org/dcGOR/data")
 {
     startT <- Sys.time()
     message(paste(c("Start at ",as.character(startT)), collapse=""), appendLF=T)
@@ -143,26 +169,55 @@ dcEnrichment <- function(data, background=NULL, domain=c("SCOP.sf","SCOP.fa","Pf
     }else{
         stop("The input data must be a vector.\n")
     }
-    
-    if(verbose){
-        now <- Sys.time()
-        message(sprintf("First, load the ontology '%s', the domain '%s', and their associations (%s) ...", ontology, domain, as.character(now)), appendLF=T)
-    }
 
-    #########
-    ## load ontology information
-    g <- dcRDataLoader(paste('onto.', ontology, sep=''), RData.location=RData.location)
-    if(class(g)=="Onto"){
-        g <- dcConverter(g, from='Onto', to='igraph', verbose=F)
+    if(!is.na(domain) & !is.na(ontology)){
+    
+        if(verbose){
+            now <- Sys.time()
+            message(sprintf("First, load the ontology '%s', the domain '%s', and their associations (%s) ...", ontology, domain, as.character(now)), appendLF=T)
+        }
+        
+        #########
+        ## load ontology information
+        g <- dcRDataLoader(paste('onto.', ontology, sep=''), RData.location=RData.location)
+        if(class(g)=="Onto"){
+            g <- dcConverter(g, from='Onto', to='igraph', verbose=F)
+        }
+    
+        #########
+        ## load domain information
+        Domain <- dcRDataLoader(domain, RData.location=RData.location)
+    
+        #########
+        ## load annotation information
+        Anno <- dcRDataLoader(domain=domain, ontology=ontology, RData.location=RData.location)
+        
+    }else if(file.exists(domain.RData) & file.exists(ontology.RData) & file.exists(annotations.RData)){
+    
+        if(verbose){
+            now <- Sys.time()
+            message(sprintf("First, load customised ontology '%s', the domain '%s', and their associations '%s' (%s)...", ontology.RData, domain.RData, annotations.RData, as.character(now)), appendLF=T)
+        }
+    
+        ## load ontology informatio
+        g <- ''
+        eval(parse(text=paste("g <- get(load('", ontology.RData,"'))", sep="")))
+        if(class(g)=="Onto"){
+            g <- dcConverter(g, from='Onto', to='igraph', verbose=F)
+        }
+        ontology <- ontology.RData
+        
+        ## load domain information
+        Domain <- ''
+        eval(parse(text=paste("Domain <- get(load('", domain.RData,"'))", sep="")))
+        domain <- domain.RData
+        
+        ## load annotation information
+        Anno <- ''
+        eval(parse(text=paste("Anno <- get(load('", annotations.RData,"'))", sep="")))
+    }else{
+        stop("There is no input for domains and/or ontology and/or annotation.\n")
     }
-    
-    #########
-    ## load domain information
-    Domain <- dcRDataLoader(domain, RData.location=RData.location)
-    
-    #########
-    ## load annotation information
-    Anno <- dcRDataLoader(domain=domain, ontology=ontology, RData.location=RData.location)
     
     if(1){
         ########################

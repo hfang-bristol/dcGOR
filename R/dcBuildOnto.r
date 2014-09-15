@@ -2,8 +2,8 @@
 #'
 #' \code{dcBuildOnto} is supposed to build an object of of the S4 class \code{\link{Onto}}, given input files. These input files include 1) a file containing term relations, and 2) a file containing term/node information. 
 #'
-#' @param relations.file an input file containing term relations (i.e. edges from parent terms to child terms). For example, a file containing relations between GO Biological Process (GOBP) terms can be found in \url{http://supfam.org/dcGOR/data/onto/igraph_GOBP_edges.txt}. As seen in this example, the input file must contain the header (in the first row) and two columns: 1st column for parent term ID, and 2nd column for child term ID
-#' @param nodes.file an input file containing term/node information. For example, a file containing GO Biological Process (GOBP) terms can be found in \url{http://supfam.org/dcGOR/data/onto/igraph_GOBP_nodes.txt}. As seen in this example, the input file must contain the header (in the first row) and five columns: 1st column 'name' for node names (actually term ID; must be unique), 2nd column 'term_id' for term ID, 3rd 'term_name' for term name, 4th column 'term_namespace' for term namespace, and 5th column 'term_distance' for term distance. These five columns must be provided, the content in the first two columns are identical, and the content for the last column can be arbitrary (if it is hard to prepare)
+#' @param relations.file an input file containing term relations (i.e. edges from parent terms to child terms). For example, a file containing relations between GO Molecular Function (GOMF) terms can be found in \url{http://supfam.org/dcGOR/data/onto/igraph_GOMF_edges.txt}. As seen in this example, the input file must contain the header (in the first row) and two columns: 1st column for parent term ID, and 2nd column for child term ID
+#' @param nodes.file an input file containing term/node information. For example, a file containing GO Molecular Function (GOMF) terms can be found in \url{http://supfam.org/dcGOR/data/onto/igraph_GOMF_nodes.txt}. As seen in this example, the input file must contain the header (in the first row) and five columns: 1st column 'name' for node names (actually term ID; must be unique), 2nd column 'term_id' for term ID, 3rd 'term_name' for term name, 4th column 'term_namespace' for term namespace, and 5th column 'term_distance' for term distance. These five columns must be provided, the content in the first two columns are identical, and the content for the last column can be arbitrary (if it is hard to prepare)
 #' @param output.file an output file used to save the built object as an RData-formatted file. If NULL, this file will be saved into "Onto.RData" in the current working local directory
 #' @return 
 #' Any use-specified variable that is given on the right side of the assigement sign '<-', which contains the built \code{Onto} object.
@@ -14,12 +14,12 @@
 #' @include dcBuildOnto.r
 #' @examples
 #' \dontrun{
-#' # build an "Onto" object for annotations of SCOP domain superfamilies (sf) by GOBP terms
-#' onto.GOBP <- dcBuildOnto(relations.file="http://supfam.org/dcGOR/data/onto/igraph_GOBP_edges.txt", nodes.file="http://supfam.org/dcGOR/data/onto/igraph_GOBP_nodes.txt", output.file="onto.GOBP.RData")
-#' onto.GOBP
+#' # build an "Onto" object for GO Molecular Function
+#' onto.GOMF <- dcBuildOnto(relations.file="http://supfam.org/dcGOR/data/onto/igraph_GOMF_edges.txt", nodes.file="http://supfam.org/dcGOR/data/onto/igraph_GOMF_nodes.txt", output.file="onto.GOMF.RData")
+#' onto.GOMF
 #' }
 
-dcBuildOnto <- function(relations.file, nodes.file, output.file=NULL)
+dcBuildOnto <- function(relations.file, nodes.file, output.file="Onto.RData")
 {
     
     if(is.null(relations.file) | is.na(relations.file)){

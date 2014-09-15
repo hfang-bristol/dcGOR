@@ -4,19 +4,19 @@
 \title{Function to build an object of the S4 class Anno from input files}
 \usage{
 dcBuildAnno(domain_info.file, term_info.file, association.file,
-output.file = NULL)
+output.file = "Anno.RData")
 }
 \arguments{
 \item{domain_info.file}{an input file containing domain information.
-For example, a file containing SCOP domain superfamilies (sf) can be
-found in \url{http://supfam.org/dcGOR/data/SCOPsf/SCOP.sf.txt}. As seen
-in this example, the input file must contain the header (in the first
+For example, a file containing InterPro domains (InterPro) can be found
+in \url{http://supfam.org/dcGOR/data/InterPro/InterPro.txt}. As seen in
+this example, the input file must contain the header (in the first
 row), and entries in the first column intend to be domain ID (and must
 be unique)}
 
 \item{term_info.file}{an input file containing term information. For
 example, a file containing Gene Ontology (GO) terms can be found in
-\url{http://supfam.org/dcGOR/data/SCOPsf/GO.txt}. As seen in this
+\url{http://supfam.org/dcGOR/data/InterPro/GO.txt}. As seen in this
 example, the input file must contain the header (in the first row) and
 four columns: 1st column for term ID (must be unique), 2nd column for
 term name, 3rd column for term namespace, and 4th column for term
@@ -25,13 +25,13 @@ last column can be arbitrary (if it is hard to prepare)}
 
 \item{association.file}{an input file containing associations between
 domains and terms. For example, a file containing associations between
-SCOP domain superfamilies and GO Biological Process (GOBP) terms can be
-found in \url{http://supfam.org/dcGOR/data/SCOPsf/Domain2GOBP.txt}. As
-seen in this example, the input file must contain the header (in the
-first row) and two columns: 1st column for domain ID (corresponding to
-the first column in 'domain_info.file'), 2nd column for term ID
-(corresponding to the first column in 'term_info.file'). If there are
-additional columns, these columns will be ignored (like this case)}
+InterPro domains and GO Molecular Function (GOMF) terms can be found in
+\url{http://supfam.org/dcGOR/data/InterPro/Domain2GOMF.txt}. As seen in
+this example, the input file must contain the header (in the first row)
+and two columns: 1st column for domain ID (corresponding to the first
+column in 'domain_info.file'), 2nd column for term ID (corresponding to
+the first column in 'term_info.file'). If there are additional columns,
+these columns will be ignored}
 
 \item{output.file}{an output file used to save the built object as an
 RData-formatted file. If NULL, this file will be saved into
@@ -58,12 +58,12 @@ working environment.
 \examples{
 \dontrun{
 # build an "Anno" object that contains SCOP domain superfamilies (sf) annotated by GOBP terms
-SCOP.sf2GOBP <-
-dcBuildAnno(domain_info.file="http://supfam.org/dcGOR/data/SCOPsf/SCOP.sf.txt",
-term_info.file="http://supfam.org/dcGOR/data/SCOPsf/GO.txt",
-association.file="http://supfam.org/dcGOR/data/SCOPsf/Domain2GOBP.txt",
-output.file="SCOP.sf2GOBP")
-SCOP.sf2GOBP
+InterPro2GOMF <-
+dcBuildAnno(domain_info.file="http://supfam.org/dcGOR/data/InterPro/InterPro.txt",
+term_info.file="http://supfam.org/dcGOR/data/InterPro/GO.txt",
+association.file="http://supfam.org/dcGOR/data/InterPro/Domain2GOMF.txt",
+output.file="InterPro2GOMF.RData")
+InterPro2GOMF
 }
 }
 \seealso{

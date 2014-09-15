@@ -95,6 +95,30 @@
 #' edge.width <- 1 + (x-min(x))/(max(x)-min(x))*3
 #' ### do visualisation
 #' dnet::visNet(g=ig, vertex.shape="sphere", edge.width=edge.width, edge.label=x, edge.label.cex=0.7)
+#' 
+#' ###########################################################
+#' # 4) Advanced usage: customised data for ontology and annotations
+#' # 4a) customise ontology
+#' g <- dcBuildOnto(relations.file="http://supfam.org/dcGOR/data/onto/igraph_GOMF_edges.txt", nodes.file="http://supfam.org/dcGOR/data/onto/igraph_GOMF_nodes.txt", output.file="ontology.RData")
+#' # 4b) customise Anno
+#' Anno <- dcBuildAnno(domain_info.file="http://supfam.org/dcGOR/data/InterPro/InterPro.txt", term_info.file="http://supfam.org/dcGOR/data/InterPro/GO.txt", association.file="http://supfam.org/dcGOR/data/InterPro/Domain2GOMF.txt", output.file="annotations.RData")
+#' ## 4c) prepare for ontology appended with annotation information
+#' dag <- dcDAGannotate(g, annotations=Anno, path.mode="shortest_paths", verbose=FALSE)
+#' ## 4d) calculate pair-wise semantic similarity between 8 randomly chosen domains
+#' alldomains <- unique(unlist(nInfo(dag)$annotations))
+#' domains <- sample(alldomains,8)
+#' dnetwork <- dcDAGdomainSim(g=dag, domains=domains, method.domain="BM.average", method.term="Resnik", parallel=FALSE, verbose=TRUE)
+#' dnetwork
+#' ## 4e) convert it to an object of class 'igraph'
+#' ig <- dcConverter(dnetwork, from='Dnetwork', to='igraph')
+#' ig
+#' ## 4f) visualise the domain network
+#' ### extract edge weight (with 2-digit precision)
+#' x <- signif(E(ig)$weight, digits=2)
+#' ### rescale into an interval [1,4] as edge width
+#' edge.width <- 1 + (x-min(x))/(max(x)-min(x))*3
+#' ### do visualisation
+#' dnet::visNet(g=ig, vertex.shape="sphere", edge.width=edge.width, edge.label=x, edge.label.cex=0.7)
 #' }
 
 dcDAGdomainSim <- function (g, domains=NULL, method.domain=c("BM.average","BM.max","BM.complete","average","max"), method.term=c("Resnik","Lin","Schlicker","Jiang","Pesquita"), force=TRUE, fast=TRUE, parallel=TRUE, multicores=NULL, verbose=TRUE)

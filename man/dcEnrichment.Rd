@@ -3,8 +3,10 @@
 \alias{dcEnrichment}
 \title{Function to conduct ontology enrichment analysis given a group of domains}
 \usage{
-dcEnrichment(data, background = NULL, domain = c("SCOP.sf", "SCOP.fa",
-"Pfam", "InterPro"), ontology = c("GOBP", "GOMF", "GOCC", "DO", "HPPA",
+dcEnrichment(data, background = NULL, domain = c(NA, "SCOP.sf",
+"SCOP.fa",
+"Pfam", "InterPro"), ontology = c(NA, "GOBP", "GOMF", "GOCC", "DO",
+"HPPA",
 "HPMI", "HPON", "MP", "EC", "KW", "UP"), sizeRange = c(10, 1000),
 min.overlap = 3, which_distance = NULL, test = c("HypergeoTest",
 "FisherTest", "BinomialTest"), p.adjust.method = c("BH", "BY",
@@ -12,6 +14,7 @@ min.overlap = 3, which_distance = NULL, test = c("HypergeoTest",
 "holm", "hochberg", "hommel"), ontology.algorithm = c("none", "pc",
 "elim",
 "lea"), elim.pvalue = 0.01, lea.depth = 2, verbose = T,
+domain.RData = NULL, ontology.RData = NULL, annotations.RData = NULL,
 RData.location = "http://supfam.org/dcGOR/data")
 }
 \arguments{
@@ -91,6 +94,21 @@ signifance at this term)}
 
 \item{verbose}{logical to indicate whether the messages will be
 displayed in the screen. By default, it sets to TRUE for display}
+
+\item{domain.RData}{a file name for RData-formatted file containing an
+object of S4 class 'InfoDataFrame' (i.g. domain). By default, it is
+NULL. It is only needed when the user wants to customise enrichment
+analysis using their own data}
+
+\item{ontology.RData}{a file name for RData-formatted file containing
+an object of S4 class 'Onto' (i.g. ontology). By default, it is NULL.
+It is only needed when the user wants to customise enrichment analysis
+using their own data}
+
+\item{annotations.RData}{a file name for RData-formatted file
+containing an object of S4 class 'Anno' (i.g. annotations). By default,
+it is NULL. It is only needed when the user wants to customise
+enrichment analysis using their own data}
 
 \item{RData.location}{the characters to tell the location of built-in
 RData files. By default, it remotely locates at
@@ -188,7 +206,7 @@ view(eoutput, top_num=10, sortBy="pvalue", details=TRUE)
 ### color-coded according to 10-based negative logarithm of adjusted p-values (adjp)
 visEnrichment(eoutput)
 ## 1e) the same as above but using a customised background
-### randomly select 100 domains as background
+### randomly select 500 domains as background
 background <- sample(rowNames(SCOP.sf), 500)
 ### perform enrichment analysis, producing an object of S4 class 'Eoutput'
 eoutput <- dcEnrichment(data, background=background, domain="SCOP.sf",
@@ -249,6 +267,38 @@ eoutput <- dcEnrichment(data, background=background, domain="InterPro",
 ontology="GOMF")
 eoutput
 ### view the top 10 significance terms
+view(eoutput, top_num=10, sortBy="pvalue", details=TRUE)
+### visualise the top 10 significant terms in the ontology hierarchy
+### color-coded according to 10-based negative logarithm of adjusted p-values (adjp)
+visEnrichment(eoutput)
+
+###########################################################
+# 4) Advanced usage: customised data for domain, ontology and annotations
+# 4a) create domain, ontology and annotations
+## for domain
+domain <-
+dcBuildInfoDataFrame(input.file="http://supfam.org/dcGOR/data/InterPro/InterPro.txt",
+output.file="domain.RData")
+## for ontology
+dcBuildOnto(relations.file="http://supfam.org/dcGOR/data/onto/igraph_GOMF_edges.txt",
+nodes.file="http://supfam.org/dcGOR/data/onto/igraph_GOMF_nodes.txt",
+output.file="ontology.RData")
+## for annotations
+dcBuildAnno(domain_info.file="http://supfam.org/dcGOR/data/InterPro/InterPro.txt",
+term_info.file="http://supfam.org/dcGOR/data/InterPro/GO.txt",
+association.file="http://supfam.org/dcGOR/data/InterPro/Domain2GOMF.txt",
+output.file="annotations.RData")
+## 4b) prepare data and background
+### randomly select 100 domains as a list of domains of interest
+data <- sample(rowNames(domain), 100)
+### randomly select 1000 domains as background
+background <- sample(rowNames(domain), 1000)
+## 4c) perform enrichment analysis, producing an object of S4 class 'Eoutput'
+eoutput <- dcEnrichment(data, background=background,
+domain.RData='domain.RData', ontology.RData='ontology.RData',
+annotations.RData='annotations.RData')
+eoutput
+## 4d) view the top 10 significance terms
 view(eoutput, top_num=10, sortBy="pvalue", details=TRUE)
 ### visualise the top 10 significant terms in the ontology hierarchy
 ### color-coded according to 10-based negative logarithm of adjusted p-values (adjp)

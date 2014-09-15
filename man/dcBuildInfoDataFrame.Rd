@@ -7,11 +7,11 @@ dcBuildInfoDataFrame(input.file, output.file = "InfoDataFrame.RData")
 }
 \arguments{
 \item{input.file}{an input file used to build the object. For example,
-a file containing SCOP domain superfamilies (sf) can be found in
-\url{http://supfam.org/dcGOR/data/SCOPsf/SCOP.sf.txt}. As seen in this
-example, the input file must contain the header (in the first row), and
-entries in the first column intend to be domain identities (and must be
-unique)}
+a file containing InterPro domains (InterPro) can be found in
+\url{http://supfam.org/dcGOR/data/InterPro/InterPro.txt}. As seen in
+this example, the input file must contain the header (in the first
+row), and entries in the first column intend to be domain identities
+(and must be unique)}
 
 \item{output.file}{an output file used to save the built object as an
 RData-formatted file. If NULL, this file will be saved into
@@ -36,17 +36,11 @@ working environment.
 }
 \examples{
 \dontrun{
-# 1) build an "InfoDataFrame" object that contains information on SCOP domain superfamilies (sf)
-SCOP.sf <-
-dcBuildInfoDataFrame(input.file="http://supfam.org/dcGOR/data/SCOPsf/SCOP.sf.txt",
-output.file="SCOP.sf.RData")
-SCOP.sf
-
-# 2) build an "InfoDataFrame" object that contains information on SCOP domain families (fa)
-SCOP.fa <-
-dcBuildInfoDataFrame(input.file="http://supfam.org/dcGOR/data/SCOPfa/SCOP.fa.txt",
-output.file="SCOP.fa.RData")
-SCOP.fa
+# build an "InfoDataFrame" object that contains information on InterPro domains (InterPro)
+InterPro <-
+dcBuildInfoDataFrame(input.file="http://supfam.org/dcGOR/data/InterPro/InterPro.txt",
+output.file="InterPro.RData")
+InterPro
 }
 }
 \seealso{

@@ -100,7 +100,13 @@ visEnrichment <- function (e, nodes_query=NULL, path.mode=c("all_shortest_paths"
     
     ######################################################################################
     ## load ontology (as an 'igraph' object)
-    g <- dcRDataLoader(paste('onto.', e@ontology, sep=''), verbose=F)
+    
+    if(class(suppressWarnings(try(dcRDataLoader(paste('onto.', e@ontology, sep=''), verbose=F), T)))=="try-error"){
+        g <- ''
+        eval(parse(text=paste("g <- get(load('", e@ontology,"'))", sep="")))
+    }else{
+        g <- dcRDataLoader(paste('onto.', e@ontology, sep=''), verbose=F)
+    }
     if(class(g)=="Onto"){
         g <- dcConverter(g, from='Onto', to='igraph', verbose=F)
     }
