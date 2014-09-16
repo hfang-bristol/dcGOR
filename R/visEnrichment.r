@@ -112,13 +112,13 @@ visEnrichment <- function (e, nodes_query=NULL, path.mode=c("all_shortest_paths"
     }
     
     if(is.null(nodes_query)){
-        nodes_query <- names(sort(adjp(e))[1:5])
+        nodes_query <- names(sort(pvalue(e))[1:5])
     }else{
         ind <- match(nodes_query, V(g)$name)
         nodes_query <- nodes_query[!is.na(ind)]
         if(length(nodes_query)==0){
             warnings("Nodes/terms in your query are not found in the ontology!\nInstead, the top 5 significant terms (in terms of adjusted p-value) will be used.\n")
-            nodes_query <- names(sort(adjp(e))[1:5])
+            nodes_query <- names(sort(pvalue(e))[1:5])
         }
     }
     

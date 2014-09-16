@@ -1,14 +1,14 @@
 Package: dcGOR
 Type: Package
-Title: an R package tailored to the needs of analysing ontologies and annotations on protein domains
+Title: Analysis of ontologies and protein domain annotations.
 Version: 1.0.3
-Date: 2014-9-15
+Date: 2014-9-16
 Author: Hai Fang and Julian Gough
 Maintainer: Hai Fang <hfang@cs.bris.ac.uk>
 Depends: R (>= 3.1.0), Matrix, igraph, dnet
-Imports: methods
-Suggests: foreach, doMC
-Description: The 'dcGOR' package is intended to provide the wider bioinformatics community to easily analyse domain-centric ontologies and annotations, particularly those in the dcGO database. The dcGO (http://supfam.org/SUPERFAMILY/dcGO) is a comprehensive domain-centric database for annotating protein domains using a variety of ontologies on functions, phenotypes, diseases and more. With the package, users are expected to easily analyse and visualise domain-centric ontologies and annotations. Supported analyses include but are not limited to: easy access to a wide range of ontologies and their domain-centric annotations; able to build customised ontologies and annotations; enrichment analysis and visual outputs; semantic similarity between annotated domains from ontology term semantic similarity; random walk with restart upon domain-domain (semantic) networks; and high-performance parallel computing.
+Imports: methods, foreach, doMC
+Suggests: 
+Description: The package is used to analyse domain-centric ontologies and annotations, particularly those in the dcGO database. The dcGO (http://supfam.org/SUPERFAMILY/dcGO) is a comprehensive domain-centric database for annotating protein domains using a panel of ontologies. With the package, users are expected to analyse and visualise domain-centric ontologies and annotations. Supported analyses include but are not limited to: easy access to a wide range of ontologies and their domain-centric annotations; able to build customised ontologies and annotations; enrichment analysis and visual outputs; semantic similarity between annotated domains from ontology term semantic similarity; random walk with restart upon domain-domain (semantic similarity) networks; and high-performance parallel computing.
 URL: http://supfam.org/dcGOR
 Collate: 
     'ClassMethod-dcGOR.r'

@@ -30,6 +30,8 @@
 #' @export
 #' @importFrom dnet dRWR dCheckParallel
 #' @import Matrix
+#' @import foreach
+#' @import doMC
 #' @seealso \code{\link{dcRDataLoader}}, \code{\link{dcDAGannotate}}, \code{\link{dcDAGdomainSim}}, \code{\link{dcConverter}}
 #' @include dcRWRpipeline.r
 #' @examples

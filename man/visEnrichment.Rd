@@ -160,7 +160,6 @@ node: 0.75 by default}
 }
 }
 \examples{
-\dontrun{
 # 1) load SCOP.sf (as 'InfoDataFrame' object)
 SCOP.sf <- dcRDataLoader('SCOP.sf')
 # randomly select 20 domains
@@ -184,7 +183,6 @@ nodes.highlight <- rep("blue", length(nodes_query))
 names(nodes.highlight) <- nodes_query
 visEnrichment(eOutput, nodes_query=nodes_query,
 node.attrs=list(color=nodes.highlight))
-}
 }
 \seealso{
 \code{\link{dcEnrichment}}, \code{\link{dcRDataLoader}},

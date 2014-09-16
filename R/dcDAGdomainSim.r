@@ -21,6 +21,8 @@
 #' @export
 #' @importFrom dnet dDAGinduce dDAGtip dDAGtermSim dCheckParallel visNet
 #' @import Matrix
+#' @import foreach
+#' @import doMC
 #' @seealso \code{\link{dcRDataLoader}}, \code{\link{dcDAGannotate}}, \code{\link{dcConverter}}, \code{\link{Dnetwork-class}}
 #' @include dcDAGdomainSim.r
 #' @examples

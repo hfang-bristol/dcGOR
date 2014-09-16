@@ -49,7 +49,7 @@ write.table(out, file="Domains_unique_in_human.txt", col.names=T, row.names=F, s
 data <- domains_human_unique
 background <- rowNames(domains_metazoa)
 
-## 1) GOBP enrichment analysis, producing an object of S4 class 'Eoutput'
+## 1a) GOBP enrichment analysis, producing an object of S4 class 'Eoutput'
 ### By default, using all annotatable domains as the background
 eoutput <- dcEnrichment(data, domain="SCOP.sf", ontology="GOBP")
 eoutput
@@ -61,7 +61,7 @@ view(eoutput, top_num=5, sortBy="pvalue", details=FALSE)
 #### color-coded according to 10-based negative logarithm of adjusted p-values (adjp)
 visEnrichment(eoutput)
 
-## 1a) GOBP enrichment analysis, producing an object of S4 class 'Eoutput'
+## 1b) GOBP enrichment analysis, producing an object of S4 class 'Eoutput'
 ### Alternatively, using all domains in Metazoa as the background (customised)
 eoutput <- dcEnrichment(data, background, domain="SCOP.sf", ontology="GOBP")
 eoutput
@@ -132,7 +132,7 @@ dnetwork
 
 ## 5) heatmap the adjacency matrix of the domain network
 D <- as.matrix(adjMatrix(dnetwork))
-visHeatmapAdv(D, Rowv=F, Colv=F, dendrogram="none", colormap="white-lightpink-darkred", zlim=c(0,1.2), KeyValueName="DO semantic similarity")
+supraHex::visHeatmapAdv(D, Rowv=F, Colv=F, dendrogram="none", colormap="white-lightpink-darkred", zlim=c(0,1.2), KeyValueName="DO semantic similarity")
 
 ## 6) visualise the domain network as a graph
 ### convert it to an object of class 'igraph' (for subsequent visualisation)

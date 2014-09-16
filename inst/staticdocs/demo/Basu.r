@@ -27,7 +27,7 @@ write(eoutput, file='Basu_GOBP_enrichments.txt')
 view(eoutput, top_num=5, sortBy="pvalue", details=FALSE)
 ### visualise the top 5 significant terms in GOMF DAG
 #### color-coded according to 10-based negative logarithm of adjusted p-values (adjp)
-visEnrichment(eoutput)
+visEnrichment(eoutput, layout.orientation="top_bottom")
 
 ## 2) GOMF enrichment analysis, producing an object of S4 class 'Eoutput'
 eoutput <- dcEnrichment(data, domain="Pfam", ontology="GOMF")
