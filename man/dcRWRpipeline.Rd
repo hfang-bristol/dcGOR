@@ -115,6 +115,7 @@ product of both numbers are huge, it is better to use 'indrect' method
 (for a single run).
 }
 \examples{
+\dontrun{
 # 1) load onto.GOMF (as 'Onto' object)
 g <- dcRDataLoader('onto.GOMF')
 
@@ -141,6 +142,7 @@ rownames(data) <- id(dnetwork)[1:5]
 # calcualte their two contact graph
 coutput <- dcRWRpipeline(data=data, g=dnetwork, parallel=FALSE)
 coutput
+}
 }
 \seealso{
 \code{\link{dcRDataLoader}}, \code{\link{dcDAGannotate}},

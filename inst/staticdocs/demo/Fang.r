@@ -83,8 +83,6 @@ view(eoutput, top_num=5, sortBy="pvalue", details=FALSE)
 ### visualise the top 5 significant terms in GOMF DAG
 #### color-coded according to 10-based negative logarithm of adjusted p-values (adjp)
 visEnrichment(eoutput)
-#### color-coded according to zscore
-visEnrichment(eoutput, data.type='zscore')
 
 ## 3) HPPA enrichment analysis, producing an object of S4 class 'Eoutput'
 eoutput <- dcEnrichment(data, domain="SCOP.sf", ontology="HPPA")

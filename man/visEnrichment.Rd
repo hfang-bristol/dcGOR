@@ -3,25 +3,29 @@
 \alias{visEnrichment}
 \title{Function to visualise enrichment analysis outputs in the context of the ontology hierarchy}
 \usage{
-visEnrichment(e, nodes_query = NULL, path.mode =
-c("all_shortest_paths",
-"shortest_paths", "all_paths"), data.type = c("adjp", "pvalue",
-"zscore"),
-height = 7, width = 7, margin = rep(0.1, 4), colormap = c("yr", "bwr",
-"jet", "gbr", "wyr", "br", "rainbow", "wb", "lightyellow-orange"),
-ncolors = 40, zlim = NULL, colorbar = T, colorbar.fraction = 0.1,
-newpage = T, layout.orientation = c("left_right", "top_bottom",
-"bottom_top", "right_left"), node.info = c("both", "none", "term_id",
-"term_name", "full_term_name"), graph.node.attrs = NULL,
-graph.edge.attrs = NULL, node.attrs = NULL)
+visEnrichment(e, nodes_query = NULL, num_top_nodes = 5,
+path.mode = c("all_shortest_paths", "shortest_paths", "all_paths"),
+data.type = c("adjp", "pvalue", "zscore"), height = 7, width = 7,
+margin = rep(0.1, 4), colormap = c("yr", "bwr", "jet", "gbr", "wyr",
+"br",
+"rainbow", "wb", "lightyellow-orange"), ncolors = 40, zlim = NULL,
+colorbar = T, colorbar.fraction = 0.1, newpage = T,
+layout.orientation = c("left_right", "top_bottom", "bottom_top",
+"right_left"), node.info = c("both", "none", "term_id", "term_name",
+"full_term_name"), graph.node.attrs = NULL, graph.edge.attrs = NULL,
+node.attrs = NULL)
 }
 \arguments{
 \item{e}{an object of S4 class \code{\link{Eoutput}}}
 
 \item{nodes_query}{a verctor containing a list of nodes/terms in query.
 These nodes are used to produce a subgraph of the ontology DAG induced
-by them. If NULL, the top 5 significant terms (in terms of adjusted
-p-value) will be used}
+by them. If NULL, the top significant terms (in terms of p-value) will
+be determined by the next 'num_top_nodes'}
+
+\item{num_top_nodes}{a numeric value specifying the number of the top
+significant terms (in terms of p-value) will be used. This parameter
+does not work if the previous 'nodes_query' has been specified}
 
 \item{path.mode}{the mode of paths induced by nodes in query. It can be
 "all_paths" for all possible paths to the root, "shortest_paths" for
@@ -160,29 +164,31 @@ node: 0.75 by default}
 }
 }
 \examples{
+\dontrun{
 # 1) load SCOP.sf (as 'InfoDataFrame' object)
 SCOP.sf <- dcRDataLoader('SCOP.sf')
 # randomly select 20 domains
 data <- sample(rowNames(SCOP.sf), 20)
 
 # 2) perform enrichment analysis, producing an object of S4 class 'Eoutput'
-eOutput <- dcEnrichment(data, domain="SCOP.sf", ontology="GOMF")
-eOutput
+eoutput <- dcEnrichment(data, domain="SCOP.sf", ontology="GOMF")
+eoutput
 
 # 3) visualise the top 10 significant terms
-# color-coded according to 10-based negative logarithm of adjusted p-values (adjp)
-visEnrichment(eOutput)
+# color-coded according to 10-based negative logarithm of p-values
+visEnrichment(eoutput)
 # color-coded according to zscore
-visEnrichment(eOutput, data.type='zscore')
+visEnrichment(eoutput, data.type='zscore')
 
 # 4) visualise the top 5 significant terms in the ontology hierarchy
-nodes_query <- names(sort(adjp(eOutput))[1:5])
-visEnrichment(eOutput, nodes_query=nodes_query)
+nodes_query <- names(sort(adjp(eoutput))[1:5])
+visEnrichment(eoutput, nodes_query=nodes_query)
 # change the frame color: highlight (framed in blue) nodes/terms in query
 nodes.highlight <- rep("blue", length(nodes_query))
 names(nodes.highlight) <- nodes_query
-visEnrichment(eOutput, nodes_query=nodes_query,
+visEnrichment(eoutput, nodes_query=nodes_query,
 node.attrs=list(color=nodes.highlight))
+}
 }
 \seealso{
 \code{\link{dcEnrichment}}, \code{\link{dcRDataLoader}},

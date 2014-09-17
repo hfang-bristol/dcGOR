@@ -65,6 +65,7 @@ definition code for the method 'f' defined in this class}
 }
 }
 \examples{
+\dontrun{
 # 1) load onto.GOMF (as 'Onto' object)
 g <- dcRDataLoader('onto.GOMF')
 
@@ -101,6 +102,7 @@ zscore(coutput)
 pvalue(coutput)
 adjp(coutput)
 cnetwork(coutput)
+}
 }
 \seealso{
 \code{\link{Coutput-method}}

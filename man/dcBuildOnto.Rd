@@ -48,12 +48,14 @@ of the assigement sign '<-', then no object will be loaded onto the
 working environment.
 }
 \examples{
+\dontrun{
 # build an "Onto" object for GO Molecular Function
 onto.GOMF <-
 dcBuildOnto(relations.file="http://supfam.org/dcGOR/data/onto/igraph_GOMF_edges.txt",
 nodes.file="http://supfam.org/dcGOR/data/onto/igraph_GOMF_nodes.txt",
 output.file="onto.GOMF.RData")
 onto.GOMF
+}
 }
 \seealso{
 \code{\link{Onto}}

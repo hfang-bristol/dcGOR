@@ -3,7 +3,8 @@
 #' \code{visEnrichment} is supposed to visualise enrichment analysis outputs (represented as an 'Eoutput' object) in the context of the ontology hierarchy (direct acyclic graph; DAG). Only part of DAG induced by those nodes/terms specified in query nodes (and the mode defining the paths to the root of DAG) will be visualised. Nodes in query are framed in black (by default), and all nodes (in query plus induced) will be color-coded according to a given data.type ('zscore'; otherwise taking the form of 10-based negative logarithm for 'adjp' or 'pvalue'). If no nodes in query, the top 5 significant terms (in terms of adjusted p-value) will be used for visualisation
 #'
 #' @param e an object of S4 class \code{\link{Eoutput}}
-#' @param nodes_query a verctor containing a list of nodes/terms in query. These nodes are used to produce a subgraph of the ontology DAG induced by them. If NULL, the top 5 significant terms (in terms of adjusted p-value) will be used
+#' @param nodes_query a verctor containing a list of nodes/terms in query. These nodes are used to produce a subgraph of the ontology DAG induced by them. If NULL, the top significant terms (in terms of p-value) will be determined by the next 'num_top_nodes'
+#' @param num_top_nodes a numeric value specifying the number of the top significant terms (in terms of p-value) will be used. This parameter does not work if the previous 'nodes_query' has been specified
 #' @param path.mode the mode of paths induced by nodes in query. It can be "all_paths" for all possible paths to the root, "shortest_paths" for only one path to the root (for each node in query), "all_shortest_paths" for all shortest paths to the root (i.e. for each node, find all shortest paths with the equal lengths)
 #' @param data.type a character telling which data type for nodes in query is used to color-code nodes. It can be one of 'adjp' for adjusted p-values (by default), 'pvalue' for p-values and 'zscore' for z-scores. When 'adjp' or 'pvalue' is used, 10-based negative logarithm is taken. For the style of how to color-code, please see the next arguments: colormap, ncolors, zlim and colorbar
 #' @param height a numeric value specifying the height of device
@@ -66,25 +67,25 @@
 #' data <- sample(rowNames(SCOP.sf), 20)
 #' 
 #' # 2) perform enrichment analysis, producing an object of S4 class 'Eoutput'
-#' eOutput <- dcEnrichment(data, domain="SCOP.sf", ontology="GOMF")
-#' eOutput
+#' eoutput <- dcEnrichment(data, domain="SCOP.sf", ontology="GOMF")
+#' eoutput
 #'
 #' # 3) visualise the top 10 significant terms
-#' # color-coded according to 10-based negative logarithm of adjusted p-values (adjp)
-#' visEnrichment(eOutput)
+#' # color-coded according to 10-based negative logarithm of p-values
+#' visEnrichment(eoutput)
 #' # color-coded according to zscore
-#' visEnrichment(eOutput, data.type='zscore')
+#' visEnrichment(eoutput, data.type='zscore')
 #'
 #' # 4) visualise the top 5 significant terms in the ontology hierarchy
-#' nodes_query <- names(sort(adjp(eOutput))[1:5])
-#' visEnrichment(eOutput, nodes_query=nodes_query)
+#' nodes_query <- names(sort(adjp(eoutput))[1:5])
+#' visEnrichment(eoutput, nodes_query=nodes_query)
 #' # change the frame color: highlight (framed in blue) nodes/terms in query
 #' nodes.highlight <- rep("blue", length(nodes_query))
 #' names(nodes.highlight) <- nodes_query
-#' visEnrichment(eOutput, nodes_query=nodes_query, node.attrs=list(color=nodes.highlight))
+#' visEnrichment(eoutput, nodes_query=nodes_query, node.attrs=list(color=nodes.highlight))
 #' }
 
-visEnrichment <- function (e, nodes_query=NULL, path.mode=c("all_shortest_paths","shortest_paths","all_paths"), data.type=c("adjp","pvalue","zscore"), height=7, width=7, margin=rep(0.1,4), colormap=c("yr","bwr","jet","gbr","wyr","br","rainbow","wb","lightyellow-orange"), ncolors=40, zlim=NULL, colorbar=T, colorbar.fraction=0.1, newpage=T, layout.orientation=c("left_right","top_bottom","bottom_top","right_left"), node.info=c("both", "none", "term_id", "term_name", "full_term_name"), graph.node.attrs=NULL, graph.edge.attrs=NULL, node.attrs=NULL)
+visEnrichment <- function (e, nodes_query=NULL, num_top_nodes=5, path.mode=c("all_shortest_paths","shortest_paths","all_paths"), data.type=c("adjp","pvalue","zscore"), height=7, width=7, margin=rep(0.1,4), colormap=c("yr","bwr","jet","gbr","wyr","br","rainbow","wb","lightyellow-orange"), ncolors=40, zlim=NULL, colorbar=T, colorbar.fraction=0.1, newpage=T, layout.orientation=c("left_right","top_bottom","bottom_top","right_left"), node.info=c("both", "none", "term_id", "term_name", "full_term_name"), graph.node.attrs=NULL, graph.edge.attrs=NULL, node.attrs=NULL)
 {
     
     ## match.arg matches arg against a table of candidate values as specified by choices, where NULL means to take the first one
@@ -111,14 +112,23 @@ visEnrichment <- function (e, nodes_query=NULL, path.mode=c("all_shortest_paths"
         g <- dcConverter(g, from='Onto', to='igraph', verbose=F)
     }
     
+    num_top_nodes <- as.integer(num_top_nodes)
+    num_all <- length(pvalue(e))
+    
     if(is.null(nodes_query)){
-        nodes_query <- names(sort(pvalue(e))[1:5])
+        if(num_top_nodes<1 & num_top_nodes>num_all){
+            num_top_nodes <- min(5, num_all)
+        }
+        nodes_query <- names(sort(pvalue(e))[1:num_top_nodes])
     }else{
         ind <- match(nodes_query, V(g)$name)
         nodes_query <- nodes_query[!is.na(ind)]
         if(length(nodes_query)==0){
-            warnings("Nodes/terms in your query are not found in the ontology!\nInstead, the top 5 significant terms (in terms of adjusted p-value) will be used.\n")
-            nodes_query <- names(sort(pvalue(e))[1:5])
+            warnings("Nodes/terms in your query are not found in the ontology!\nInstead, the top 5 significant terms (in terms of p-value) will be used.\n")
+            if(num_top_nodes<1 & num_top_nodes>num_all){
+                num_top_nodes <- min(5, num_all)
+            }
+            nodes_query <- names(sort(pvalue(e))[1:num_top_nodes])
         }
     }
     

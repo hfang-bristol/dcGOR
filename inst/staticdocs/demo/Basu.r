@@ -17,6 +17,10 @@ domains[1:5,]
 ## define the input data
 data <- as.character(domains$Pfam)
 
+### load Pfam domain informtion (as 'InfoDataFrame' object)
+Pfam <- dcRDataLoader('Pfam')
+Pfam
+
 ## 1) GOBP enrichment analysis, producing an object of S4 class 'Eoutput'
 ### By default, using all annotatable domains as the background
 eoutput <- dcEnrichment(data, domain="Pfam", ontology="GOBP")
@@ -24,10 +28,15 @@ eoutput
 ### write into a local file <a href="Basu_GOBP_enrichments.txt">Basu_GOBP_enrichments.txt</a>
 write(eoutput, file='Basu_GOBP_enrichments.txt')
 ### view the top 5 significant terms
-view(eoutput, top_num=5, sortBy="pvalue", details=FALSE)
-### visualise the top 5 significant terms in GOMF DAG
+view(eoutput, top_num=5, sortBy="pvalue", details=TRUE)
+### visualise the top 4 significant terms (adjp < 0.05) in GOBP DAG
 #### color-coded according to 10-based negative logarithm of adjusted p-values (adjp)
-visEnrichment(eoutput, layout.orientation="top_bottom")
+visEnrichment(eoutput, num_top_nodes=4, layout.orientation="top_bottom", zlim=c(0,4))
+#### look at Pfam domains annotated by the most signficant term
+tmp <- as.character(view(eoutput, top_num=1, sortBy="pvalue", details=T)$members)
+tmp <- unlist(strsplit(a,","))
+ind <- match(tmp,rowNames(Pfam))
+Data(Pfam)[ind,]
 
 ## 2) GOMF enrichment analysis, producing an object of S4 class 'Eoutput'
 eoutput <- dcEnrichment(data, domain="Pfam", ontology="GOMF")
@@ -35,10 +44,15 @@ eoutput
 ### write into a local file <a href="Basu_GOMF_enrichments.txt">Basu_GOMF_enrichments.txt</a>
 write(eoutput, file='Basu_GOMF_enrichments.txt')
 ### view the top 5 significant terms
-view(eoutput, top_num=5, sortBy="pvalue", details=FALSE)
+view(eoutput, top_num=5, sortBy="pvalue", details=TRUE)
 ### visualise the top 5 significant terms in GOMF DAG
 #### color-coded according to 10-based negative logarithm of adjusted p-values (adjp)
-visEnrichment(eoutput)
+visEnrichment(eoutput, layout.orientation="top_bottom", zlim=c(0,4))
+#### look at Pfam domains annotated by the most signficant term
+tmp <- as.character(view(eoutput, top_num=1, sortBy="pvalue", details=T)$members)
+tmp <- unlist(strsplit(tmp,","))
+ind <- match(tmp,rowNames(Pfam))
+Data(Pfam)[ind,]
 
 ## 3) GOCC enrichment analysis, producing an object of S4 class 'Eoutput'
 eoutput <- dcEnrichment(data, domain="Pfam", ontology="GOCC")
@@ -50,6 +64,19 @@ view(eoutput, top_num=5, sortBy="pvalue", details=FALSE)
 ### visualise the top 5 significant terms in GOMF DAG
 #### color-coded according to 10-based negative logarithm of adjusted p-values (adjp)
 visEnrichment(eoutput)
+
+
+a <- as.character(view(eoutput, top_num=1, sortBy="pvalue", details=T)$members)
+a <- unlist(strsplit(a,","))
+
+### load Pfam domain informtion (as 'InfoDataFrame' object)
+Pfam <- dcRDataLoader('Pfam')
+Pfam
+### prepare the node labels (including domain id and description)
+ind <- match(a,rowNames(Pfam))
+Data(Pfam)[ind,]
+
+vertex.label <- paste(V(ig)$name, '\n', as.character(dData(Anno)[ind,]$description), sep='')
 
 #---------------------------------------------------------------------
 #---------------------------------------------------------------------
