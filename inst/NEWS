@@ -7,7 +7,7 @@ NEW FEATURES
     
     o Add an option that allows the user to specify the test background in the function 'dcEnrichment'
     
-    o Add annotations of Pfam and InterPro domains by GO, and extend analytical support ('dcEnrichment', 'visEnrichment' and 'dcDAGdomainSim') for these domains
+    o Add annotations of Pfam and InterPro domains and Rfam RNA families by GO, and extend analytical support ('dcEnrichment', 'visEnrichment' and 'dcDAGdomainSim') for these domains
     
     o This version is in relation to the manuscript submission (PLoS Computational Biology)
 

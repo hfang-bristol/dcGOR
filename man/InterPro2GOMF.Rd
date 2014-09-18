@@ -48,7 +48,7 @@ data(InterPro2GOMF)
 InterPro2GOMF
 # retrieve info on ontology terms
 termData(InterPro2GOMF)
-# retrieve info on SCOP domains
+# retrieve info on InterPro domains
 domainData(InterPro2GOMF)
 # retrieve the first 5 rows and columns of annotation data
 x <- annoData(InterPro2GOMF)[1:5,1:5]

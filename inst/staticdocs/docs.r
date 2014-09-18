@@ -112,6 +112,15 @@ list(
                 "InterPro2GOCC"
             )
         ),
+        sd_section("Rfam RNA families and their annotations by ontologies",
+            "These R objects are about Rfam RNA families (Rfam) and their annotations by Gene Ontology (GO).",
+            c(
+                "Rfam",
+                "Rfam2GOBP",
+                "Rfam2GOMF",
+                "Rfam2GOCC"
+            )
+        ),
         sd_section("Complete domains (domain-ome) in Eukaryotic tree of life (eTOL)",
             "These databases are used for domain-centric genome analysis in Eukaryotes. Note: these domains are defined as SCOP domain superfamilies.",
             c(

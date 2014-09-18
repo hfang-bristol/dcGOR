@@ -48,7 +48,7 @@ data(InterPro2GOBP)
 InterPro2GOBP
 # retrieve info on ontology terms
 termData(InterPro2GOBP)
-# retrieve info on SCOP domains
+# retrieve info on InterPro domains
 domainData(InterPro2GOBP)
 # retrieve the first 5 rows and columns of annotation data
 x <- annoData(InterPro2GOBP)[1:5,1:5]

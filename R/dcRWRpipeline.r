@@ -30,8 +30,6 @@
 #' @export
 #' @importFrom dnet dRWR dCheckParallel
 #' @import Matrix
-#' @import foreach
-#' @import doMC
 #' @seealso \code{\link{dcRDataLoader}}, \code{\link{dcDAGannotate}}, \code{\link{dcDAGdomainSim}}, \code{\link{dcConverter}}
 #' @include dcRWRpipeline.r
 #' @examples
@@ -204,9 +202,19 @@ dcRWRpipeline <- function(data, g, method=c("indirect","direct"), normalise=c("l
     ###### parallel computing
     flag_parallel <- F
     if(parallel==TRUE){
+        
+        ############################
+        pkgs <- c("doMC", "foreach")
+        if (any(pkgs %in% rownames(installed.packages()))) {
+            sapply(pkgs, function(pkg) {
+                suppressPackageStartupMessages(require(pkg, character.only = T))
+            })
+        }
+        ############################
+            
         flag_parallel <- dnet::dCheckParallel(multicores=multicores, verbose=verbose)
         if(flag_parallel){
-            exp_b <- foreach(b=1:B, .inorder=T) %dopar% {
+            exp_b <- foreach::foreach(b=1:B, .inorder=T) %dopar% {
                 progress_indicate(b, B, 10, flag=T)
                 if(permutation=="degree"){
                     seeds_random <- dp_randomisation(ig, P0matrix)

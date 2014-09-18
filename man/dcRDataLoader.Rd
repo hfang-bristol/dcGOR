@@ -4,6 +4,7 @@
 \title{Function to load dcGOR built-in RData}
 \usage{
 dcRDataLoader(RData = c(NA, "SCOP.sf", "SCOP.fa", "Pfam", "InterPro",
+"Rfam",
 "onto.GOBP", "onto.GOMF", "onto.GOCC", "onto.DO", "onto.HPPA",
 "onto.HPMI",
 "onto.HPON", "onto.MP", "onto.EC", "onto.KW", "onto.UP",
@@ -16,27 +17,31 @@ dcRDataLoader(RData = c(NA, "SCOP.sf", "SCOP.fa", "Pfam", "InterPro",
 "SCOP.fa2HPMI", "SCOP.fa2HPON", "SCOP.fa2MP", "SCOP.fa2EC",
 "SCOP.fa2KW",
 "SCOP.fa2UP", "Pfam2GOBP", "Pfam2GOMF", "Pfam2GOCC", "InterPro2GOBP",
-"InterPro2GOMF", "InterPro2GOCC", "Ancestral_domainome", "eTOL"),
-domain = c(NA, "SCOP.sf", "SCOP.fa", "Pfam", "InterPro"), ontology =
-c(NA,
-"GOBP", "GOMF", "GOCC", "DO", "HPPA", "HPMI", "HPON", "MP", "EC", "KW",
-"UP"),
-verbose = T, RData.location = "http://supfam.org/dcGOR/data")
+"InterPro2GOMF", "InterPro2GOCC", "Rfam2GOBP", "Rfam2GOMF",
+"Rfam2GOCC",
+"Ancestral_domainome", "eTOL"), domain = c(NA, "SCOP.sf", "SCOP.fa",
+"Pfam",
+"InterPro", "Rfam"), ontology = c(NA, "GOBP", "GOMF", "GOCC", "DO",
+"HPPA",
+"HPMI", "HPON", "MP", "EC", "KW", "UP"), verbose = T,
+RData.location = "http://supfam.org/dcGOR/data")
 }
 \arguments{
 \item{RData}{which built-in RData to load. If NOT NA, this RData will
-be always loaded. It can be: domains (including 'SCOP.sf', 'SCOP.fa'),
-ontologies (including 'onto.GOBP', 'onto.GOMF', 'onto.GOCC', 'onto.DO',
-'onto.HPPA', 'onto.HPMI', 'onto.HPON', 'onto.MP', 'onto.EC', 'onto.KW',
-'onto.UP'), annotations (including 'SCOP.sf2GOBP', 'SCOP.sf2GOMF',
-'SCOP.sf2GOCC', 'SCOP.sf2DO', 'SCOP.sf2HPPA', 'SCOP.sf2HPMI',
-'SCOP.sf2HPON', 'SCOP.sf2MP', 'SCOP.sf2EC', 'SCOP.sf2KW', 'SCOP.sf2UP',
-'SCOP.fa2GOBP', 'SCOP.fa2GOMF', 'SCOP.fa2GOCC', 'SCOP.fa2DO',
-'SCOP.fa2HPPA', 'SCOP.fa2HPMI', 'SCOP.fa2HPON', 'SCOP.fa2MP',
-'SCOP.fa2EC', 'SCOP.fa2KW', 'SCOP.fa2UP', 'Pfam2GOBP', 'Pfam2GOMF',
-'Pfam2GOCC', 'InterPro2GOBP', 'InterPro2GOMF', 'InterPro2GOCC'), and
-domainome in eukaryotic genomes (including 'Ancestral_domainome',
-'eTOL'). On the meanings, please refer to the Documentations}
+be always loaded. It can be: domains/RNAs (including 'SCOP.sf',
+'SCOP.fa', 'Pfam', 'InterPro', 'Rfam'), ontologies (including
+'onto.GOBP', 'onto.GOMF', 'onto.GOCC', 'onto.DO', 'onto.HPPA',
+'onto.HPMI', 'onto.HPON', 'onto.MP', 'onto.EC', 'onto.KW', 'onto.UP'),
+annotations (including 'SCOP.sf2GOBP', 'SCOP.sf2GOMF', 'SCOP.sf2GOCC',
+'SCOP.sf2DO', 'SCOP.sf2HPPA', 'SCOP.sf2HPMI', 'SCOP.sf2HPON',
+'SCOP.sf2MP', 'SCOP.sf2EC', 'SCOP.sf2KW', 'SCOP.sf2UP', 'SCOP.fa2GOBP',
+'SCOP.fa2GOMF', 'SCOP.fa2GOCC', 'SCOP.fa2DO', 'SCOP.fa2HPPA',
+'SCOP.fa2HPMI', 'SCOP.fa2HPON', 'SCOP.fa2MP', 'SCOP.fa2EC',
+'SCOP.fa2KW', 'SCOP.fa2UP', 'Pfam2GOBP', 'Pfam2GOMF', 'Pfam2GOCC',
+'InterPro2GOBP', 'InterPro2GOMF', 'InterPro2GOCC', 'Rfam2GOBP',
+'Rfam2GOMF', 'Rfam2GOCC'), and domainome in eukaryotic genomes
+(including 'Ancestral_domainome', 'eTOL'). On the meanings, please
+refer to the Documentations}
 
 \item{domain}{domain part of annotation RData to load. When RData is NA
 and this plus next are NOT NA, then this plus next one are used to
@@ -84,6 +89,7 @@ working environment.
 SCOP.sf <- dcRDataLoader(RData='SCOP.sf')
 Pfam <- dcRDataLoader(RData='Pfam')
 InterPro <- dcRDataLoader(RData='InterPro')
+Rfam <- dcRDataLoader(RData='Rfam')
 onto.GOMF <- dcRDataLoader(RData='onto.GOMF')
 # But for annotaion data, there are two ways to do so:
 # 1) in a direct way

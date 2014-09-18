@@ -5,9 +5,10 @@
 \usage{
 dcEnrichment(data, background = NULL, domain = c(NA, "SCOP.sf",
 "SCOP.fa",
-"Pfam", "InterPro"), ontology = c(NA, "GOBP", "GOMF", "GOCC", "DO",
-"HPPA",
-"HPMI", "HPON", "MP", "EC", "KW", "UP"), sizeRange = c(10, 1000),
+"Pfam", "InterPro", "Rfam"), ontology = c(NA, "GOBP", "GOMF", "GOCC",
+"DO",
+"HPPA", "HPMI", "HPON", "MP", "EC", "KW", "UP"), sizeRange = c(10,
+1000),
 min.overlap = 3, which_distance = NULL, test = c("HypergeoTest",
 "FisherTest", "BinomialTest"), p.adjust.method = c("BH", "BY",
 "bonferroni",
@@ -27,7 +28,7 @@ default all annotatable domains are used as background}
 
 \item{domain}{the domain identity. It can be one of 'SCOP.sf' for SCOP
 superfamilies, 'SCOP.fa' for SCOP families, 'Pfam' for Pfam domains,
-'InterPro' for InterPro domains}
+'InterPro' for InterPro domains, 'Rfam' for Rfam RNA families}
 
 \item{ontology}{the ontology identity. It can be "GOBP" for Gene
 Ontology Biological Process, "GOMF" for Gene Ontology Molecular
@@ -273,8 +274,35 @@ view(eoutput, top_num=10, sortBy="pvalue", details=TRUE)
 visEnrichment(eoutput)
 
 ###########################################################
-# 4) Advanced usage: customised data for domain, ontology and annotations
-# 4a) create domain, ontology and annotations
+# 4) Enrichment analysis for Rfam RNA families (Rfam)
+## 4a) load Rfam (as 'InfoDataFrame' object)
+Rfam <- dcRDataLoader('Rfam')
+### randomly select 100 RNAs as a list of RNAs of interest
+data <- sample(rowNames(Rfam), 100)
+## 4b) perform enrichment analysis, producing an object of S4 class 'Eoutput'
+eoutput <- dcEnrichment(data, domain="Rfam", ontology="GOBP")
+eoutput
+## 4c) view the top 10 significance terms
+view(eoutput, top_num=10, sortBy="pvalue", details=FALSE)
+## 4d) visualise the top 10 significant terms in the ontology hierarchy
+### color-coded according to 10-based negative logarithm of adjusted p-values (adjp)
+visEnrichment(eoutput)
+## 4e) the same as above but using a customised background
+### randomly select 1000 RNAs as background
+background <- sample(rowNames(Rfam), 1000)
+### perform enrichment analysis, producing an object of S4 class 'Eoutput'
+eoutput <- dcEnrichment(data, background=background, domain="Rfam",
+ontology="GOBP")
+eoutput
+### view the top 10 significance terms
+view(eoutput, top_num=10, sortBy="pvalue", details=FALSE)
+### visualise the top 10 significant terms in the ontology hierarchy
+### color-coded according to 10-based negative logarithm of adjusted p-values (adjp)
+visEnrichment(eoutput)
+
+###########################################################
+# 5) Advanced usage: customised data for domain, ontology and annotations
+# 5a) create domain, ontology and annotations
 ## for domain
 domain <-
 dcBuildInfoDataFrame(input.file="http://supfam.org/dcGOR/data/InterPro/InterPro.txt",
@@ -288,17 +316,17 @@ dcBuildAnno(domain_info.file="http://supfam.org/dcGOR/data/InterPro/InterPro.txt
 term_info.file="http://supfam.org/dcGOR/data/InterPro/GO.txt",
 association.file="http://supfam.org/dcGOR/data/InterPro/Domain2GOMF.txt",
 output.file="annotations.RData")
-## 4b) prepare data and background
+## 5b) prepare data and background
 ### randomly select 100 domains as a list of domains of interest
 data <- sample(rowNames(domain), 100)
 ### randomly select 1000 domains as background
 background <- sample(rowNames(domain), 1000)
-## 4c) perform enrichment analysis, producing an object of S4 class 'Eoutput'
+## 5c) perform enrichment analysis, producing an object of S4 class 'Eoutput'
 eoutput <- dcEnrichment(data, background=background,
 domain.RData='domain.RData', ontology.RData='ontology.RData',
 annotations.RData='annotations.RData')
 eoutput
-## 4d) view the top 10 significance terms
+## 5d) view the top 10 significance terms
 view(eoutput, top_num=10, sortBy="pvalue", details=TRUE)
 ### visualise the top 10 significant terms in the ontology hierarchy
 ### color-coded according to 10-based negative logarithm of adjusted p-values (adjp)

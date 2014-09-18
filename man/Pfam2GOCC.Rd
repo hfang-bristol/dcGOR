@@ -46,7 +46,7 @@ data(Pfam2GOCC)
 Pfam2GOCC
 # retrieve info on ontology terms
 termData(Pfam2GOCC)
-# retrieve info on SCOP domains
+# retrieve info on Pfam domains
 domainData(Pfam2GOCC)
 # retrieve the first 5 rows and columns of annotation data
 x <- annoData(Pfam2GOCC)[1:5,1:5]

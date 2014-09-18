@@ -139,7 +139,7 @@ edge.label=x, edge.label.cex=0.7)
 # 2) Semantic similarity between Pfam domains (Pfam)
 ## 2a) load onto.GOMF (as 'Onto' object)
 g <- dcRDataLoader('onto.GOMF')
-## 2b) load SCOP superfamilies annotated by GOMF (as 'Anno' object)
+## 2b) load Pfam domains annotated by GOMF (as 'Anno' object)
 Anno <- dcRDataLoader('Pfam2GOMF')
 ## 2c) prepare for ontology appended with annotation information
 dag <- dcDAGannotate(g, annotations=Anno, path.mode="shortest_paths",
@@ -167,7 +167,7 @@ edge.label=x, edge.label.cex=0.7)
 # 3) Semantic similarity between InterPro domains (InterPro)
 ## 3a) load onto.GOMF (as 'Onto' object)
 g <- dcRDataLoader('onto.GOMF')
-## 3b) load SCOP superfamilies annotated by GOMF (as 'Anno' object)
+## 3b) load InterPro domains annotated by GOMF (as 'Anno' object)
 Anno <- dcRDataLoader('InterPro2GOMF')
 ## 3c) prepare for ontology appended with annotation information
 dag <- dcDAGannotate(g, annotations=Anno, path.mode="shortest_paths",
@@ -192,22 +192,15 @@ dnet::visNet(g=ig, vertex.shape="sphere", edge.width=edge.width,
 edge.label=x, edge.label.cex=0.7)
 
 ###########################################################
-# 4) Advanced usage: customised data for ontology and annotations
-# 4a) customise ontology
-g <-
-dcBuildOnto(relations.file="http://supfam.org/dcGOR/data/onto/igraph_GOMF_edges.txt",
-nodes.file="http://supfam.org/dcGOR/data/onto/igraph_GOMF_nodes.txt",
-output.file="ontology.RData")
-# 4b) customise Anno
-Anno <-
-dcBuildAnno(domain_info.file="http://supfam.org/dcGOR/data/InterPro/InterPro.txt",
-term_info.file="http://supfam.org/dcGOR/data/InterPro/GO.txt",
-association.file="http://supfam.org/dcGOR/data/InterPro/Domain2GOMF.txt",
-output.file="annotations.RData")
+# 4) Semantic similarity between Rfam RNA families (Rfam)
+## 4a) load onto.GOBP (as 'Onto' object)
+g <- dcRDataLoader('onto.GOBP')
+## 4b) load Rfam families annotated by GOBP (as 'Anno' object)
+Anno <- dcRDataLoader('Rfam2GOBP')
 ## 4c) prepare for ontology appended with annotation information
 dag <- dcDAGannotate(g, annotations=Anno, path.mode="shortest_paths",
 verbose=FALSE)
-## 4d) calculate pair-wise semantic similarity between 8 randomly chosen domains
+## 4d) calculate pair-wise semantic similarity between 8 randomly chosen RNAs
 alldomains <- unique(unlist(nInfo(dag)$annotations))
 domains <- sample(alldomains,8)
 dnetwork <- dcDAGdomainSim(g=dag, domains=domains,
@@ -218,6 +211,41 @@ dnetwork
 ig <- dcConverter(dnetwork, from='Dnetwork', to='igraph')
 ig
 ## 4f) visualise the domain network
+### extract edge weight (with 2-digit precision)
+x <- signif(E(ig)$weight, digits=2)
+### rescale into an interval [1,4] as edge width
+edge.width <- 1 + (x-min(x))/(max(x)-min(x))*3
+### do visualisation
+dnet::visNet(g=ig, vertex.shape="sphere", edge.width=edge.width,
+edge.label=x, edge.label.cex=0.7)
+
+###########################################################
+# 5) Advanced usage: customised data for ontology and annotations
+# 5a) customise ontology
+g <-
+dcBuildOnto(relations.file="http://supfam.org/dcGOR/data/onto/igraph_GOMF_edges.txt",
+nodes.file="http://supfam.org/dcGOR/data/onto/igraph_GOMF_nodes.txt",
+output.file="ontology.RData")
+# 5b) customise Anno
+Anno <-
+dcBuildAnno(domain_info.file="http://supfam.org/dcGOR/data/InterPro/InterPro.txt",
+term_info.file="http://supfam.org/dcGOR/data/InterPro/GO.txt",
+association.file="http://supfam.org/dcGOR/data/InterPro/Domain2GOMF.txt",
+output.file="annotations.RData")
+## 5c) prepare for ontology appended with annotation information
+dag <- dcDAGannotate(g, annotations=Anno, path.mode="shortest_paths",
+verbose=FALSE)
+## 5d) calculate pair-wise semantic similarity between 8 randomly chosen domains
+alldomains <- unique(unlist(nInfo(dag)$annotations))
+domains <- sample(alldomains,8)
+dnetwork <- dcDAGdomainSim(g=dag, domains=domains,
+method.domain="BM.average", method.term="Resnik", parallel=FALSE,
+verbose=TRUE)
+dnetwork
+## 5e) convert it to an object of class 'igraph'
+ig <- dcConverter(dnetwork, from='Dnetwork', to='igraph')
+ig
+## 5f) visualise the domain network
 ### extract edge weight (with 2-digit precision)
 x <- signif(E(ig)$weight, digits=2)
 ### rescale into an interval [1,4] as edge width
