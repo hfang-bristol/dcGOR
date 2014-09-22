@@ -43,7 +43,7 @@ Second, install the package `dcGOR` under [stable release version hosted in CRAN
 
     install.packages("dcGOR",repos="http://cran.r-project.org",type="source")
 
-Third (`highly recommended`): update the package `dcGOR` from [latest development version hosted in GitHub](https://github.com/hfang-bristol/dcGOR):
+Third (`highly recommended`), update the package `dcGOR` from [latest development version hosted in GitHub](https://github.com/hfang-bristol/dcGOR):
 
     library(devtools)
     for(pkg in c("dcGOR","dnet")){

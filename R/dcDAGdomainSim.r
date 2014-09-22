@@ -258,18 +258,20 @@ dcDAGdomainSim <- function (g, domains=NULL, method.domain=c("BM.average","BM.ma
     if(parallel==TRUE){
         
         ############################
+        if(0){
         pkgs <- c("doMC", "foreach")
         if (any(pkgs %in% rownames(installed.packages()))) {
             sapply(pkgs, function(pkg) {
                 suppressPackageStartupMessages(require(pkg, character.only = T))
             })
         }
+        }
         ############################
     
         flag_parallel <- dnet::dCheckParallel(multicores=multicores, verbose=verbose)
         if(flag_parallel){
             if(method.domain=='average'){
-                sim <- foreach::foreach(i=1:(num_domains-1), .inorder=T, .combine=rbind) %dopar% {
+                sim <- foreach::`%dopar%` (foreach::foreach(i=1:(num_domains-1), .inorder=T, .combine=rbind), {
                     ind1 <- domains2terms_index[[i]]
                     progress_indicate(i, num_domains, 10, flag=T)
                     fast <- T
@@ -285,9 +287,9 @@ dcDAGdomainSim <- function (g, domains=NULL, method.domain=c("BM.average","BM.ma
                         x[js] <- res
                         x
                     }
-                }
+                })
             }else if(method.domain=='max'){
-                sim <- foreach::foreach(i=1:(num_domains-1), .inorder=T, .combine=rbind) %dopar% {
+                sim <- foreach::`%dopar%` (foreach::foreach(i=1:(num_domains-1), .inorder=T, .combine=rbind), {
                     ind1 <- domains2terms_index[[i]]
                     progress_indicate(i, num_domains, 10, flag=T)
                     fast <- T
@@ -303,9 +305,9 @@ dcDAGdomainSim <- function (g, domains=NULL, method.domain=c("BM.average","BM.ma
                         x[js] <- res
                         x
                     }
-                }
+                })
             }else if(method.domain=='BM.average'){
-                sim <- foreach::foreach(i=1:(num_domains-1), .inorder=T, .combine=rbind) %dopar% {
+                sim <- foreach::`%dopar%` (foreach::foreach(i=1:(num_domains-1), .inorder=T, .combine=rbind), {
                     ind1 <- domains2terms_index[[i]]
                     progress_indicate(i, num_domains, 10, flag=T)
                     fast <- T
@@ -322,9 +324,9 @@ dcDAGdomainSim <- function (g, domains=NULL, method.domain=c("BM.average","BM.ma
                         x[js] <- res
                         x
                     }
-                }
+                })
             }else if(method.domain=='BM.max'){
-                sim <- foreach::foreach(i=1:(num_domains-1), .inorder=T, .combine=rbind) %dopar% {
+                sim <- foreach::`%dopar%` (foreach::foreach(i=1:(num_domains-1), .inorder=T, .combine=rbind), {
                     ind1 <- domains2terms_index[[i]]
                     progress_indicate(i, num_domains, 10, flag=T)
                     fast <- T
@@ -341,9 +343,9 @@ dcDAGdomainSim <- function (g, domains=NULL, method.domain=c("BM.average","BM.ma
                         x[js] <- res
                         x
                     }
-                }
+                })
             }else if(method.domain=='BM.complete'){
-                sim <- foreach::foreach(i=1:(num_domains-1), .inorder=T, .combine=rbind) %dopar% {
+                sim <- foreach::`%dopar%` (foreach::foreach(i=1:(num_domains-1), .inorder=T, .combine=rbind), {
                     ind1 <- domains2terms_index[[i]]
                     progress_indicate(i, num_domains, 10, flag=T)
                     fast <- T
@@ -360,7 +362,7 @@ dcDAGdomainSim <- function (g, domains=NULL, method.domain=c("BM.average","BM.ma
                         x[js] <- res
                         x
                     }
-                }
+                })
             }
 
             ## add the last row

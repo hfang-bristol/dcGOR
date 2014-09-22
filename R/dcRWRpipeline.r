@@ -204,17 +204,19 @@ dcRWRpipeline <- function(data, g, method=c("indirect","direct"), normalise=c("l
     if(parallel==TRUE){
         
         ############################
+        if(0){
         pkgs <- c("doMC", "foreach")
         if (any(pkgs %in% rownames(installed.packages()))) {
             sapply(pkgs, function(pkg) {
                 suppressPackageStartupMessages(require(pkg, character.only = T))
             })
         }
+        }
         ############################
             
         flag_parallel <- dnet::dCheckParallel(multicores=multicores, verbose=verbose)
         if(flag_parallel){
-            exp_b <- foreach::foreach(b=1:B, .inorder=T) %dopar% {
+            exp_b <- foreach::`%dopar%` (foreach::foreach(b=1:B, .inorder=T), {
                 progress_indicate(b, B, 10, flag=T)
                 if(permutation=="degree"){
                     seeds_random <- dp_randomisation(ig, P0matrix)
@@ -231,7 +233,7 @@ dcRWRpipeline <- function(data, g, method=c("indirect","direct"), normalise=c("l
                     PTmatrix <- Matrix::Matrix(PTmatrix, sparse=T)
                 }
                 as.matrix(t(as.matrix(PT_random)) %*% PT_random)
-            }
+            })
         }
     }
     
