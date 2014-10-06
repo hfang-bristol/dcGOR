@@ -19,11 +19,11 @@ dcRDataLoader(RData = c(NA, "SCOP.sf", "SCOP.fa", "Pfam", "InterPro",
 "SCOP.fa2UP", "Pfam2GOBP", "Pfam2GOMF", "Pfam2GOCC", "InterPro2GOBP",
 "InterPro2GOMF", "InterPro2GOCC", "Rfam2GOBP", "Rfam2GOMF",
 "Rfam2GOCC",
-"Ancestral_domainome", "eTOL"), domain = c(NA, "SCOP.sf", "SCOP.fa",
-"Pfam",
-"InterPro", "Rfam"), ontology = c(NA, "GOBP", "GOMF", "GOCC", "DO",
-"HPPA",
-"HPMI", "HPON", "MP", "EC", "KW", "UP"), verbose = T,
+"Ancestral_domainome", "eTOL", "Feature2GOBP.sf", "Feature2GOMF.sf",
+"Feature2GOCC.sf"), domain = c(NA, "SCOP.sf", "SCOP.fa", "Pfam",
+"InterPro",
+"Rfam"), ontology = c(NA, "GOBP", "GOMF", "GOCC", "DO", "HPPA", "HPMI",
+"HPON", "MP", "EC", "KW", "UP"), verbose = T,
 RData.location = "http://supfam.org/dcGOR/data")
 }
 \arguments{

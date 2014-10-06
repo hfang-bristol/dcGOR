@@ -1,3 +1,13 @@
+CHANGES IN VERSION 1.0.4
+-----------------------
+
+NEW FEATURES
+
+    o Add functions 'dcAlgoPropagate' and 'dcAlgoPredict' for domain-centric ontology term predictions
+    
+    o Add databases used for domain-centric ontology term predictions
+
+
 CHANGES IN VERSION 1.0.3
 -----------------------
 
@@ -7,9 +17,9 @@ NEW FEATURES
     
     o Add an option that allows the user to specify the test background in the function 'dcEnrichment'
     
-    o Add annotations of Pfam and InterPro domains and Rfam RNA families by GO, and extend analytical support ('dcEnrichment', 'visEnrichment' and 'dcDAGdomainSim') for these domains
+    o Add annotations of Pfam and InterPro domains and Rfam RNA families by GO, and extend analytical support ('dcEnrichment', 'visEnrichment' and 'dcDAGdomainSim') for these domains/RNAs
     
-    o This version is in relation to the manuscript submission (PLoS Computational Biology)
+    o This version is in relation to the publication in PLoS Computational Biology
 
 
 CHANGES IN VERSION 1.0.2

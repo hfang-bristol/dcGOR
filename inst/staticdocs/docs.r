@@ -127,6 +127,21 @@ list(
                 "Ancestral_domainome",
                 "eTOL"
             )
+        ),
+        sd_section("Functions for ontology term predictions",
+            "These functions are used for domain-centric ontology term predictions.",
+            c(
+                "dcAlgoPropagate",
+                "dcAlgoPredict"
+            )
+        ),
+        sd_section("Databases used for ontology term predictions",
+            "These databases contain ontology annotations (along with hypergeometric scores) for domains and domain combinations, which are then used for domain-centric ontology term predictions.",
+            c(
+                "Feature2GOBP.sf",
+                "Feature2GOMF.sf",
+                "Feature2GOCC.sf"
+            )
         )
 
     )

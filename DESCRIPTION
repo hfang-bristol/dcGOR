@@ -1,14 +1,14 @@
 Package: dcGOR
 Type: Package
 Title: Analysis of ontologies and protein domain annotations.
-Version: 1.0.3
-Date: 2014-9-22
+Version: 1.0.4
+Date: 2014-10-6
 Author: Hai Fang and Julian Gough
 Maintainer: Hai Fang <hfang@cs.bris.ac.uk>
 Depends: R (>= 3.1.0), Matrix, igraph, dnet
 Imports: methods
 Suggests: foreach, doMC
-Description: The package is used to analyse domain-centric ontologies and annotations, particularly those in the dcGO database. The dcGO (http://supfam.org/SUPERFAMILY/dcGO) is a comprehensive domain-centric database for annotating protein domains using a panel of ontologies. With the package, users are expected to analyse and visualise domain-centric ontologies and annotations. Supported analyses include but are not limited to: easy access to a wide range of ontologies and their domain-centric annotations; able to build customised ontologies and annotations; enrichment analysis and visual outputs; semantic similarity between annotated domains from ontology term semantic similarity; random walk with restart upon domain-domain (semantic similarity) networks; and high-performance parallel computing.
+Description: The package is used to analyse domain-centric ontologies and annotations, particularly those in the dcGO database. The dcGO (http://supfam.org/SUPERFAMILY/dcGO) is a comprehensive domain-centric database for annotating protein domains using a panel of ontologies including Gene Ontology. With the package, users are expected to analyse and visualise domain-centric ontologies and annotations. Supported analyses include but are not limited to: easy access to a wide range of ontologies and their domain-centric annotations; able to build customised ontologies and annotations; domain-based enrichment analysis and visualisation; construction of a domain (semantic similarity) network according to ontology annotations; significance analysis for estimating a contact (statistical significance) network via Random Walk with Restart; and high-performance parallel computing.
 URL: http://supfam.org/dcGOR
 Collate: 
     'ClassMethod-dcGOR.r'
@@ -22,5 +22,7 @@ Collate:
     'dcBuildInfoDataFrame.r'
     'dcBuildAnno.r'
     'dcBuildOnto.r'
+    'dcAlgoPropagate.r'
+    'dcAlgoPredict.r'
 License: GPL-2
 biocViews: Bioinformatics

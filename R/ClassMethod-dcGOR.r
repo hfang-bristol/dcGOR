@@ -1082,7 +1082,7 @@ setMethod("show",
         cat("An object of S4 class '", class(object), "'\n", sep="")
         adim <- dim(object)
         if (length(adim)>1){
-            cat("@adjMatrix:", if (length(adim)>1) paste(adim[[1]], "a direct matrix of terms (parents/from),",adim[[2]], "terms (children/to)") else NULL, "\n")
+            cat("@adjMatrix:", if (length(adim)>1) paste("a direct matrix of",adim[[1]], "terms (parents/from) X",adim[[2]], "terms (children/to)") else NULL, "\n")
         }
         ## nodeInfo
         if( dim(nodeInfo(object))[1] != 0 ){

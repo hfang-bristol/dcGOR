@@ -73,6 +73,8 @@ view(eoutput, top_num=5, sortBy="pvalue", details=FALSE)
 #### color-coded according to 10-based negative logarithm of adjusted p-values (adjp)
 visEnrichment(eoutput)
 
+visEnrichment(eoutput,height=10, width=10,graph.node.attrs=list(fontsize=20),node.attrs=list(fontsize=28), node.info = c("both", "none","term_id", "term_name", "full_term_name")[3])
+
 ## 2) GOMF enrichment analysis, producing an object of S4 class 'Eoutput'
 eoutput <- dcEnrichment(data, background, domain="SCOP.sf", ontology="GOMF")
 eoutput

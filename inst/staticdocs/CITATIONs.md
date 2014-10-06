@@ -1,4 +1,4 @@
-Fang H. (2014) <B>dcGOR: an R package for analysing ontologies and protein domain annotations</B>. <I>PLOS Computational Biology</I> ([doi:10.1371/journal.pcbi.1003929](http://dx.doi.org/10.1371/journal.pcbi.1003929))
+Fang H. (2014) <B>dcGOR: an R package for analysing ontologies and protein domain annotations</B>. <I>PLoS Computational Biology</I> ([doi:10.1371/journal.pcbi.1003929](http://dx.doi.org/10.1371/journal.pcbi.1003929))
 
 You may also cite the package as:
 * `database`

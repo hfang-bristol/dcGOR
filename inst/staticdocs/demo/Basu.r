@@ -34,9 +34,8 @@ view(eoutput, top_num=5, sortBy="pvalue", details=TRUE)
 visEnrichment(eoutput, num_top_nodes=4, layout.orientation="top_bottom", zlim=c(0,4))
 #### look at Pfam domains annotated by the most signficant term
 tmp <- as.character(view(eoutput, top_num=1, sortBy="pvalue", details=T)$members)
-tmp <- unlist(strsplit(a,","))
-ind <- match(tmp,rowNames(Pfam))
-Data(Pfam)[ind,]
+tmp <- unlist(strsplit(tmp,","))
+Data(Pfam)[match(tmp,rowNames(Pfam)),]
 
 ## 2) GOMF enrichment analysis, producing an object of S4 class 'Eoutput'
 eoutput <- dcEnrichment(data, domain="Pfam", ontology="GOMF")
@@ -51,8 +50,7 @@ visEnrichment(eoutput, layout.orientation="top_bottom", zlim=c(0,4))
 #### look at Pfam domains annotated by the most signficant term
 tmp <- as.character(view(eoutput, top_num=1, sortBy="pvalue", details=T)$members)
 tmp <- unlist(strsplit(tmp,","))
-ind <- match(tmp,rowNames(Pfam))
-Data(Pfam)[ind,]
+Data(Pfam)[match(tmp,rowNames(Pfam)),]
 
 ## 3) GOCC enrichment analysis, producing an object of S4 class 'Eoutput'
 eoutput <- dcEnrichment(data, domain="Pfam", ontology="GOCC")
@@ -64,19 +62,11 @@ view(eoutput, top_num=5, sortBy="pvalue", details=FALSE)
 ### visualise the top 5 significant terms in GOMF DAG
 #### color-coded according to 10-based negative logarithm of adjusted p-values (adjp)
 visEnrichment(eoutput)
+#### look at Pfam domains annotated by the most signficant term
+tmp <- as.character(view(eoutput, top_num=1, sortBy="pvalue", details=T)$members)
+tmp <- unlist(strsplit(tmp,","))
+Data(Pfam)[match(tmp,rowNames(Pfam)),]
 
-
-a <- as.character(view(eoutput, top_num=1, sortBy="pvalue", details=T)$members)
-a <- unlist(strsplit(a,","))
-
-### load Pfam domain informtion (as 'InfoDataFrame' object)
-Pfam <- dcRDataLoader('Pfam')
-Pfam
-### prepare the node labels (including domain id and description)
-ind <- match(a,rowNames(Pfam))
-Data(Pfam)[ind,]
-
-vertex.label <- paste(V(ig)$name, '\n', as.character(dData(Anno)[ind,]$description), sep='')
 
 #---------------------------------------------------------------------
 #---------------------------------------------------------------------

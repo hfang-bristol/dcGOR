@@ -26,7 +26,7 @@
 #' # 2) in an indirect way: specify both domain and ontology
 #' SCOP.sf2GOMF <- dcRDataLoader(domain='SCOP.sf', ontology='GOMF')
 
-dcRDataLoader <- function(RData=c(NA,'SCOP.sf','SCOP.fa','Pfam','InterPro','Rfam','onto.GOBP','onto.GOMF','onto.GOCC','onto.DO','onto.HPPA','onto.HPMI','onto.HPON','onto.MP','onto.EC','onto.KW','onto.UP','SCOP.sf2GOBP','SCOP.sf2GOMF','SCOP.sf2GOCC','SCOP.sf2DO','SCOP.sf2HPPA','SCOP.sf2HPMI','SCOP.sf2HPON','SCOP.sf2MP','SCOP.sf2EC','SCOP.sf2KW','SCOP.sf2UP','SCOP.fa2GOBP','SCOP.fa2GOMF','SCOP.fa2GOCC','SCOP.fa2DO','SCOP.fa2HPPA','SCOP.fa2HPMI','SCOP.fa2HPON','SCOP.fa2MP','SCOP.fa2EC','SCOP.fa2KW','SCOP.fa2UP','Pfam2GOBP','Pfam2GOMF','Pfam2GOCC','InterPro2GOBP','InterPro2GOMF','InterPro2GOCC','Rfam2GOBP','Rfam2GOMF','Rfam2GOCC','Ancestral_domainome','eTOL'), domain=c(NA,'SCOP.sf','SCOP.fa','Pfam','InterPro','Rfam'), ontology=c(NA,'GOBP','GOMF','GOCC','DO','HPPA','HPMI','HPON','MP','EC','KW','UP'), verbose=T, RData.location="http://supfam.org/dcGOR/data")
+dcRDataLoader <- function(RData=c(NA,'SCOP.sf','SCOP.fa','Pfam','InterPro','Rfam','onto.GOBP','onto.GOMF','onto.GOCC','onto.DO','onto.HPPA','onto.HPMI','onto.HPON','onto.MP','onto.EC','onto.KW','onto.UP','SCOP.sf2GOBP','SCOP.sf2GOMF','SCOP.sf2GOCC','SCOP.sf2DO','SCOP.sf2HPPA','SCOP.sf2HPMI','SCOP.sf2HPON','SCOP.sf2MP','SCOP.sf2EC','SCOP.sf2KW','SCOP.sf2UP','SCOP.fa2GOBP','SCOP.fa2GOMF','SCOP.fa2GOCC','SCOP.fa2DO','SCOP.fa2HPPA','SCOP.fa2HPMI','SCOP.fa2HPON','SCOP.fa2MP','SCOP.fa2EC','SCOP.fa2KW','SCOP.fa2UP','Pfam2GOBP','Pfam2GOMF','Pfam2GOCC','InterPro2GOBP','InterPro2GOMF','InterPro2GOCC','Rfam2GOBP','Rfam2GOMF','Rfam2GOCC','Ancestral_domainome','eTOL','Feature2GOBP.sf','Feature2GOMF.sf','Feature2GOCC.sf'), domain=c(NA,'SCOP.sf','SCOP.fa','Pfam','InterPro','Rfam'), ontology=c(NA,'GOBP','GOMF','GOCC','DO','HPPA','HPMI','HPON','MP','EC','KW','UP'), verbose=T, RData.location="http://supfam.org/dcGOR/data")
 {
 
     ## match.arg matches arg against a table of candidate values as specified by choices, where NA means to take the first one
@@ -76,7 +76,7 @@ dcRDataLoader <- function(RData=c(NA,'SCOP.sf','SCOP.fa','Pfam','InterPro','Rfam
     load_package <- RData
 
     ## first, load data from the package itself
-    if(class(suppressWarnings(try(eval(parse(text=paste("data(",load_package,", package='dcGOR')",sep=""))), T)))=="try-error"){
+    if(length(suppressWarnings(tryCatch(eval(parse(text=paste("data(",load_package,", package='dcGOR')",sep=""))), error=function(e) e, warning=function(w) w)))==2){
         ## second, load local R files
         RData_local <- c(load_local1, load_local2)
         load_flag <- sapply(RData_local, function(x){
