@@ -1,18 +1,18 @@
 #' Function to propogate ontology annotations according to an input file
 #'
-#' \code{dcAlgoPropagate} is supposed to propogate ontology annotations, given an input file. This input file contains original annotations between domains/features and ontology terms, along with the hypergeometric scores (hscore) in support for their annotations. The annotations are propogated to the ontology root (retaining the maximum hscore). After the propogation, the ontology terms of increasing levels are determined based on the concept of Information Content (IC) to product a slim version of ontology. It returns an object of S3 class "HL" with two components: "hscore" and "level".
-#'
+#' \code{dcAlgoPropagate} is supposed to propogate ontology annotations, given an input file. This input file contains original annotations between domains/features and ontology terms, along with the hypergeometric scores (hscore) in support for their annotations. The annotations are propogated to the ontology root (retaining the maximum hscore). After the propogation, the ontology terms of increasing levels are determined based on the concept of Information Content (IC) to product a slim version of ontology. It returns an object of S3 class "HIS" with three components: "hscore", "ic" and "slim".
 #'
 #' @param input.file an input file used to build the object. This input file contains original annotations between domains/features and ontology terms, along with the hypergeometric scores (hscore) in support for their annotations. For example, a file containing original annotations between SCOP domain architectures and GO terms can be found in \url{http://supfam.org/dcGOR/data/Feature/Feature2GO.sf.txt}. As seen in this example, the input file must contain the header (in the first row) and three columns: 1st column for 'Feature_id' (here SCOP domain architectures), 2nd column for 'Term_id' (GO terms), and 3rd column for 'Score' (hscore)
 #' @param ontology the ontology identity. It can be "GOBP" for Gene Ontology Biological Process, "GOMF" for Gene Ontology Molecular Function, "GOCC" for Gene Ontology Cellular Component, "DO" for Disease Ontology, "HPPA" for Human Phenotype Phenotypic Abnormality, "HPMI" for Human Phenotype Mode of Inheritance, "HPON" for Human Phenotype ONset and clinical course
-#' @param output.file an output file used to save the built object as an RData-formatted file. If NULL, this file will be saved into "HL.RData" in the current working local directory
+#' @param output.file an output file used to save the built object as an RData-formatted file. If NULL, this file will be saved into "HIS.RData" in the current working local directory
 #' @param verbose logical to indicate whether the messages will be displayed in the screen. By default, it sets to TRUE for display
 #' @param RData.location the characters to tell the location of built-in RData files. By default, it remotely locates at "http://supfam.org/dcGOR/data" or "https://github.com/hfang-bristol/dcGOR/data". For the user equipped with fast internet connection, this option can be just left as default. But it is always advisable to download these files locally. Especially when the user needs to run this function many times, there is no need to ask the function to remotely download every time (also it will unnecessarily increase the runtime). For examples, these files (as a whole or part of them) can be first downloaded into your current working directory, and then set this option as: \eqn{RData.location="."}. If RData to load is already part of package itself, this parameter can be ignored (since this function will try to load it via function \code{data} first)
 #' @return 
-#' an object of S3 class \code{HL}, with following components:
+#' an object of S3 class \code{HIS}, with following components:
 #' \itemize{
 #'  \item{\code{hscore}: a list of features, each with a term-named vector containing hscore}
-#'  \item{\code{level}: a list of four levels, each with a term-named vector containing information content (IC). Level '1' for very general terms, '2' for general terms, '3' for specific terms, '4' for very specific terms}
+#'  \item{\code{ic}: a term-named vector containing information content (IC). Terms are ordered first by IC and then by longest-path level, making sure that for terms with the same IC, parental terms always come first}
+#'  \item{\code{slim}: a list of four slims, each with a term-named vector containing information content (IC). Slim '1' for very general terms, '2' for general terms, '3' for specific terms, '4' for very specific terms}
 #' }
 #' @note None
 #' @export
@@ -21,14 +21,15 @@
 #' @include dcAlgoPropagate.r
 #' @examples
 #' \dontrun{
-#' # build an "HL" object for GO Molecular Function
+#' # build an "HIS" object for GO Molecular Function
 #' Feature2GOMF.sf <- dcAlgoPropagate(input.file="http://supfam.org/dcGOR/data/Feature/Feature2GO.sf.txt", ontology="GOMF", output.file="Feature2GOMF.sf.RData")
 #' names(Feature2GOMF.sf)
 #' Feature2GOMF.sf$hscore[1]
-#' Feature2GOMF.sf$level[1]
+#' Feature2GOMF.sf$ic[1:10]
+#' Feature2GOMF.sf$slim[1]
 #' }
 
-dcAlgoPropagate <- function(input.file, ontology=c("GOBP","GOMF","GOCC","HPPA","HPMI","HPON"), output.file="HL.RData", verbose=T, RData.location="http://supfam.org/dcGOR/data")
+dcAlgoPropagate <- function(input.file, ontology=c("GOBP","GOMF","GOCC","HPPA","HPMI","HPON"), output.file="HIS.RData", verbose=T, RData.location="http://supfam.org/dcGOR/data")
 {
     startT <- Sys.time()
     message(paste(c("Start at ",as.character(startT)), collapse=""), appendLF=T)
@@ -43,8 +44,8 @@ dcAlgoPropagate <- function(input.file, ontology=c("GOBP","GOMF","GOCC","HPPA","
     }
     
     if(is.null(output.file)){
-        warnings("Since the output file is not provided, the function will use the default output file 'HL.RData'!\n")   
-        output.file <- "HL.RData"
+        warnings("Since the output file is not provided, the function will use the default output file 'HIS.RData'!\n")   
+        output.file <- "HIS.RData"
     }
     
     if(verbose){
@@ -188,7 +189,7 @@ dcAlgoPropagate <- function(input.file, ontology=c("GOBP","GOMF","GOCC","HPPA","
     #################################
     
     if(verbose){
-        message(sprintf("Determining IC-based levels ..."), appendLF=T)
+        message(sprintf("Determining IC-based slim levels ..."), appendLF=T)
     }
     
     ## define IC
@@ -210,7 +211,7 @@ dcAlgoPropagate <- function(input.file, ontology=c("GOBP","GOMF","GOCC","HPPA","
         nlev <- 4
         ninterval <- 1/(nlev*4) # interval units
         npoint <- seq(0,(nlev-1))/nlev + 1/(nlev*2) # central points for the levels
-        naway <- c(ninterval*2, rep(ninterval, nlev-1)) # away from npoint
+        naway <- c(ninterval*2, rep(ninterval, nlev-1)) # away from npoint: the wider 1st, the rest same
         IC_cutoff <- max(go_ic) * npoint
         IC_min <- max(go_ic) * (npoint - naway)
         IC_max <- max(go_ic) * (npoint + naway)
@@ -291,16 +292,28 @@ dcAlgoPropagate <- function(input.file, ontology=c("GOBP","GOMF","GOCC","HPPA","
     output.var <- gsub(".RDat$", "", output.var, ignore.case=T, perl=T)
     output.var <- gsub(".RDa$", "", output.var, ignore.case=T, perl=T)
     
+    # all terms in an order: first by ic and then by level (ie longest path)
+    terms <- unlist(level2node, use.names=F)
+    times <- sapply(level2node, function(x){
+        length(x)
+    })
+    lvs <- rep(as.numeric(names(times)), times)
+    df <- data.frame(ind=1:length(terms), terms=terms, levels=lvs, ic=as.numeric(go_ic[terms]))
+    ordering <- df[base::order(df$ic,df$levels),]$ind
+    ic <- df[ordering,]$ic
+    names(ic) <- df[ordering,]$terms
+    
     x <- list(hscore = fAnnos,
-              level  = level_ic
+              ic     = ic,
+              slim  = level_ic
               )
-    class(x) <- "HL"
+    class(x) <- "HIS"
     
     do.call(assign, list(output.var, x))
     save(list=output.var, file=output.file)
 
     if(file.exists(output.file)){
-        message(sprintf("An object of S3 class 'HL' has been built and saved into '%s'.", file.path(getwd(),output.file)), appendLF=T)
+        message(sprintf("An object of S3 class 'HIS' has been built and saved into '%s'.", file.path(getwd(),output.file)), appendLF=T)
     }
 
     ####################################################################################

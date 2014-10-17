@@ -5,7 +5,7 @@
 \usage{
 dcAlgoPropagate(input.file, ontology = c("GOBP", "GOMF", "GOCC",
 "HPPA",
-"HPMI", "HPON"), output.file = "HL.RData", verbose = T,
+"HPMI", "HPON"), output.file = "HIS.RData", verbose = T,
 RData.location = "http://supfam.org/dcGOR/data")
 }
 \arguments{
@@ -28,7 +28,7 @@ Human Phenotype Mode of Inheritance, "HPON" for Human Phenotype ONset
 and clinical course}
 
 \item{output.file}{an output file used to save the built object as an
-RData-formatted file. If NULL, this file will be saved into "HL.RData"
+RData-formatted file. If NULL, this file will be saved into "HIS.RData"
 in the current working local directory}
 
 \item{verbose}{logical to indicate whether the messages will be
@@ -50,14 +50,18 @@ itself, this parameter can be ignored (since this function will try to
 load it via function \code{data} first)}
 }
 \value{
-an object of S3 class \code{HL}, with following components:
+an object of S3 class \code{HIS}, with following components:
 \itemize{
 \item{\code{hscore}: a list of features, each with a term-named vector
 containing hscore}
-\item{\code{level}: a list of four levels, each with a term-named
-vector containing information content (IC). Level '1' for very general
-terms, '2' for general terms, '3' for specific terms, '4' for very
-specific terms}
+\item{\code{ic}: a term-named vector containing information content
+(IC). Terms are ordered first by IC and then by longest-path level,
+making sure that for terms with the same IC, parental terms always come
+first}
+\item{\code{slim}: a list of four slims, each with a term-named vector
+containing information content (IC). Slim '1' for very general terms,
+'2' for general terms, '3' for specific terms, '4' for very specific
+terms}
 }
 }
 \description{
@@ -69,20 +73,21 @@ annotations are propogated to the ontology root (retaining the maximum
 hscore). After the propogation, the ontology terms of increasing levels
 are determined based on the concept of Information Content (IC) to
 product a slim version of ontology. It returns an object of S3 class
-"HL" with two components: "hscore" and "level".
+"HIS" with three components: "hscore", "ic" and "slim".
 }
 \note{
 None
 }
 \examples{
 \dontrun{
-# build an "HL" object for GO Molecular Function
+# build an "HIS" object for GO Molecular Function
 Feature2GOMF.sf <-
 dcAlgoPropagate(input.file="http://supfam.org/dcGOR/data/Feature/Feature2GO.sf.txt",
 ontology="GOMF", output.file="Feature2GOMF.sf.RData")
 names(Feature2GOMF.sf)
 Feature2GOMF.sf$hscore[1]
-Feature2GOMF.sf$level[1]
+Feature2GOMF.sf$ic[1:10]
+Feature2GOMF.sf$slim[1]
 }
 }
 \seealso{

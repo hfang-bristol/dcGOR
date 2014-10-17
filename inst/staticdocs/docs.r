@@ -129,10 +129,11 @@ list(
             )
         ),
         sd_section("Functions for ontology term predictions",
-            "These functions are used for domain-centric ontology term predictions.",
+            "These functions are used for predicting domain-centric ontology terms.",
             c(
                 "dcAlgoPropagate",
-                "dcAlgoPredict"
+                "dcAlgoPredict",
+                "dcAlgoPredictMain"
             )
         ),
         sd_section("Databases used for ontology term predictions",
@@ -140,7 +141,16 @@ list(
             c(
                 "Feature2GOBP.sf",
                 "Feature2GOMF.sf",
-                "Feature2GOCC.sf"
+                "Feature2GOCC.sf",
+                "Feature2HPPA.sf",
+                "Feature2GOBP.pfam",
+                "Feature2GOMF.pfam",
+                "Feature2GOCC.pfam",
+                "Feature2HPPA.pfam",
+                "Feature2GOBP.interpro",
+                "Feature2GOMF.interpro",
+                "Feature2GOCC.interpro",
+                "Feature2HPPA.interpro"
             )
         )
 

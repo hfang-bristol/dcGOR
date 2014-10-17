@@ -20,10 +20,14 @@ dcRDataLoader(RData = c(NA, "SCOP.sf", "SCOP.fa", "Pfam", "InterPro",
 "InterPro2GOMF", "InterPro2GOCC", "Rfam2GOBP", "Rfam2GOMF",
 "Rfam2GOCC",
 "Ancestral_domainome", "eTOL", "Feature2GOBP.sf", "Feature2GOMF.sf",
-"Feature2GOCC.sf"), domain = c(NA, "SCOP.sf", "SCOP.fa", "Pfam",
-"InterPro",
-"Rfam"), ontology = c(NA, "GOBP", "GOMF", "GOCC", "DO", "HPPA", "HPMI",
-"HPON", "MP", "EC", "KW", "UP"), verbose = T,
+"Feature2GOCC.sf", "Feature2HPPA.sf", "Feature2GOBP.pfam",
+"Feature2GOMF.pfam", "Feature2GOCC.pfam", "Feature2HPPA.pfam",
+"Feature2GOBP.interpro", "Feature2GOMF.interpro",
+"Feature2GOCC.interpro",
+"Feature2HPPA.interpro"), domain = c(NA, "SCOP.sf", "SCOP.fa", "Pfam",
+"InterPro", "Rfam"), ontology = c(NA, "GOBP", "GOMF", "GOCC", "DO",
+"HPPA",
+"HPMI", "HPON", "MP", "EC", "KW", "UP"), verbose = T,
 RData.location = "http://supfam.org/dcGOR/data")
 }
 \arguments{
@@ -39,9 +43,10 @@ annotations (including 'SCOP.sf2GOBP', 'SCOP.sf2GOMF', 'SCOP.sf2GOCC',
 'SCOP.fa2HPMI', 'SCOP.fa2HPON', 'SCOP.fa2MP', 'SCOP.fa2EC',
 'SCOP.fa2KW', 'SCOP.fa2UP', 'Pfam2GOBP', 'Pfam2GOMF', 'Pfam2GOCC',
 'InterPro2GOBP', 'InterPro2GOMF', 'InterPro2GOCC', 'Rfam2GOBP',
-'Rfam2GOMF', 'Rfam2GOCC'), and domainome in eukaryotic genomes
-(including 'Ancestral_domainome', 'eTOL'). On the meanings, please
-refer to the Documentations}
+'Rfam2GOMF', 'Rfam2GOCC'), domainome in eukaryotic genomes (including
+'Ancestral_domainome', 'eTOL'), and databases used for predictiing
+ontology terms from input protein domain contents. On the meanings,
+please refer to the Documentations}
 
 \item{domain}{domain part of annotation RData to load. When RData is NA
 and this plus next are NOT NA, then this plus next one are used to
