@@ -3,6 +3,8 @@
 export(dcAlgoPredict)
 export(dcAlgoPredictMain)
 export(dcAlgoPropagate)
+export(dcAncestralML)
+export(dcAncestralMP)
 export(dcBuildAnno)
 export(dcBuildInfoDataFrame)
 export(dcBuildOnto)
