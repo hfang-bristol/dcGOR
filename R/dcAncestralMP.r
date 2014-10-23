@@ -1,25 +1,25 @@
 #' Function to reconstruct ancestral discrete states using maximum parsimony algorithm
 #'
-#' \code{dcAncestralMP} is supposed to reconstruct ancestral discrete states using a maximum parsimony-modified Fitch algorithm. In a bottom-up manner, ancestral state for an internal node is determined if a state is shared in a majority by all its children. If two or more states in a majority are equally shared, this internal node is marked as unknown tie. For those ties, they are resolved being the same as its direct parent in a top-down manner. If the tie also occurs at the root, the state at the root is set to the last state (for example, 'present' for 2 states).
+#' \code{dcAncestralMP} is supposed to reconstruct ancestral discrete states using a maximum parsimony-modified Fitch algorithm. In a from-tip-to-root manner, ancestral state for an internal node is determined if a state is shared in a majority by all its children. If two or more states in a majority are equally shared, this internal node is temporarily marked as an unknown tie, which is further resolved in a from-root-to-tip manner: always being the same state as its direct parent holds. If the ties also occur at the root, the state at the root is set to the last state in ties (for example, usually being 'present' for 'present'-'absent' two states).
 #'
 #' @param x a vector of discrete states in the tips. It can be an unnamed vector; in this case, assumedly it has the same order as in the tree tips. More wisely, it is a named vector, whose names can be matched to the tip labels of the tree. The names of this input vector can be more than found in the tree labels, and they should contain all those in the tree labels
 #' @param phy an object of class 'phylo'
 #' @param verbose logical to indicate whether the messages will be displayed in the screen. By default, it sets to TRUE for display
 #' @return
-#' a list of architectures, containing three components for "transition", "states" and "rp":
+#' a list of architectures, containing three components for "transition", "states" and "relative":
 #' \itemize{
 #'  \item{\code{transition}: a posterior transition matrix between states}
 #'  \item{\code{states}: a named vector storing states (extant and ancestral states)}
-#'  \item{\code{rp}: a matrix of nodes X states, storing relative probability}
+#'  \item{\code{relative}: a matrix of nodes X states, storing relative probability}
 #' }
 #' @note
 #' This maximum parsimony algorithm for ancestral discrete state reconstruction is attributable to the basic idea as described in \url{http://sysbio.oxfordjournals.org/content/20/4/406.short}
 #' @export
-#' @seealso \code{\link{dcAncestralMP}}
+#' @seealso \code{\link{dcAncestralML}}
 #' @include dcAncestralMP.r
 #' @examples
 #' # provide the tree and states in the tips
-#' tree <- "((((t10:5.03,t2:5.03):2.74,(t9:4.17,t5:4.17):3.60):2.80,(t3:4.05,t7:4.05):6.53):2.32,((t6:4.38,t1:4.38):2.18,(t8:2.17,t4:2.17):4.39):6.33);"
+#' tree <- "((((t10:5,t2:5):2,(t9:4,t5:4):3):2,(t3:4,t7:4):6):2,((t6:4,t1:4):2,(t8:2,t4:2):4):6);"
 #' phy <- ape::read.tree(text=paste(tree, collapse=""))
 #' x <- c(0, rep(1,4), rep(0,5))
 #'
@@ -31,16 +31,15 @@
 #' Ntip <- ape::Ntip(phy)
 #' Nnode <- ape::Nnode(phy)
 #' color <- c("white","gray")
-#' ## main tree
+#' ## visualise main tree
 #' ape::plot.phylo(phy, type="p", use.edge.length=TRUE, label.offset=1, show.tip.label=TRUE, show.node.label=FALSE)
-#' ## tips
+#' ## visualise tips (state 1 in gray, state 0 in white)
 #' ape::tiplabels(pch=22, bg=color[as.numeric(x)+1], cex=2, adj=1)
-#' ## internal nodes
-#' ### relative probability
+#' ## visualise internal nodes
+#' ### thermo bar to illustrate relative probability (state 1 in gray, state 0 in white)
 #' ape::nodelabels(thermo=res$relative[Ntip+1:Nnode,2:1], piecol=color[2:1], cex=0.75)
-#' ### ancestral states
+#' ### labeling reconstructed ancestral states
 #' ape::nodelabels(text=res$states[Ntip+1:Nnode], node=Ntip+1:Nnode, frame="none", col="red", bg="transparent", cex=0.75)
-#' #ape::nodelabels(text=phy$node.label, node=Ntip+1:Nnode, frame="none", col="red", bg="transparent", cex=0.75)
 
 dcAncestralMP <- function(x, phy, verbose=T)
 {
@@ -120,6 +119,8 @@ dcAncestralMP <- function(x, phy, verbose=T)
         ind <- which(ttmp==max(ttmp))
         if(length(ind)==1){
             Cx[cur, ind] <- 1
+        }else{
+            Cx[cur, ind] <- Inf
         }
         
     }
@@ -127,7 +128,7 @@ dcAncestralMP <- function(x, phy, verbose=T)
     anc <- apply(Cx, 1, function(x){
         tmp <- lvls[which(x==1)]
         if(length(tmp)==0){
-            return(NA)
+            return("tie")
         }else{
             return(tmp)
         }
@@ -141,18 +142,18 @@ dcAncestralMP <- function(x, phy, verbose=T)
     # break ties: the tie always follows the direct parent state (in a preorder)
     anc_final <- anc
     Cx_final <- Cx
-    ties <- which(is.na(anc_final))
+    ties <- which(anc_final=='tie')
     if(length(ties) > 0){
         if(verbose){
             message(sprintf("\tbreak %d tie(s)", length(ties)), appendLF=T)
         }
-    
         for(i in 1:length(ties)){
             child_ind <- ties[i]
             if(child_ind==Ntip+1){
                 # break the tie at the root
-                anc_final[child_ind] <- lvls[nl]
-                Cx_final[child_ind, nl] <- 1
+                ind <- which(is.infinite(Cx_final[child_ind,]))
+                anc_final[child_ind] <- lvls[ind[length(ind)]]
+                Cx_final[child_ind, ind[length(ind)]] <- 1
             }else{
                 child <- names(child_ind)
                 parent <- e1[match(child, e2)]
@@ -162,6 +163,7 @@ dcAncestralMP <- function(x, phy, verbose=T)
             }
         }
     }
+    Cx_final[is.infinite(Cx_final)] <- NA
     
     ####################################################################################
     if(verbose){

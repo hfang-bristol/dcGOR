@@ -20,25 +20,26 @@ displayed in the screen. By default, it sets to TRUE for display}
 }
 \value{
 a list of architectures, containing three components for "transition",
-"states" and "rp":
+"states" and "relative":
 \itemize{
 \item{\code{transition}: a posterior transition matrix between states}
 \item{\code{states}: a named vector storing states (extant and
 ancestral states)}
-\item{\code{rp}: a matrix of nodes X states, storing relative
+\item{\code{relative}: a matrix of nodes X states, storing relative
 probability}
 }
 }
 \description{
 \code{dcAncestralMP} is supposed to reconstruct ancestral discrete
 states using a maximum parsimony-modified Fitch algorithm. In a
-bottom-up manner, ancestral state for an internal node is determined if
-a state is shared in a majority by all its children. If two or more
-states in a majority are equally shared, this internal node is marked
-as unknown tie. For those ties, they are resolved being the same as its
-direct parent in a top-down manner. If the tie also occurs at the root,
-the state at the root is set to the last state (for example, 'present'
-for 2 states).
+from-tip-to-root manner, ancestral state for an internal node is
+determined if a state is shared in a majority by all its children. If
+two or more states in a majority are equally shared, this internal node
+is temporarily marked as an unknown tie, which is further resolved in a
+from-root-to-tip manner: always being the same state as its direct
+parent holds. If the ties also occur at the root, the state at the root
+is set to the last state in ties (for example, usually being 'present'
+for 'present'-'absent' two states).
 }
 \note{
 This maximum parsimony algorithm for ancestral discrete state
@@ -48,7 +49,7 @@ reconstruction is attributable to the basic idea as described in
 \examples{
 # provide the tree and states in the tips
 tree <-
-"((((t10:5.03,t2:5.03):2.74,(t9:4.17,t5:4.17):3.60):2.80,(t3:4.05,t7:4.05):6.53):2.32,((t6:4.38,t1:4.38):2.18,(t8:2.17,t4:2.17):4.39):6.33);"
+"((((t10:5,t2:5):2,(t9:4,t5:4):3):2,(t3:4,t7:4):6):2,((t6:4,t1:4):2,(t8:2,t4:2):4):6);"
 phy <- ape::read.tree(text=paste(tree, collapse=""))
 x <- c(0, rep(1,4), rep(0,5))
 
@@ -60,21 +61,20 @@ res
 Ntip <- ape::Ntip(phy)
 Nnode <- ape::Nnode(phy)
 color <- c("white","gray")
-## main tree
+## visualise main tree
 ape::plot.phylo(phy, type="p", use.edge.length=TRUE, label.offset=1,
 show.tip.label=TRUE, show.node.label=FALSE)
-## tips
+## visualise tips (state 1 in gray, state 0 in white)
 ape::tiplabels(pch=22, bg=color[as.numeric(x)+1], cex=2, adj=1)
-## internal nodes
-### relative probability
+## visualise internal nodes
+### thermo bar to illustrate relative probability (state 1 in gray, state 0 in white)
 ape::nodelabels(thermo=res$relative[Ntip+1:Nnode,2:1],
 piecol=color[2:1], cex=0.75)
-### ancestral states
+### labeling reconstructed ancestral states
 ape::nodelabels(text=res$states[Ntip+1:Nnode], node=Ntip+1:Nnode,
 frame="none", col="red", bg="transparent", cex=0.75)
-#ape::nodelabels(text=phy$node.label, node=Ntip+1:Nnode, frame="none", col="red", bg="transparent", cex=0.75)
 }
 \seealso{
-\code{\link{dcAncestralMP}}
+\code{\link{dcAncestralML}}
 }
 

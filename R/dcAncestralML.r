@@ -1,6 +1,6 @@
 #' Function to reconstruct ancestral discrete states using fast maximum likelihood algorithm
 #'
-#' \code{dcAncestralML} is supposed to reconstruct ancestral discrete states using fast maximum likelihood algorithm. It takes inputs both the phylo-formatted tree and discrete states in the tips. The algorithm assumes that state changes can be described by a probablistic reversible model. It first determines transition matrix between states (also considering branch lengths), then used dynamic programming (from tips to the root) to estimate conditional maximum likelihood, and finally reconstruct the ancestral states (from the root to tips).
+#' \code{dcAncestralML} is supposed to reconstruct ancestral discrete states using fast maximum likelihood algorithm. It takes inputs both the phylo-formatted tree and discrete states in the tips. The algorithm assumes that state changes can be described by a probablistic reversible model. It first determines transition matrix between states (also considering branch lengths), then uses dynamic programming (from tips to the root) to estimate conditional maximum likelihood, and finally reconstructs the ancestral states (from the root to tips). If the ties occur at the root, the state at the root is set to the last state in ties (for example, usually being 'present' for 'present'-'absent' two states).
 #'
 #' @param x a vector of discrete states in the tips. It can be an unnamed vector; in this case, assumedly it has the same order as in the tree tips. More wisely, it is a named vector, whose names can be matched to the tip labels of the tree. The names of this input vector can be more than found in the tree labels, and they should contain all those in the tree labels
 #' @param phy an object of class 'phylo'
@@ -19,11 +19,11 @@
 #' @note
 #' This fast dynamic programming for ancestral discrete state reconstruction is partially inspired by a joint estimation procedure as described in \url{http://mbe.oxfordjournals.org/content/17/6/890.full}
 #' @export
-#' @seealso \code{\link{dcAncestralML}}
+#' @seealso \code{\link{dcAncestralMP}}
 #' @include dcAncestralML.r
 #' @examples
 #' # provide the tree and states in the tips
-#' tree <- "((((t10:5.03,t2:5.03):2.74,(t9:4.17,t5:4.17):3.60):2.80,(t3:4.05,t7:4.05):6.53):2.32,((t6:4.38,t1:4.38):2.18,(t8:2.17,t4:2.17):4.39):6.33);"
+#' tree <- "((((t10:5,t2:5):2,(t9:4,t5:4):3):2,(t3:4,t7:4):6):2,((t6:4,t1:4):2,(t8:2,t4:2):4):6);"
 #' phy <- ape::read.tree(text=paste(tree, collapse=""))
 #' x <- c(0, rep(1,4), rep(0,5))
 #'
@@ -35,16 +35,15 @@
 #' Ntip <- ape::Ntip(phy)
 #' Nnode <- ape::Nnode(phy)
 #' color <- c("white","gray")
-#' ## main tree
+#' ## visualise main tree
 #' ape::plot.phylo(phy, type="p", use.edge.length=TRUE, label.offset=1, show.tip.label=TRUE, show.node.label=FALSE)
-#' ## tips
+#' ## visualise tips (state 1 in gray, state 0 in white)
 #' ape::tiplabels(pch=22, bg=color[as.numeric(x)+1], cex=2, adj=1)
-#' ## internal nodes
-#' ### conditional maximum likelihood
+#' ## visualise internal nodes
+#' ### thermo bar to illustrate conditional maximum likelihood (state 1 in gray, state 0 in white)
 #' ape::nodelabels(thermo=res$relative[Ntip+1:Nnode,2:1], piecol=color[2:1], cex=0.75)
-#' ### ancestral states
+#' ### labeling reconstructed ancestral states
 #' ape::nodelabels(text=res$states[Ntip+1:Nnode], node=Ntip+1:Nnode, frame="none", col="red", bg="transparent", cex=0.75)
-#' #ape::nodelabels(text=phy$node.label, node=Ntip+1:Nnode, frame="none", col="red", bg="transparent", cex=0.75)
 
 dcAncestralML <- function(x, phy, transition.model=c("different","symmetric","same","customised"), customised.model=NULL, edge.length.power=1, initial.estimate=0.1, verbose=T)
 {
@@ -234,7 +233,9 @@ dcAncestralML <- function(x, phy, transition.model=c("different","symmetric","sa
         for(k in 1:nl){
             tmp <- t_matrix[k,] * (Lxs[des1,] * Lxs[des2,])
             Lxs[cur, k] <- max(tmp)
-            Cxs[cur, k] <- names(which.max(tmp))
+            ## for ties, always use the last state in ties
+            ind <- which(tmp==max(tmp))
+            Cxs[cur, k] <- names(ind[length(ind)])
         }
     }
 
@@ -249,7 +250,7 @@ dcAncestralML <- function(x, phy, transition.model=c("different","symmetric","sa
     ## reconstruct the ancestral states in a top-down manner
     anc <- rep(NA, Ntot)
     names(anc) <- 1:Ntot
-   
+    
     ## in a preordered manner
     for (i in seq(to=1, by=-2, length.out=Nnode)) {
         
@@ -261,8 +262,8 @@ dcAncestralML <- function(x, phy, transition.model=c("different","symmetric","sa
             if(length(ind)==1){
                 anc[cur] <- colnames(Lxs)[ind]
             }else{
-                ### in ties, always the last state
-                anc[cur] <- colnames(Lxs)[length(ind)]
+                ### in ties, always the last state in ties
+                anc[cur] <- colnames(Lxs)[ind[length(ind)]]
             }
         }
         
