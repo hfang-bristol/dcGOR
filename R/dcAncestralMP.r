@@ -2,14 +2,19 @@
 #'
 #' \code{dcAncestralMP} is supposed to reconstruct ancestral discrete states using a maximum parsimony-modified Fitch algorithm. In a from-tip-to-root manner, ancestral state for an internal node is determined if a state is shared in a majority by all its children. If two or more states in a majority are equally shared, this internal node is temporarily marked as an unknown tie, which is further resolved in a from-root-to-tip manner: always being the same state as its direct parent holds. If the ties also occur at the root, the state at the root is set to the last state in ties (for example, usually being 'present' for 'present'-'absent' two states).
 #'
-#' @param x a vector of discrete states in the tips. It can be an unnamed vector; in this case, assumedly it has the same order as in the tree tips. More wisely, it is a named vector, whose names can be matched to the tip labels of the tree. The names of this input vector can be more than found in the tree labels, and they should contain all those in the tree labels
+#' @param data an input data matrix storing discrete states for tips (in rows) X characters (in columns). The rows in the matrix are for tips. If the row names do not exist, then addumedly they have the same order as in the tree tips. More wisely, users provide row names which can be matched to the tip labels of the tree. The row names can be more than found in the tree labels, and they should contain all those in the tree labels
 #' @param phy an object of class 'phylo'
+#' @param output.detail logical to indicate whether the output is returned as a detailed list. If TRUE, a nested list is returned: a list of characters (corresponding to columns of input data matrix), in which each element is a list consisting of three components ("states", "transition" and "relative"). If FALSE, a matrix is returned: the columns respond to the input data columns, and rows responding to all node index in the phylo-formatted tree
+#' @param parallel logical to indicate whether parallel computation with multicores is used. By default, it sets to true, but not necessarily does so. Partly because parallel backends available will be system-specific (now only Linux or Mac OS). Also, it will depend on whether these two packages "foreach" and "doMC" have been installed. It can be installed via: \code{source("http://bioconductor.org/biocLite.R"); biocLite(c("foreach","doMC"))}. If not yet installed, this option will be disabled
+#' @param multicores an integer to specify how many cores will be registered as the multicore parallel backend to the 'foreach' package. If NULL, it will use a half of cores available in a user's computer. This option only works when parallel computation is enabled
 #' @param verbose logical to indicate whether the messages will be displayed in the screen. By default, it sets to TRUE for display
 #' @return
-#' a list of architectures, containing three components for "transition", "states" and "relative":
+#' It depends on the 'output.detail'.
+#' If FALSE (by default), a matrix is returned, with the columns responding to the input data columns, and rows responding to node index in the phylo-formatted tree.
+#' If TRUE, a nested list is returned. Outer-most list is for characters (corresponding to columns of input data matrix), in which each elemenl is a list (inner-most) consisting of three components ("states", "transition" and "relative"):
 #' \itemize{
-#'  \item{\code{transition}: a posterior transition matrix between states}
 #'  \item{\code{states}: a named vector storing states (extant and ancestral states)}
+#'  \item{\code{transition}: a posterior transition matrix between states}
 #'  \item{\code{relative}: a matrix of nodes X states, storing relative probability}
 #' }
 #' @note
@@ -18,22 +23,34 @@
 #' @seealso \code{\link{dcAncestralML}}
 #' @include dcAncestralMP.r
 #' @examples
-#' # provide the tree and states in the tips
+#' # 1) provide the phylo-formatted tree
 #' tree <- "((((t10:5,t2:5):2,(t9:4,t5:4):3):2,(t3:4,t7:4):6):2,((t6:4,t1:4):2,(t8:2,t4:2):4):6);"
 #' phy <- ape::read.tree(text=paste(tree, collapse=""))
-#' x <- c(0, rep(1,4), rep(0,5))
 #'
-#' # reconstruct ancestral states
-#' res <- dcAncestralMP(x, phy)
+#' # 2) an input data matrix storing discrete states for tips (in rows) X two characters (in columns)
+#' data1 <- matrix(c(0,rep(1,4),rep(0,5)), ncol=1)
+#' data2 <- matrix(c(0,rep(0,4),rep(1,5)), ncol=1)
+#' data <- cbind(data1, data2)
+#' colnames(data) <- c("C1", "C2")
+#' ## reconstruct ancestral states, without detailed output
+#' res <- dcAncestralMP(data, phy, parallel=FALSE)
 #' res
 #'
-#' # visualise the tree with ancestral states and their conditional probability
+#' # 3) an input data matrix storing discrete states for tips (in rows) X only one character
+#' data <- matrix(c(0,rep(0,4),rep(1,5)), ncol=1)
+#' ## reconstruct ancestral states, with detailed output
+#' res <- dcAncestralMP(data, phy, parallel=FALSE, output.detail=TRUE, verbose=TRUE)
+#' res
+#' ## get the inner-most list
+#' res <- res[[1]]
+#' ## visualise the tree with ancestral states and their conditional probability
 #' Ntip <- ape::Ntip(phy)
 #' Nnode <- ape::Nnode(phy)
 #' color <- c("white","gray")
 #' ## visualise main tree
 #' ape::plot.phylo(phy, type="p", use.edge.length=TRUE, label.offset=1, show.tip.label=TRUE, show.node.label=FALSE)
 #' ## visualise tips (state 1 in gray, state 0 in white)
+#' x <- data[,1]
 #' ape::tiplabels(pch=22, bg=color[as.numeric(x)+1], cex=2, adj=1)
 #' ## visualise internal nodes
 #' ### thermo bar to illustrate relative probability (state 1 in gray, state 0 in white)
@@ -41,7 +58,7 @@
 #' ### labeling reconstructed ancestral states
 #' ape::nodelabels(text=res$states[Ntip+1:Nnode], node=Ntip+1:Nnode, frame="none", col="red", bg="transparent", cex=0.75)
 
-dcAncestralMP <- function(x, phy, verbose=T)
+dcAncestralMP <- function(data, phy, output.detail=F, parallel=T, multicores=NULL, verbose=F)
 {
     
     if (class(phy) != "phylo"){
@@ -57,17 +74,31 @@ dcAncestralMP <- function(x, phy, verbose=T)
     e1 <- phy$edge[, 1]
     e2 <- phy$edge[, 2]
     
+    ## most recent common ancestor (MRCA) for each pair of tips and nodes
+    mrca_node <- ape::mrca(phy, full=T)
+    
     if (Nnode != Ntip-1){
         stop("The input 'phy' is not binary and rooted!")
     }
     
-    if (!is.null(names(x))) {
+    if(is.vector(data)){
+        tmp_data <- matrix(data, ncol=1)
+        if(!is.null(names(data))){
+            rownames(tmp_data) <- names(data)
+        }
+        data <- tmp_data
+    }
+    if(is.data.frame(data)){
+        data <- as.matrix(data)
+    }
     
-        ind <- match(names(x), phy$tip.label)
-        x <- x[ind[!is.na(ind)]]
+    if (!is.null(rownames(data))) {
+    
+        ind <- match(rownames(data), phy$tip.label)
+        data <- data[ind[!is.na(ind)],]
         
-        if(length(x) != Ntip){
-            stop(message(sprintf("The names of input 'x' do not contain all of the tip labels of the input 'phy': %d NOT FOUND!", Ntip-length(x)), appendLF=T))
+        if(nrow(data) != Ntip){
+            stop(message(sprintf("The row names of input 'data' do not contain all of the tip labels of the input 'phy': %d NOT FOUND!", Ntip-nrow(data)), appendLF=T))
         }
     }
 
@@ -75,115 +106,122 @@ dcAncestralMP <- function(x, phy, verbose=T)
         message(sprintf("The input tree has '%d' tips.", Ntip), appendLF=T)
     }
 
-    if (!is.factor(x)){
-        x_tmp <- factor(x)
-    }else{
-        x_tmp <- x
-    }
-    nl <- nlevels(x_tmp)
-    lvls <- levels(x_tmp)
-    x_tmp <- as.integer(x_tmp)
-    
-    ##########################
-    if(nl==1){
-        res <- list()
-        res$transition <- NULL
-        res$states <- rep(lvls, Ntot)
-        res$relative <- NULL
-        
-        if(verbose){
-            message(sprintf("Note, there is only one state '%s' in tips", lvls), appendLF=T)
-        }
-        
-        return(invisible(res))
-    }
-    ########################## 
-    
-    ################################################################################################
-    if(verbose){
-        message(sprintf("First, do maximum parsimony-modified Fitch algorithm in a bottom-up manner (%s) ...", as.character(Sys.time())), appendLF=T)
-    }
 
-    ## dimension: #nodes X #states (current node)
-    Cx <- matrix(NA, nrow=Ntot, ncol=nl, dimnames=list(1:Ntot, lvls))
+    ######################################################################################
+    ## A function to do prediction
+    doReconstruct <- function(x, Ntot, Ntip, Nnode, mrca_node, e1, e2, output.detail, verbose){
     
-    ## for tips
-    Cx[cbind(1:Ntip, x_tmp)] <- 1
-
-    ## most recent common ancestor (MRCA) for each pair of tips and nodes
-    mrca_node <- ape::mrca(phy, full=T)
-
-    ## for internal nodes (in a postordered manner)
-    for (i in seq(from=1, by=2, length.out=Nnode)) {
-        
-        j <- i + 1L
-        cur <- e1[i]
-        
-        all_child <- which(mrca_node[cur,]==cur, arr.ind=T)
-        all_child <- setdiff(all_child, cur) # exclude self
-        
-        ## only tips
-        if(0){
-            ind <- match(1:Ntip, all_child)
-            all_child <- all_child[ind[!is.na(ind)]]
-        }
-        
-        ### do calculation
-        tmp <- Cx[all_child, ]
-        ttmp <- apply(tmp, 2, function(x) sum(x,na.rm=T))
-        ind <- which(ttmp==max(ttmp))
-        if(length(ind)==1){
-            Cx[cur, ind] <- 1
+        if (!is.factor(x)){
+            x_tmp <- base::factor(x)
         }else{
-            Cx[cur, ind] <- Inf
+            x_tmp <- x
         }
-        
-    }
+        nl <- base::nlevels(x_tmp)
+        lvls <- base::levels(x_tmp)
+        x_tmp <- as.integer(x_tmp)
     
-    anc <- apply(Cx, 1, function(x){
-        tmp <- lvls[which(x==1)]
-        if(length(tmp)==0){
-            return("tie")
-        }else{
-            return(tmp)
-        }
-    })
+        ##########################
+        if(nl==1){
 
-    ################################################################################################
-    if(verbose){
-        message(sprintf("Second, resolve unknown states being the same as its direct parent in a top-down manner (%s) ...", as.character(Sys.time())), appendLF=T)
-    }
-    
-    # break ties: the tie always follows the direct parent state (in a preorder)
-    anc_final <- anc
-    Cx_final <- Cx
-    ties <- which(anc_final=='tie')
-    if(length(ties) > 0){
-        if(verbose){
-            message(sprintf("\tbreak %d tie(s)", length(ties)), appendLF=T)
-        }
-        for(i in 1:length(ties)){
-            child_ind <- ties[i]
-            if(child_ind==Ntip+1){
-                # break the tie at the root
-                ind <- which(is.infinite(Cx_final[child_ind,]))
-                anc_final[child_ind] <- lvls[ind[length(ind)]]
-                Cx_final[child_ind, ind[length(ind)]] <- 1
+            if(verbose){
+                message(sprintf("\tNote, there is only one state '%s' in tips", lvls), appendLF=T)
+            }
+            
+            if(output.detail){
+                res <- list()
+                res$states <- rep(lvls, Ntot)
             }else{
-                child <- names(child_ind)
-                parent <- e1[match(child, e2)]
-                parent_ind <- match(parent, names(anc))
-                anc_final[child_ind] <- anc_final[parent_ind]
-                Cx_final[child_ind, match(anc_final[parent_ind],lvls)] <- 1
+                res <- rep(lvls, Ntot)
+            }
+            
+            return(invisible(res))
+        }
+        ########################## 
+    
+        ################################################################################################
+        if(verbose){
+            message(sprintf("\tFirst, do maximum parsimony-modified Fitch algorithm in a bottom-up manner (%s) ...", as.character(Sys.time())), appendLF=T)
+        }
+
+        ## dimension: #nodes X #states (current node)
+        Cx <- matrix(NA, nrow=Ntot, ncol=nl, dimnames=list(1:Ntot, lvls))
+    
+        ## for tips
+        Cx[cbind(1:Ntip, x_tmp)] <- 1
+        
+        Cx_final <- Cx
+        ## for internal nodes (in a postordered manner)
+        for (i in seq(from=1, by=2, length.out=Nnode)) {
+        
+            j <- i + 1L
+            cur <- e1[i]
+        
+            all_child <- which(mrca_node[cur,]==cur, arr.ind=T)
+            all_child <- base::setdiff(all_child, cur) # exclude self
+        
+            ## only tips
+            if(0){
+                ind <- match(1:Ntip, all_child)
+                all_child <- all_child[ind[!is.na(ind)]]
+            }
+        
+            ### do calculation
+            tmp <- Cx[all_child, ]
+            ttmp <- apply(tmp, 2, function(x) sum(x,na.rm=T))
+            ind <- which(ttmp==max(ttmp))
+            if(length(ind)==1){
+                Cx[cur, ind] <- 1
+                Cx_final[cur, ind] <- 1
+            }else{
+                Cx[cur, ind] <- NA
+                Cx_final[cur, ind] <- Inf
+            }
+        
+        }
+    
+        anc <- apply(Cx, 1, function(x){
+            tmp <- lvls[which(x==1)]
+            if(length(tmp)==0){
+                return("tie")
+            }else{
+                return(tmp)
+            }
+        })
+
+        ################################################################################################
+        if(verbose){
+            message(sprintf("\tSecond, resolve unknown states being the same as its direct parent in a top-down manner (%s) ...", as.character(Sys.time())), appendLF=T)
+        }
+    
+        # break ties: the tie always follows the direct parent state (in a preorder)
+        anc_final <- anc
+        ties <- which(anc_final=='tie')
+        if(length(ties) > 0){
+            if(verbose){
+                message(sprintf("\t\tbreak %d tie(s)", length(ties)), appendLF=T)
+            }
+            for(i in 1:length(ties)){
+                child_ind <- ties[i]
+                if(child_ind==Ntip+1){
+                    # break the tie at the root
+                    ind <- which(is.infinite(Cx_final[child_ind,]))
+                    anc_final[child_ind] <- lvls[ind[length(ind)]]
+                    Cx_final[child_ind, ind[length(ind)]] <- 1
+                }else{
+                    child <- names(child_ind)
+                    parent <- e1[match(child, e2)]
+                    parent_ind <- match(parent, names(anc))
+                    anc_final[child_ind] <- anc_final[parent_ind]
+                    Cx_final[child_ind, match(anc_final[parent_ind],lvls)] <- 1
+                }
             }
         }
-    }
-    Cx_final[is.infinite(Cx_final)] <- NA
+        Cx_final[is.infinite(Cx_final)] <- NA
     
-    ####################################################################################
-    if(verbose){
+        ####################################################################################
+        
         ## A summary of changes between states
-        p2c <- cbind(anc_final[phy$edge[,1]], anc_final[phy$edge[,2]])
+        p2c <- cbind(anc_final[e1], anc_final[e2])
         p2c_final <- p2c
         ### for the root: being present
         if(nl==2){
@@ -191,52 +229,114 @@ dcAncestralMP <- function(x, phy, verbose=T)
                 p2c_final <- rbind(p2c_final, lvls)
             }
         }
-        all <- paste(p2c_final[,1], "->", p2c_final[,2], sep='')
-        changes <- sapply(unique(all), function(x){
-            sum(x==all)
-        })
-        changes <- sort(changes)
-        msg <- paste(names(changes),changes, sep=": ", collapse="\n")
+        
+        if(verbose){
+            all <- paste("\t", p2c_final[,1], "->", p2c_final[,2], sep='')
+            changes <- sapply(unique(all), function(x){
+                sum(x==all)
+            })
+            changes <- sort(changes)
+            msg <- paste(names(changes),changes, sep=": ", collapse="\n")
     
-        message(sprintf("In summary, the number of between-state changes:\n%s", msg), appendLF=T)
-    }
-    
-    ### Calculate relative probability
-    ## dimension: #nodes X #probability (current node)
-    Lx <- matrix(0, nrow=Ntot, ncol=nl, dimnames=list(1:Ntot, lvls))
-    ## for tips
-    Lx[cbind(1:Ntip, x_tmp)] <- 1
-    ## for internal nodes (in a postordered manner)
-    for (i in seq(from=1, by=2, length.out=Nnode)) {
-        j <- i + 1L
-        cur <- e1[i]
-        all_child <- which(mrca_node[cur,]==cur, arr.ind=T)
-        all_child <- setdiff(all_child, cur) # exclude self
-        ## only tips
-        if(0){
-            ind <- match(1:Ntip, all_child)
-            all_child <- all_child[ind[!is.na(ind)]]
+            message(sprintf("\tIn summary, the number of between-state changes:\n%s\n", msg), appendLF=T)
         }
-        ### do calculation
-        tmp <- Cx_final[all_child, ]
-        ttmp <- apply(tmp, 2, function(x) sum(x,na.rm=T))
-        Lx[cur,] <- ttmp
-    }
-    ## relative probability
-    rp <- t(apply(Lx, 1, function(x) x/sum(x)))
+        
+        if(output.detail){
+            ### Calculate relative probability
+            ## dimension: #nodes X #probability (current node)
+            Lx <- matrix(0, nrow=Ntot, ncol=nl, dimnames=list(1:Ntot, lvls))
+            ## for tips
+            Lx[cbind(1:Ntip, x_tmp)] <- 1
+            ## for internal nodes (in a postordered manner)
+            for (i in seq(from=1, by=2, length.out=Nnode)) {
+                j <- i + 1L
+                cur <- e1[i]
+                all_child <- which(mrca_node[cur,]==cur, arr.ind=T)
+                all_child <- setdiff(all_child, cur) # exclude self
+                ## only tips
+                if(0){
+                    ind <- match(1:Ntip, all_child)
+                    all_child <- all_child[ind[!is.na(ind)]]
+                }
+                ### do calculation
+                tmp <- Cx_final[all_child, ]
+                ttmp <- apply(tmp, 2, function(x) sum(x,na.rm=T))
+                Lx[cur,] <- ttmp
+            }
+            ## relative probability
+            rp <- t(apply(Lx, 1, function(x) x/sum(x)))
     
-    ### Calculate posterior transition matrix
-    rate <- matrix(0, nl, nl)
-    ind <- matrix(match(p2c_final, lvls),ncol=2)
-    for(i in 1:nrow(ind)){
-        rate[ind[i,1], ind[i,2]] <- rate[ind[i,1], ind[i,2]] + 1
+            ### Calculate posterior transition matrix
+            rate <- matrix(0, nl, nl)
+            ind <- matrix(match(p2c_final, lvls),ncol=2)
+            for(i in 1:nrow(ind)){
+                rate[ind[i,1], ind[i,2]] <- rate[ind[i,1], ind[i,2]] + 1
+            }
+            colnames(rate) <- rownames(rate) <- lvls
+        }
+
+        if(output.detail){
+            res <- list()
+            res$states <- anc_final
+            res$transition <- rate
+            res$relative <- signif(rp, digits=4)
+        }else{
+            res <- anc_final
+        }
+        
+        return(invisible(res))
     }
-    colnames(rate) <- rownames(rate) <- lvls
     
-    res <- list()
-    res$transition <- rate
-    res$states <- anc_final
-    res$relative <- rp
+    ## A function to indicate the running progress
+    progress_indicate <- function(i, B, step, flag=F){
+        if(i %% ceiling(B/step) == 0 | i==B | i==1){
+            if(flag & verbose){
+                message(sprintf("%d out of %d (%s)", i, B, as.character(Sys.time())), appendLF=T)
+            }
+        }
+    }
+    
+    ######################################################################################
+    ###### parallel computing
+    flag_parallel <- F
+    if(parallel){
+        flag_parallel <- dnet::dCheckParallel(multicores=multicores, verbose=verbose)
+        if(flag_parallel){
+            j <- 1
+            res_list <- foreach::`%dopar%` (foreach::foreach(j=1:ncol(data), .inorder=T), {
+                progress_indicate(i=j, B=ncol(data), 10, flag=T)
+                doReconstruct(x=data[,j], Ntot=Ntot, Ntip=Ntip, Nnode=Nnode, mrca_node=mrca_node, e1=e1, e2=e2, output.detail=output.detail, verbose=verbose)
+            })
+            if(!is.null(colnames(data))){
+                names(res_list) <- colnames(data)
+            }
+            
+            if(!output.detail){
+                res <- do.call(base::cbind, res_list)
+            }else{
+                res <- res_list
+            }
+            
+        }
+    }
+    
+    ###### non-parallel computing
+    if(flag_parallel==F){
+        res_list <- lapply(1:ncol(data),function(j) {
+            progress_indicate(i=j, B=ncol(data), 10, flag=T)
+            da <- data[,j]
+            doReconstruct(x=data[,j], Ntot=Ntot, Ntip=Ntip, Nnode=Nnode, mrca_node=mrca_node, e1=e1, e2=e2, output.detail=output.detail, verbose=verbose)
+        })
+        if(!is.null(colnames(data))){
+            names(res_list) <- colnames(data)
+        }
+            
+        if(!output.detail){
+            res <- do.call(base::cbind, res_list)
+        }else{
+            res <- res_list
+        }
+    }
     
     invisible(res)
 }

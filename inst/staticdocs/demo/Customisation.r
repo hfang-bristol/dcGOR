@@ -2,9 +2,9 @@
 # 
 # InterPro2GO mapping is derived from manual annotations of InterPro from GO (<a href="http://www.ncbi.nlm.nih.gov/pubmed/22301074" target="22301074">http://www.ncbi.nlm.nih.gov/pubmed/22301074</a>.
 # This demo assumes that the user has collected three bits (files) of information:
-## 1) InterPro domains (see <a href="http://supfam.org/dcGOR/data/InterPro/InterPro.txt">InterPro.txt</a>);
-## 2) GO Molecular Function (see <a href="http://supfam.org/dcGOR/data/onto/igraph_GOMF_nodes.txt">igraph_GOMF_nodes.txt</a> for GOMF term information and <a href="http://supfam.org/dcGOR/data/onto/igraph_GOBP_edges.txt">igraph_GOMF_edges.txt</a> for parent-child relations between GOMF terms);
-## 3) Annotations of InterPro domains by GOMF terms (see <a href="http://supfam.org/dcGOR/data/InterPro/GO.txt">GO.txt</a> for all GO term information and <a href="http://supfam.org/dcGOR/data/InterPro/Domain2GOMF.txt">Domain2GOMF.txt</a> for annotations)
+## 1) InterPro domains (see <a href="http://dcgor.r-forge.r-project.org/data/InterPro/InterPro.txt">InterPro.txt</a>);
+## 2) GO Molecular Function (see <a href="http://dcgor.r-forge.r-project.org/data/onto/igraph_GOMF_nodes.txt">igraph_GOMF_nodes.txt</a> for GOMF term information and <a href="http://dcgor.r-forge.r-project.org/data/onto/igraph_GOBP_edges.txt">igraph_GOMF_edges.txt</a> for parent-child relations between GOMF terms);
+## 3) Annotations of InterPro domains by GOMF terms (see <a href="http://dcgor.r-forge.r-project.org/data/InterPro/GO.txt">GO.txt</a> for all GO term information and <a href="http://dcgor.r-forge.r-project.org/data/InterPro/Domain2GOMF.txt">Domain2GOMF.txt</a> for annotations)
 #
 # From this demo, the user can learn how to customise analysis based on their own data (domains, ontology and annotations). The key to this customised analysis is to prepare input files exactly the same as those mentioned above. 
 ###############################################################################
@@ -17,13 +17,13 @@ library(dcGOR)
 #---------------------------------------------------------------------------
 
 ## 1) InterPro domains
-domain <- dcBuildInfoDataFrame(input.file="http://supfam.org/dcGOR/data/InterPro/InterPro.txt", output.file="domain.RData")
+domain <- dcBuildInfoDataFrame(input.file="http://dcgor.r-forge.r-project.org/data/InterPro/InterPro.txt", output.file="domain.RData")
 domain
 ## 2) ontology (GO Molecular Function, GOMF)
-g <- dcBuildOnto(relations.file="http://supfam.org/dcGOR/data/onto/igraph_GOMF_edges.txt", nodes.file="http://supfam.org/dcGOR/data/onto/igraph_GOMF_nodes.txt", output.file="ontology.RData")
+g <- dcBuildOnto(relations.file="http://dcgor.r-forge.r-project.org/data/onto/igraph_GOMF_edges.txt", nodes.file="http://dcgor.r-forge.r-project.org/data/onto/igraph_GOMF_nodes.txt", output.file="ontology.RData")
 g
 ## 3) annotations (between InterPro domains and GOMF terms)
-Anno <- dcBuildAnno(domain_info.file="http://supfam.org/dcGOR/data/InterPro/InterPro.txt", term_info.file="http://supfam.org/dcGOR/data/InterPro/GO.txt", association.file="http://supfam.org/dcGOR/data/InterPro/Domain2GOMF.txt", output.file="annotations.RData")
+Anno <- dcBuildAnno(domain_info.file="http://dcgor.r-forge.r-project.org/data/InterPro/InterPro.txt", term_info.file="http://dcgor.r-forge.r-project.org/data/InterPro/GO.txt", association.file="http://dcgor.r-forge.r-project.org/data/InterPro/Domain2GOMF.txt", output.file="annotations.RData")
 Anno
 ## In your working directory, you should see three RData-formatted files: "domain.RData", "ontology.RData", "annotations.RData"
 

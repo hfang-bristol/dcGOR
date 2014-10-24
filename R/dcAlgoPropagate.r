@@ -2,11 +2,11 @@
 #'
 #' \code{dcAlgoPropagate} is supposed to propogate ontology annotations, given an input file. This input file contains original annotations between domains/features and ontology terms, along with the hypergeometric scores (hscore) in support for their annotations. The annotations are propogated to the ontology root (retaining the maximum hscore). After the propogation, the ontology terms of increasing levels are determined based on the concept of Information Content (IC) to product a slim version of ontology. It returns an object of S3 class "HIS" with three components: "hscore", "ic" and "slim".
 #'
-#' @param input.file an input file used to build the object. This input file contains original annotations between domains/features and ontology terms, along with the hypergeometric scores (hscore) in support for their annotations. For example, a file containing original annotations between SCOP domain architectures and GO terms can be found in \url{http://supfam.org/dcGOR/data/Feature/Feature2GO.sf.txt}. As seen in this example, the input file must contain the header (in the first row) and three columns: 1st column for 'Feature_id' (here SCOP domain architectures), 2nd column for 'Term_id' (GO terms), and 3rd column for 'Score' (hscore)
+#' @param input.file an input file used to build the object. This input file contains original annotations between domains/features and ontology terms, along with the hypergeometric scores (hscore) in support for their annotations. For example, a file containing original annotations between SCOP domain architectures and GO terms can be found in \url{http://dcgor.r-forge.r-project.org/data/Feature/Feature2GO.sf.txt}. As seen in this example, the input file must contain the header (in the first row) and three columns: 1st column for 'Feature_id' (here SCOP domain architectures), 2nd column for 'Term_id' (GO terms), and 3rd column for 'Score' (hscore)
 #' @param ontology the ontology identity. It can be "GOBP" for Gene Ontology Biological Process, "GOMF" for Gene Ontology Molecular Function, "GOCC" for Gene Ontology Cellular Component, "DO" for Disease Ontology, "HPPA" for Human Phenotype Phenotypic Abnormality, "HPMI" for Human Phenotype Mode of Inheritance, "HPON" for Human Phenotype ONset and clinical course
 #' @param output.file an output file used to save the built object as an RData-formatted file. If NULL, this file will be saved into "HIS.RData" in the current working local directory
 #' @param verbose logical to indicate whether the messages will be displayed in the screen. By default, it sets to TRUE for display
-#' @param RData.location the characters to tell the location of built-in RData files. By default, it remotely locates at "http://supfam.org/dcGOR/data" or "https://github.com/hfang-bristol/dcGOR/data". For the user equipped with fast internet connection, this option can be just left as default. But it is always advisable to download these files locally. Especially when the user needs to run this function many times, there is no need to ask the function to remotely download every time (also it will unnecessarily increase the runtime). For examples, these files (as a whole or part of them) can be first downloaded into your current working directory, and then set this option as: \eqn{RData.location="."}. If RData to load is already part of package itself, this parameter can be ignored (since this function will try to load it via function \code{data} first)
+#' @param RData.location the characters to tell the location of built-in RData files. By default, it remotely locates at "http://supfam.org/dcGOR/data" or "http://dcgor.r-forge.r-project.org/data". For the user equipped with fast internet connection, this option can be just left as default. But it is always advisable to download these files locally. Especially when the user needs to run this function many times, there is no need to ask the function to remotely download every time (also it will unnecessarily increase the runtime). For examples, these files (as a whole or part of them) can be first downloaded into your current working directory, and then set this option as: \eqn{RData.location="."}. If RData to load is already part of package itself, this parameter can be ignored (since this function will try to load it via function \code{data} first)
 #' @return 
 #' an object of S3 class \code{HIS}, with following components:
 #' \itemize{
@@ -22,14 +22,14 @@
 #' @examples
 #' \dontrun{
 #' # build an "HIS" object for GO Molecular Function
-#' Feature2GOMF.sf <- dcAlgoPropagate(input.file="http://supfam.org/dcGOR/data/Feature/Feature2GO.sf.txt", ontology="GOMF", output.file="Feature2GOMF.sf.RData")
+#' Feature2GOMF.sf <- dcAlgoPropagate(input.file="http://dcgor.r-forge.r-project.org/data/Feature/Feature2GO.sf.txt", ontology="GOMF", output.file="Feature2GOMF.sf.RData")
 #' names(Feature2GOMF.sf)
 #' Feature2GOMF.sf$hscore[1]
 #' Feature2GOMF.sf$ic[1:10]
 #' Feature2GOMF.sf$slim[1]
 #' }
 
-dcAlgoPropagate <- function(input.file, ontology=c("GOBP","GOMF","GOCC","HPPA","HPMI","HPON"), output.file="HIS.RData", verbose=T, RData.location="http://supfam.org/dcGOR/data")
+dcAlgoPropagate <- function(input.file, ontology=c("GOBP","GOMF","GOCC","HPPA","HPMI","HPON"), output.file="HIS.RData", verbose=T, RData.location="http://dcgor.r-forge.r-project.org/data")
 {
     startT <- Sys.time()
     message(paste(c("Start at ",as.character(startT)), collapse=""), appendLF=T)

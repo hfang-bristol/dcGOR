@@ -3,28 +3,59 @@
 \alias{dcAncestralMP}
 \title{Function to reconstruct ancestral discrete states using maximum parsimony algorithm}
 \usage{
-dcAncestralMP(x, phy, verbose = T)
+dcAncestralMP(data, phy, output.detail = F, parallel = T,
+multicores = NULL, verbose = F)
 }
 \arguments{
-\item{x}{a vector of discrete states in the tips. It can be an unnamed
-vector; in this case, assumedly it has the same order as in the tree
-tips. More wisely, it is a named vector, whose names can be matched to
-the tip labels of the tree. The names of this input vector can be more
-than found in the tree labels, and they should contain all those in the
-tree labels}
+\item{data}{an input data matrix storing discrete states for tips (in
+rows) X characters (in columns). The rows in the matrix are for tips.
+If the row names do not exist, then addumedly they have the same order
+as in the tree tips. More wisely, users provide row names which can be
+matched to the tip labels of the tree. The row names can be more than
+found in the tree labels, and they should contain all those in the tree
+labels}
 
 \item{phy}{an object of class 'phylo'}
+
+\item{output.detail}{logical to indicate whether the output is returned
+as a detailed list. If TRUE, a nested list is returned: a list of
+characters (corresponding to columns of input data matrix), in which
+each element is a list consisting of three components ("states",
+"transition" and "relative"). If FALSE, a matrix is returned: the
+columns respond to the input data columns, and rows responding to all
+node index in the phylo-formatted tree}
+
+\item{parallel}{logical to indicate whether parallel computation with
+multicores is used. By default, it sets to true, but not necessarily
+does so. Partly because parallel backends available will be
+system-specific (now only Linux or Mac OS). Also, it will depend on
+whether these two packages "foreach" and "doMC" have been installed. It
+can be installed via:
+\code{source("http://bioconductor.org/biocLite.R");
+biocLite(c("foreach","doMC"))}. If not yet installed, this option will
+be disabled}
+
+\item{multicores}{an integer to specify how many cores will be
+registered as the multicore parallel backend to the 'foreach' package.
+If NULL, it will use a half of cores available in a user's computer.
+This option only works when parallel computation is enabled}
 
 \item{verbose}{logical to indicate whether the messages will be
 displayed in the screen. By default, it sets to TRUE for display}
 }
 \value{
-a list of architectures, containing three components for "transition",
-"states" and "relative":
+It depends on the 'output.detail'.
+If FALSE (by default), a matrix is returned, with the columns
+responding to the input data columns, and rows responding to node index
+in the phylo-formatted tree.
+If TRUE, a nested list is returned. Outer-most list is for characters
+(corresponding to columns of input data matrix), in which each elemenl
+is a list (inner-most) consisting of three components ("states",
+"transition" and "relative"):
 \itemize{
-\item{\code{transition}: a posterior transition matrix between states}
 \item{\code{states}: a named vector storing states (extant and
 ancestral states)}
+\item{\code{transition}: a posterior transition matrix between states}
 \item{\code{relative}: a matrix of nodes X states, storing relative
 probability}
 }
@@ -47,17 +78,29 @@ reconstruction is attributable to the basic idea as described in
 \url{http://sysbio.oxfordjournals.org/content/20/4/406.short}
 }
 \examples{
-# provide the tree and states in the tips
+# 1) provide the phylo-formatted tree
 tree <-
 "((((t10:5,t2:5):2,(t9:4,t5:4):3):2,(t3:4,t7:4):6):2,((t6:4,t1:4):2,(t8:2,t4:2):4):6);"
 phy <- ape::read.tree(text=paste(tree, collapse=""))
-x <- c(0, rep(1,4), rep(0,5))
 
-# reconstruct ancestral states
-res <- dcAncestralMP(x, phy)
+# 2) an input data matrix storing discrete states for tips (in rows) X two characters (in columns)
+data1 <- matrix(c(0,rep(1,4),rep(0,5)), ncol=1)
+data2 <- matrix(c(0,rep(0,4),rep(1,5)), ncol=1)
+data <- cbind(data1, data2)
+colnames(data) <- c("C1", "C2")
+## reconstruct ancestral states, without detailed output
+res <- dcAncestralMP(data, phy, parallel=FALSE)
 res
 
-# visualise the tree with ancestral states and their conditional probability
+# 3) an input data matrix storing discrete states for tips (in rows) X only one character
+data <- matrix(c(0,rep(0,4),rep(1,5)), ncol=1)
+## reconstruct ancestral states, with detailed output
+res <- dcAncestralMP(data, phy, parallel=FALSE, output.detail=TRUE,
+verbose=TRUE)
+res
+## get the inner-most list
+res <- res[[1]]
+## visualise the tree with ancestral states and their conditional probability
 Ntip <- ape::Ntip(phy)
 Nnode <- ape::Nnode(phy)
 color <- c("white","gray")
@@ -65,6 +108,7 @@ color <- c("white","gray")
 ape::plot.phylo(phy, type="p", use.edge.length=TRUE, label.offset=1,
 show.tip.label=TRUE, show.node.label=FALSE)
 ## visualise tips (state 1 in gray, state 0 in white)
+x <- data[,1]
 ape::tiplabels(pch=22, bg=color[as.numeric(x)+1], cex=2, adj=1)
 ## visualise internal nodes
 ### thermo bar to illustrate relative probability (state 1 in gray, state 0 in white)

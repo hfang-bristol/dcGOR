@@ -12,7 +12,7 @@ dcAlgoPredict(data, RData.HIS = c("Feature2GOBP.sf", "Feature2GOMF.sf",
 scale.method = c("log", "linear", "none"),
 feature.mode = c("supradomains", "domains"), slim.level = NULL,
 parallel = TRUE, multicores = NULL, verbose = T,
-RData.location = "http://supfam.org/dcGOR/data")
+RData.location = "http://dcgor.r-forge.r-project.org/data")
 }
 \arguments{
 \item{data}{an input data vector containing domain architectures. An
@@ -78,11 +78,11 @@ displayed in the screen. By default, it sets to TRUE for display}
 \item{RData.location}{the characters to tell the location of built-in
 RData files. By default, it remotely locates at
 "http://supfam.org/dcGOR/data" or
-"https://github.com/hfang-bristol/dcGOR/data". For the user equipped
-with fast internet connection, this option can be just left as default.
-But it is always advisable to download these files locally. Especially
-when the user needs to run this function many times, there is no need
-to ask the function to remotely download every time (also it will
+"http://dcgor.r-forge.r-project.org/data". For the user equipped with
+fast internet connection, this option can be just left as default. But
+it is always advisable to download these files locally. Especially when
+the user needs to run this function many times, there is no need to ask
+the function to remotely download every time (also it will
 unnecessarily increase the runtime). For examples, these files (as a
 whole or part of them) can be first downloaded into your current
 working directory, and then set this option as:
@@ -105,6 +105,7 @@ into predictive scores across terms.
 none
 }
 \examples{
+\dontrun{
 # 1) randomly generate 5 domains and/or domain architectures
 x <- dcRDataLoader(RData="Feature2GOMF.sf")
 data <- sample(names(x$hscore), 5)
@@ -133,6 +134,7 @@ data <- pscore[[1]]
 subg <- dnet::dDAGinduce(ig, nodes_query=names(data),
 path.mode="shortest_paths")
 dnet::visDAG(g=subg, data=data, node.info="term_id")
+}
 }
 \seealso{
 \code{\link{dcRDataLoader}}, \code{\link{dcConverter}},

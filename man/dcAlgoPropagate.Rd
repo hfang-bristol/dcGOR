@@ -6,7 +6,7 @@
 dcAlgoPropagate(input.file, ontology = c("GOBP", "GOMF", "GOCC",
 "HPPA",
 "HPMI", "HPON"), output.file = "HIS.RData", verbose = T,
-RData.location = "http://supfam.org/dcGOR/data")
+RData.location = "http://dcgor.r-forge.r-project.org/data")
 }
 \arguments{
 \item{input.file}{an input file used to build the object. This input
@@ -14,8 +14,9 @@ file contains original annotations between domains/features and
 ontology terms, along with the hypergeometric scores (hscore) in
 support for their annotations. For example, a file containing original
 annotations between SCOP domain architectures and GO terms can be found
-in \url{http://supfam.org/dcGOR/data/Feature/Feature2GO.sf.txt}. As
-seen in this example, the input file must contain the header (in the
+in
+\url{http://dcgor.r-forge.r-project.org/data/Feature/Feature2GO.sf.txt}.
+As seen in this example, the input file must contain the header (in the
 first row) and three columns: 1st column for 'Feature_id' (here SCOP
 domain architectures), 2nd column for 'Term_id' (GO terms), and 3rd
 column for 'Score' (hscore)}
@@ -37,11 +38,11 @@ displayed in the screen. By default, it sets to TRUE for display}
 \item{RData.location}{the characters to tell the location of built-in
 RData files. By default, it remotely locates at
 "http://supfam.org/dcGOR/data" or
-"https://github.com/hfang-bristol/dcGOR/data". For the user equipped
-with fast internet connection, this option can be just left as default.
-But it is always advisable to download these files locally. Especially
-when the user needs to run this function many times, there is no need
-to ask the function to remotely download every time (also it will
+"http://dcgor.r-forge.r-project.org/data". For the user equipped with
+fast internet connection, this option can be just left as default. But
+it is always advisable to download these files locally. Especially when
+the user needs to run this function many times, there is no need to ask
+the function to remotely download every time (also it will
 unnecessarily increase the runtime). For examples, these files (as a
 whole or part of them) can be first downloaded into your current
 working directory, and then set this option as:
@@ -79,14 +80,16 @@ product a slim version of ontology. It returns an object of S3 class
 None
 }
 \examples{
+\dontrun{
 # build an "HIS" object for GO Molecular Function
 Feature2GOMF.sf <-
-dcAlgoPropagate(input.file="http://supfam.org/dcGOR/data/Feature/Feature2GO.sf.txt",
+dcAlgoPropagate(input.file="http://dcgor.r-forge.r-project.org/data/Feature/Feature2GO.sf.txt",
 ontology="GOMF", output.file="Feature2GOMF.sf.RData")
 names(Feature2GOMF.sf)
 Feature2GOMF.sf$hscore[1]
 Feature2GOMF.sf$ic[1:10]
 Feature2GOMF.sf$slim[1]
+}
 }
 \seealso{
 \code{\link{dcRDataLoader}}, \code{\link{dcConverter}}

@@ -1,11 +1,11 @@
 # This is a demo for analysing promiscuous Pfam domains by Basu et al
 # 
-# This list of promiscuous Pfam domains was reported in <a href="http://www.ncbi.nlm.nih.gov/pubmed/18230802" target="18230802">http://www.ncbi.nlm.nih.gov/pubmed/18230802</a>. There are 215 domains identified as strongly promiscuous (a tendency to occur in diverse domain architectures), in which 76 were taken from Pfam domains and thus used for this demo. It can be found in the file <a href="http://supfam.org/dcGOR/data/demo/domain_promiscuity_Basu_et_al_2008.txt">domain_promiscuity_Basu_et_al_2008.txt</a>, containing two columns: 1st column for Pfam domain ID, and 2nd column for promiscuity value (the higher the more promiscuous).
+# This list of promiscuous Pfam domains was reported in <a href="http://www.ncbi.nlm.nih.gov/pubmed/18230802" target="18230802">http://www.ncbi.nlm.nih.gov/pubmed/18230802</a>. There are 215 domains identified as strongly promiscuous (a tendency to occur in diverse domain architectures), in which 76 were taken from Pfam domains and thus used for this demo. It can be found in the file <a href="http://dcgor.r-forge.r-project.org/data/demo/domain_promiscuity_Basu_et_al_2008.txt">domain_promiscuity_Basu_et_al_2008.txt</a>, containing two columns: 1st column for Pfam domain ID, and 2nd column for promiscuity value (the higher the more promiscuous).
 ###############################################################################
 library(dcGOR)
 
 # Read promiscuous Pfam domains
-domains <- read.delim("http://supfam.org/dcGOR/data/demo/domain_promiscuity_Basu_et_al_2008.txt",header=T)
+domains <- read.delim("http://dcgor.r-forge.r-project.org/data/demo/domain_promiscuity_Basu_et_al_2008.txt",header=T)
 domains[1:5,]
 
 #---------------------------------------------------------------------------

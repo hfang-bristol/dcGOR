@@ -8,20 +8,30 @@ data(Rfam2GOMF)
 }
 
 \description{
-An object of class "Anno" that contains associations between Gene Ontology Molecular Function terms and Rfam RNA families. This data is prepared based on the Rfam database (see \url{http://rfam.xfam.org}) and \url{http://geneontology.org/external2go/rfam2go}.
+An object of class "Anno" that contains associations between Gene
+Ontology Molecular Function terms and Rfam RNA families. This data is
+prepared based on the Rfam database (see \url{http://rfam.xfam.org})
+and \url{http://geneontology.org/external2go/rfam2go}.
 }
 
-\value{   
-    an object of class \code{\link{Anno}}. It has slots for "annoData", "termData" and "domainData": 
-    \itemize{
-        \item{\code{annoData}: a sparse matrix of RNAs X terms}
-        \item{\code{termData}: variables describing ontology terms (i.e. columns in annoData), including: "ID" (i.e. term ID), "Name" (i.e. term Names), "Namespace" (i.e. term Namespace), and "Distance" (i.e. term Distance to the ontology root)}
-        \item{\code{domainData}: variables describing RNAs (i.e. rows in annoData), including: "id" for Rfam accession ID, and "level" always equals "Rfam", "description" for Rfam description}
-    }
+\value{
+an object of class \code{\link{Anno}}. It has slots for "annoData",
+"termData" and "domainData":
+\itemize{
+\item{\code{annoData}: a sparse matrix of RNAs X terms}
+\item{\code{termData}: variables describing ontology terms (i.e.
+columns in annoData), including: "ID" (i.e. term ID), "Name" (i.e. term
+Names), "Namespace" (i.e. term Namespace), and "Distance" (i.e. term
+Distance to the ontology root)}
+\item{\code{domainData}: variables describing RNAs (i.e. rows in
+annoData), including: "id" for Rfam accession ID, and "level" always
+equals "Rfam", "description" for Rfam description}
+}
 }
 
 \references{
-Gardner et al. (2011) Rfam: Wikipedia, clans and the "decimal" release. \emph{Nucleic Acids Res}, 39(Database issue):D141-D145.
+Gardner et al. (2011) Rfam: Wikipedia, clans and the "decimal" release.
+\emph{Nucleic Acids Res}, 39(Database issue):D141-D145.
 }
 
 \seealso{

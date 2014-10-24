@@ -13,15 +13,15 @@ weight.method = c("none", "copynum", "ic", "both"),
 merge.method = c("sum", "max", "sequential"), scale.method = c("log",
 "linear", "none"), feature.mode = c("supradomains", "domains"),
 slim.level = NULL, parallel = TRUE, multicores = NULL, verbose = T,
-RData.location = "http://supfam.org/dcGOR/data")
+RData.location = "http://dcgor.r-forge.r-project.org/data")
 }
 \arguments{
 \item{input.file}{an input file containing domain architectures
 (including individual domains). For example, a file containing UniProt
 ID and domain architectures for human proteins can be found in
-\url{http://supfam.org/dcGOR/data/Feature/hs.txt}. As seen in this
-example, the input file must contain the header (in the first row) and
-two columns: 1st column for 'SeqID' (actually these IDs can be
+\url{http://dcgor.r-forge.r-project.org/data/Feature/hs.txt}. As seen
+in this example, the input file must contain the header (in the first
+row) and two columns: 1st column for 'SeqID' (actually these IDs can be
 anything), 2nd column for 'Architecture' (SCOP domain architectures,
 each represented as comma-separated domains). Alternatively, the
 input.file can be a matrix or data frame, assuming that input file has
@@ -96,11 +96,11 @@ displayed in the screen. By default, it sets to TRUE for display}
 \item{RData.location}{the characters to tell the location of built-in
 RData files. By default, it remotely locates at
 "http://supfam.org/dcGOR/data" or
-"https://github.com/hfang-bristol/dcGOR/data". For the user equipped
-with fast internet connection, this option can be just left as default.
-But it is always advisable to download these files locally. Especially
-when the user needs to run this function many times, there is no need
-to ask the function to remotely download every time (also it will
+"http://dcgor.r-forge.r-project.org/data". For the user equipped with
+fast internet connection, this option can be just left as default. But
+it is always advisable to download these files locally. Especially when
+the user needs to run this function many times, there is no need to ask
+the function to remotely download every time (also it will
 unnecessarily increase the runtime). For examples, these files (as a
 whole or part of them) can be first downloaded into your current
 working directory, and then set this option as:
@@ -123,10 +123,12 @@ with the column names: the first two (the same as input file), 3rd for
 predicted scores)
 }
 \examples{
-input.file <- "http://supfam.org/dcGOR/data/Feature/hs.txt"
+\dontrun{
+input.file <- "http://dcgor.r-forge.r-project.org/data/Feature/hs.txt"
 output <- dcAlgoPredictMain(input.file, RData.HIS="Feature2GOMF.sf")
 length(output)
 output[1:10]
+}
 }
 \seealso{
 \code{\link{dcRDataLoader}}, \code{\link{dcConverter}},

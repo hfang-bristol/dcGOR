@@ -8,10 +8,10 @@ dcBuildInfoDataFrame(input.file, output.file = "InfoDataFrame.RData")
 \arguments{
 \item{input.file}{an input file used to build the object. For example,
 a file containing InterPro domains (InterPro) can be found in
-\url{http://supfam.org/dcGOR/data/InterPro/InterPro.txt}. As seen in
-this example, the input file must contain the header (in the first
-row), and entries in the first column intend to be domain identities
-(and must be unique)}
+\url{http://dcgor.r-forge.r-project.org/data/InterPro/InterPro.txt}. As
+seen in this example, the input file must contain the header (in the
+first row), and entries in the first column intend to be domain
+identities (and must be unique)}
 
 \item{output.file}{an output file used to save the built object as an
 RData-formatted file. If NULL, this file will be saved into
@@ -35,11 +35,13 @@ of the assigement sign '<-', then no object will be loaded onto the
 working environment.
 }
 \examples{
+\dontrun{
 # build an "InfoDataFrame" object that contains information on InterPro domains (InterPro)
 InterPro <-
-dcBuildInfoDataFrame(input.file="http://supfam.org/dcGOR/data/InterPro/InterPro.txt",
+dcBuildInfoDataFrame(input.file="http://dcgor.r-forge.r-project.org/data/InterPro/InterPro.txt",
 output.file="InterPro.RData")
 InterPro
+}
 }
 \seealso{
 \code{\link{InfoDataFrame}}

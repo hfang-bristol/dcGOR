@@ -16,7 +16,7 @@ min.overlap = 3, which_distance = NULL, test = c("HypergeoTest",
 "elim",
 "lea"), elim.pvalue = 0.01, lea.depth = 2, verbose = T,
 domain.RData = NULL, ontology.RData = NULL, annotations.RData = NULL,
-RData.location = "http://supfam.org/dcGOR/data")
+RData.location = "http://dcgor.r-forge.r-project.org/data")
 }
 \arguments{
 \item{data}{an input vector. It contains id for a list of domains, for
@@ -114,11 +114,11 @@ enrichment analysis using their own data}
 \item{RData.location}{the characters to tell the location of built-in
 RData files. By default, it remotely locates at
 "http://supfam.org/dcGOR/data" or
-"https://github.com/hfang-bristol/dcGOR/data". For the user equipped
-with fast internet connection, this option can be just left as default.
-But it is always advisable to download these files locally. Especially
-when the user needs to run this function many times, there is no need
-to ask the function to remotely download every time (also it will
+"http://dcgor.r-forge.r-project.org/data". For the user equipped with
+fast internet connection, this option can be just left as default. But
+it is always advisable to download these files locally. Especially when
+the user needs to run this function many times, there is no need to ask
+the function to remotely download every time (also it will
 unnecessarily increase the runtime). For examples, these files (as a
 whole or part of them) can be first downloaded into your current
 working directory, and then set this option as:
@@ -192,6 +192,7 @@ maximum of both p-values in these two calculations.}
 }
 }
 \examples{
+\dontrun{
 # 1) Enrichment analysis for SCOP domain superfamilies (sf)
 ## 1a) load SCOP.sf (as 'InfoDataFrame' object)
 SCOP.sf <- dcRDataLoader('SCOP.sf')
@@ -304,16 +305,16 @@ visEnrichment(eoutput)
 # 5a) create domain, ontology and annotations
 ## for domain
 domain <-
-dcBuildInfoDataFrame(input.file="http://supfam.org/dcGOR/data/InterPro/InterPro.txt",
+dcBuildInfoDataFrame(input.file="http://dcgor.r-forge.r-project.org/data/InterPro/InterPro.txt",
 output.file="domain.RData")
 ## for ontology
-dcBuildOnto(relations.file="http://supfam.org/dcGOR/data/onto/igraph_GOMF_edges.txt",
-nodes.file="http://supfam.org/dcGOR/data/onto/igraph_GOMF_nodes.txt",
+dcBuildOnto(relations.file="http://dcgor.r-forge.r-project.org/data/onto/igraph_GOMF_edges.txt",
+nodes.file="http://dcgor.r-forge.r-project.org/data/onto/igraph_GOMF_nodes.txt",
 output.file="ontology.RData")
 ## for annotations
-dcBuildAnno(domain_info.file="http://supfam.org/dcGOR/data/InterPro/InterPro.txt",
-term_info.file="http://supfam.org/dcGOR/data/InterPro/GO.txt",
-association.file="http://supfam.org/dcGOR/data/InterPro/Domain2GOMF.txt",
+dcBuildAnno(domain_info.file="http://dcgor.r-forge.r-project.org/data/InterPro/InterPro.txt",
+term_info.file="http://dcgor.r-forge.r-project.org/data/InterPro/GO.txt",
+association.file="http://dcgor.r-forge.r-project.org/data/InterPro/Domain2GOMF.txt",
 output.file="annotations.RData")
 ## 5b) prepare data and background
 ### randomly select 100 domains as a list of domains of interest
@@ -330,6 +331,7 @@ view(eoutput, top_num=10, sortBy="pvalue", details=TRUE)
 ### visualise the top 10 significant terms in the ontology hierarchy
 ### color-coded according to 10-based negative logarithm of adjusted p-values (adjp)
 visEnrichment(eoutput)
+}
 }
 \seealso{
 \code{\link{dcRDataLoader}}, \code{\link{dcDAGannotate}},
