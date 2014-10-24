@@ -62,8 +62,15 @@
 #' ### labeling reconstructed ancestral states
 #' ape::nodelabels(text=res$states[Ntip+1:Nnode], node=Ntip+1:Nnode, frame="none", col="red", bg="transparent", cex=0.75)
 
-dcAncestralML <- function(data, phy, transition.model=c("different","symmetric","same","customised"), customised.model=NULL, edge.length.power=1, initial.estimate=0.1, output.detail=F, parallel=T, multicores=NULL, verbose=F)
+dcAncestralML <- function(data, phy, transition.model=c("different","symmetric","same","customised"), customised.model=NULL, edge.length.power=1, initial.estimate=0.1, output.detail=F, parallel=T, multicores=NULL, verbose=T)
 {
+
+    startT <- Sys.time()
+    if(verbose){
+        message(paste(c("Start at ",as.character(startT)), collapse=""), appendLF=T)
+        message("", appendLF=T)
+    }
+    ####################################################################################
 
     ## match.arg matches arg against a table of candidate values as specified by choices, where NULL means to take the first one
     transition.model <- match.arg(transition.model)
@@ -366,7 +373,7 @@ dcAncestralML <- function(data, phy, transition.model=c("different","symmetric",
     progress_indicate <- function(i, B, step, flag=F){
         if(i %% ceiling(B/step) == 0 | i==B | i==1){
             if(flag & verbose){
-                message(sprintf("%d out of %d (%s)", i, B, as.character(Sys.time())), appendLF=T)
+                message(sprintf("\t%d out of %d (%s)", i, B, as.character(Sys.time())), appendLF=T)
             }
         }
     }
@@ -380,7 +387,7 @@ dcAncestralML <- function(data, phy, transition.model=c("different","symmetric",
             j <- 1
             res_list <- foreach::`%dopar%` (foreach::foreach(j=1:ncol(data), .inorder=T), {
                 progress_indicate(i=j, B=ncol(data), 10, flag=T)
-                doReconstruct(x=data[,j], Ntot=Ntot, Ntip=Ntip, Nnode=Nnode, E=E, e1=e1, e2=e2, output.detail=output.detail, verbose=verbose)
+                suppressMessages(doReconstruct(x=data[,j], Ntot=Ntot, Ntip=Ntip, Nnode=Nnode, E=E, e1=e1, e2=e2, output.detail=output.detail, verbose=verbose))
             })
             if(!is.null(colnames(data))){
                 names(res_list) <- colnames(data)
@@ -388,6 +395,17 @@ dcAncestralML <- function(data, phy, transition.model=c("different","symmetric",
             
             if(!output.detail){
                 res <- do.call(base::cbind, res_list)
+                if(is.numeric(data)){
+                    res_tmp <- matrix(as.numeric(res), ncol=ncol(res), nrow=nrow(res))
+                    if(!is.null(rownames(res))){
+                        rownames(res_tmp) <- rownames(res)
+                    }
+                    if(!is.null(colnames(res))){
+                        colnames(res_tmp) <- colnames(res)
+                    }
+                    res <- res_tmp
+                }
+                
             }else{
                 res <- res_list
             }
@@ -400,7 +418,7 @@ dcAncestralML <- function(data, phy, transition.model=c("different","symmetric",
         res_list <- lapply(1:ncol(data),function(j) {
             progress_indicate(i=j, B=ncol(data), 10, flag=T)
             da <- data[,j]
-            doReconstruct(x=data[,j], Ntot=Ntot, Ntip=Ntip, Nnode=Nnode, E=E, e1=e1, e2=e2, output.detail=output.detail, verbose=verbose)
+            suppressMessages(doReconstruct(x=data[,j], Ntot=Ntot, Ntip=Ntip, Nnode=Nnode, E=E, e1=e1, e2=e2, output.detail=output.detail, verbose=verbose))
         })
         if(!is.null(colnames(data))){
             names(res_list) <- colnames(data)
@@ -408,10 +426,31 @@ dcAncestralML <- function(data, phy, transition.model=c("different","symmetric",
             
         if(!output.detail){
             res <- do.call(base::cbind, res_list)
+            if(is.numeric(data)){
+                res_tmp <- matrix(as.numeric(res), ncol=ncol(res), nrow=nrow(res))
+                if(!is.null(rownames(res))){
+                    rownames(res_tmp) <- rownames(res)
+                }
+                if(!is.null(colnames(res))){
+                    colnames(res_tmp) <- colnames(res)
+                }
+                res <- res_tmp
+            }
+            
         }else{
             res <- res_list
         }
     }
+    
+    ####################################################################################
+    endT <- Sys.time()
+    if(verbose){
+        message("", appendLF=T)
+        message(paste(c("Finish at ",as.character(endT)), collapse=""), appendLF=T)
+    }
+    
+    runTime <- as.numeric(difftime(strptime(endT, "%Y-%m-%d %H:%M:%S"), strptime(startT, "%Y-%m-%d %H:%M:%S"), units="secs"))
+    message(paste(c("Runtime in total is: ",runTime," secs\n"), collapse=""), appendLF=T)
     
     invisible(res)
 }

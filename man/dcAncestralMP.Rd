@@ -4,7 +4,7 @@
 \title{Function to reconstruct ancestral discrete states using maximum parsimony algorithm}
 \usage{
 dcAncestralMP(data, phy, output.detail = F, parallel = T,
-multicores = NULL, verbose = F)
+multicores = NULL, verbose = T)
 }
 \arguments{
 \item{data}{an input data matrix storing discrete states for tips (in

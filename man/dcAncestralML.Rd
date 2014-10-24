@@ -6,7 +6,7 @@
 dcAncestralML(data, phy, transition.model = c("different", "symmetric",
 "same", "customised"), customised.model = NULL, edge.length.power = 1,
 initial.estimate = 0.1, output.detail = F, parallel = T,
-multicores = NULL, verbose = F)
+multicores = NULL, verbose = T)
 }
 \arguments{
 \item{data}{an input data matrix storing discrete states for tips (in
