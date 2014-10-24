@@ -79,7 +79,6 @@ product a slim version of ontology. It returns an object of S3 class
 None
 }
 \examples{
-\dontrun{
 # build an "HIS" object for GO Molecular Function
 Feature2GOMF.sf <-
 dcAlgoPropagate(input.file="http://supfam.org/dcGOR/data/Feature/Feature2GO.sf.txt",
@@ -88,7 +87,6 @@ names(Feature2GOMF.sf)
 Feature2GOMF.sf$hscore[1]
 Feature2GOMF.sf$ic[1:10]
 Feature2GOMF.sf$slim[1]
-}
 }
 \seealso{
 \code{\link{dcRDataLoader}}, \code{\link{dcConverter}}

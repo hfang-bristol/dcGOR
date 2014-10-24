@@ -98,6 +98,21 @@ dcAncestralML <- function(x, phy, transition.model=c("different","symmetric","sa
     lvls <- levels(x_tmp)
     x_tmp <- as.integer(x_tmp)
     
+    ##########################
+    if(nl==1){
+        res <- list()
+        res$transition <- NULL
+        res$states <- rep(lvls, Ntot)
+        res$relative <- NULL
+        
+        if(verbose){
+            message(sprintf("Note, there is only one state '%s' in tips", lvls), appendLF=T)
+        }
+        
+        return(invisible(res))
+    }
+    ##########################    
+    
     if(transition.model != 'customised'){
         rate <- matrix(NA, nl, nl)
         switch(transition.model, 
@@ -198,7 +213,14 @@ dcAncestralML <- function(x, phy, transition.model=c("different","symmetric","sa
         }
     }
     
-    out <- stats::nlminb(rep(initial.estimate,length.out=np), function(p) dev(p), lower=rep(0, np), upper=rep(1e+50, np))
+    #out <- stats::nlminb(rep(initial.estimate,length.out=np), function(p) dev(p), lower=rep(0, np), upper=rep(1e+50, np))
+    out <- stats::nlminb(rep(initial.estimate,length.out=np), function(p) dev(p), lower=rep(0, np), upper=rep(1/nl, np))
+    
+    ############################################################
+    ## make sure the estimated transition rate no more than 1/nl
+    ind <- which(out$par>=1/nl)
+    out$par[ind] <- min(out$par)
+    ############################################################
     
     ## transition matrix: from (in rows) -> to (in columns)
     t_matrix <- matrix(out$par[rate], nl, nl)

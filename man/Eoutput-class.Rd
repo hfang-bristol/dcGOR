@@ -92,7 +92,6 @@ definition code for the method 'f' defined in this class}
 }
 }
 \examples{
-\dontrun{
 # 1) load SCOP.sf (as 'InfoDataFrame' object)
 SCOP.sf <- dcRDataLoader('SCOP.sf')
 # randomly select 20 domains
@@ -112,7 +111,6 @@ view(eoutput, top_num=5, sortBy="pvalue", details=TRUE)
 zscore(eoutput)[1:5]
 pvalue(eoutput)[1:5]
 adjp(eoutput)[1:5]
-}
 }
 \seealso{
 \code{\link{Eoutput-method}}

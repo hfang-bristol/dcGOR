@@ -84,6 +84,21 @@ dcAncestralMP <- function(x, phy, verbose=T)
     lvls <- levels(x_tmp)
     x_tmp <- as.integer(x_tmp)
     
+    ##########################
+    if(nl==1){
+        res <- list()
+        res$transition <- NULL
+        res$states <- rep(lvls, Ntot)
+        res$relative <- NULL
+        
+        if(verbose){
+            message(sprintf("Note, there is only one state '%s' in tips", lvls), appendLF=T)
+        }
+        
+        return(invisible(res))
+    }
+    ########################## 
+    
     ################################################################################################
     if(verbose){
         message(sprintf("First, do maximum parsimony-modified Fitch algorithm in a bottom-up manner (%s) ...", as.character(Sys.time())), appendLF=T)

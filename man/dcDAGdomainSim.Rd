@@ -107,7 +107,6 @@ nodes in query, while the mode "all_paths" results in the complete
 subgraph.
 }
 \examples{
-\dontrun{
 # 1) Semantic similarity between SCOP domain superfamilies (sf)
 ## 1a) load onto.GOMF (as 'Onto' object)
 g <- dcRDataLoader('onto.GOMF')
@@ -253,7 +252,6 @@ edge.width <- 1 + (x-min(x))/(max(x)-min(x))*3
 ### do visualisation
 dnet::visNet(g=ig, vertex.shape="sphere", edge.width=edge.width,
 edge.label=x, edge.label.cex=0.7)
-}
 }
 \seealso{
 \code{\link{dcRDataLoader}}, \code{\link{dcDAGannotate}},

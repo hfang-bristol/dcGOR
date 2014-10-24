@@ -123,12 +123,10 @@ with the column names: the first two (the same as input file), 3rd for
 predicted scores)
 }
 \examples{
-\dontrun{
 input.file <- "http://supfam.org/dcGOR/data/Feature/hs.txt"
 output <- dcAlgoPredictMain(input.file, RData.HIS="Feature2GOMF.sf")
 length(output)
 output[1:10]
-}
 }
 \seealso{
 \code{\link{dcRDataLoader}}, \code{\link{dcConverter}},

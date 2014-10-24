@@ -92,11 +92,16 @@ dcRDataLoader <- function(RData=c(NA,'SCOP.sf','SCOP.fa','Pfam','InterPro','Rfam
             
                 con <- url(load_remote)
                 if(class(suppressWarnings(try(load(con), T)))=="try-error"){
-                    load_remote <- paste("https://github.com/hfang-bristol/dcGOR/data/", RData, ".RData", sep="")
+                    load_remote <- paste("https://github.com/hfang-bristol/dcGOR/tree/master/data/", RData, ".RData", sep="")
                 
                     con <- url(load_remote)
                     if(class(suppressWarnings(try(load(con), T)))=="try-error"){
-                        stop("Built-in Rdata files cannot be loaded. Please check your internet connection or their location in your local machine.\n")   
+                        load_remote <- paste("http://dcgor.r-forge.r-project.org/data/", RData, ".RData", sep="")
+                        
+                        con <- url(load_remote)
+                        if(class(suppressWarnings(try(load(con), T)))=="try-error"){
+                            stop("Built-in Rdata files cannot be loaded. Please check your internet connection or their location in your local machine.\n")   
+                        }
                     }
                 }
             }
