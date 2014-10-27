@@ -2,7 +2,7 @@
 #'
 #' \code{dcAncestralMP} is supposed to reconstruct ancestral discrete states using a maximum parsimony-modified Fitch algorithm. In a from-tip-to-root manner, ancestral state for an internal node is determined if a state is shared in a majority by all its children. If two or more states in a majority are equally shared, this internal node is temporarily marked as an unknown tie, which is further resolved in a from-root-to-tip manner: always being the same state as its direct parent holds. If the ties also occur at the root, the state at the root is set to the last state in ties (for example, usually being 'present' for 'present'-'absent' two states).
 #'
-#' @param data an input data matrix storing discrete states for tips (in rows) X characters (in columns). The rows in the matrix are for tips. If the row names do not exist, then addumedly they have the same order as in the tree tips. More wisely, users provide row names which can be matched to the tip labels of the tree. The row names can be more than found in the tree labels, and they should contain all those in the tree labels
+#' @param data an input data matrix/frame storing discrete states for tips (in rows) X characters (in columns). The rows in the matrix are for tips. If the row names do not exist, then addumedly they have the same order as in the tree tips. More wisely, users provide row names which can be matched to the tip labels of the tree. The row names can be more than found in the tree labels, and they should contain all those in the tree labels
 #' @param phy an object of class 'phylo'
 #' @param output.detail logical to indicate whether the output is returned as a detailed list. If TRUE, a nested list is returned: a list of characters (corresponding to columns of input data matrix), in which each element is a list consisting of three components ("states", "transition" and "relative"). If FALSE, a matrix is returned: the columns respond to the input data columns, and rows responding to all node index in the phylo-formatted tree
 #' @param parallel logical to indicate whether parallel computation with multicores is used. By default, it sets to true, but not necessarily does so. Partly because parallel backends available will be system-specific (now only Linux or Mac OS). Also, it will depend on whether these two packages "foreach" and "doMC" have been installed. It can be installed via: \code{source("http://bioconductor.org/biocLite.R"); biocLite(c("foreach","doMC"))}. If not yet installed, this option will be disabled
@@ -20,26 +20,26 @@
 #' @note
 #' This maximum parsimony algorithm for ancestral discrete state reconstruction is attributable to the basic idea as described in \url{http://sysbio.oxfordjournals.org/content/20/4/406.short}
 #' @export
-#' @seealso \code{\link{dcAncestralML}}
+#' @seealso \code{\link{dcAncestralML}}, \code{\link{dcTreeConnectivity}}, \code{\link{dcDuplicated}}
 #' @include dcAncestralMP.r
 #' @examples
-#' # 1) provide the phylo-formatted tree
-#' tree <- "((((t10:5,t2:5):2,(t9:4,t5:4):3):2,(t3:4,t7:4):6):2,((t6:4,t1:4):2,(t8:2,t4:2):4):6);"
-#' phy <- ape::read.tree(text=paste(tree, collapse=""))
+#' # 1) a newick tree that is imported as a phylo-formatted tree
+#' tree <- "(((t1:5,t2:5):2,(t3:4,t4:4):3):2,(t5:4,t6:4):6);"
+#' phy <- ape::read.tree(text=tree)
 #'
-#' # 2) an input data matrix storing discrete states for tips (in rows) X two characters (in columns)
-#' data1 <- matrix(c(0,rep(1,4),rep(0,5)), ncol=1)
-#' data2 <- matrix(c(0,rep(0,4),rep(1,5)), ncol=1)
-#' data <- cbind(data1, data2)
-#' colnames(data) <- c("C1", "C2")
+#' # 2) an input data matrix storing discrete states for tips (in rows) X four characters (in columns)
+#' data1 <- matrix(c(0,rep(1,3),rep(0,2)), ncol=1)
+#' data2 <- matrix(c(rep(0,4),rep(1,2)), ncol=1)
+#' data <- cbind(data1, data1, data1, data2)
+#' colnames(data) <- c("C1", "C2", "C3", "C4")
 #' ## reconstruct ancestral states, without detailed output
 #' res <- dcAncestralMP(data, phy, parallel=FALSE)
 #' res
 #'
 #' # 3) an input data matrix storing discrete states for tips (in rows) X only one character
-#' data <- matrix(c(0,rep(0,4),rep(1,5)), ncol=1)
+#' data <- matrix(c(0,rep(1,3),rep(0,2)), ncol=1)
 #' ## reconstruct ancestral states, with detailed output
-#' res <- dcAncestralMP(data, phy, parallel=FALSE, output.detail=TRUE, verbose=TRUE)
+#' res <- dcAncestralMP(data, phy, parallel=FALSE, output.detail=TRUE)
 #' res
 #' ## get the inner-most list
 #' res <- res[[1]]
@@ -81,8 +81,8 @@ dcAncestralMP <- function(data, phy, output.detail=F, parallel=T, multicores=NUL
     e1 <- phy$edge[, 1]
     e2 <- phy$edge[, 2]
     
-    ## most recent common ancestor (MRCA) for each pair of tips and nodes
-    mrca_node <- ape::mrca(phy, full=T)
+    ## calculate the sparse connectivity matrix between parents and children
+    connectivity <- dcTreeConnectivity(phy, verbose=verbose)
     
     if (Nnode != Ntip-1){
         stop("The input 'phy' is not binary and rooted!")
@@ -113,10 +113,9 @@ dcAncestralMP <- function(data, phy, output.detail=F, parallel=T, multicores=NUL
         message(sprintf("The input tree has '%d' tips.", Ntip), appendLF=T)
     }
 
-
     ######################################################################################
     ## A function to do prediction
-    doReconstruct <- function(x, Ntot, Ntip, Nnode, mrca_node, e1, e2, output.detail, verbose){
+    doReconstruct <- function(x, Ntot, Ntip, Nnode, connectivity, e1, e2, output.detail, verbose){
     
         if (!is.factor(x)){
             x_tmp <- base::factor(x)
@@ -163,17 +162,16 @@ dcAncestralMP <- function(data, phy, output.detail=F, parallel=T, multicores=NUL
             j <- i + 1L
             cur <- e1[i]
         
-            all_child <- which(mrca_node[cur,]==cur, arr.ind=T)
-            all_child <- base::setdiff(all_child, cur) # exclude self
+            all_children <- which(connectivity[cur-Ntip,]==1)
         
             ## only tips
             if(0){
-                ind <- match(1:Ntip, all_child)
-                all_child <- all_child[ind[!is.na(ind)]]
+                ind <- match(1:Ntip, all_children)
+                all_children <- all_children[ind[!is.na(ind)]]
             }
         
             ### do calculation
-            tmp <- Cx[all_child, ]
+            tmp <- Cx[all_children, ]
             ttmp <- apply(tmp, 2, function(x) sum(x,na.rm=T))
             ind <- which(ttmp==max(ttmp))
             if(length(ind)==1){
@@ -258,15 +256,14 @@ dcAncestralMP <- function(data, phy, output.detail=F, parallel=T, multicores=NUL
             for (i in seq(from=1, by=2, length.out=Nnode)) {
                 j <- i + 1L
                 cur <- e1[i]
-                all_child <- which(mrca_node[cur,]==cur, arr.ind=T)
-                all_child <- setdiff(all_child, cur) # exclude self
+                all_children <- which(connectivity[cur-Ntip,]==1)
                 ## only tips
                 if(0){
-                    ind <- match(1:Ntip, all_child)
-                    all_child <- all_child[ind[!is.na(ind)]]
+                    ind <- match(1:Ntip, all_children)
+                    all_children <- all_children[ind[!is.na(ind)]]
                 }
                 ### do calculation
-                tmp <- Cx_final[all_child, ]
+                tmp <- Cx_final[all_children, ]
                 ttmp <- apply(tmp, 2, function(x) sum(x,na.rm=T))
                 Lx[cur,] <- ttmp
             }
@@ -304,18 +301,36 @@ dcAncestralMP <- function(data, phy, output.detail=F, parallel=T, multicores=NUL
     }
     
     ######################################################################################
+    
+    integer_vec <- suppressMessages(dcDuplicated(data, pattern.wise="column", verbose=verbose))
+    ind_unique <- sort(unique(integer_vec))
+    data_unique <- as.matrix(data[, ind_unique], ncol=length(ind_unique))
+    
+    if(verbose){
+        message(sprintf("The input data has %d characters/columns (with %d distinct patterns).", ncol(data), ncol(data_unique)), appendLF=T)
+    }
+    
     ###### parallel computing
     flag_parallel <- F
     if(parallel){
         flag_parallel <- dnet::dCheckParallel(multicores=multicores, verbose=verbose)
         if(flag_parallel){
             j <- 1
-            res_list <- foreach::`%dopar%` (foreach::foreach(j=1:ncol(data), .inorder=T), {
-                progress_indicate(i=j, B=ncol(data), 10, flag=T)
-                suppressMessages(doReconstruct(x=data[,j], Ntot=Ntot, Ntip=Ntip, Nnode=Nnode, mrca_node=mrca_node, e1=e1, e2=e2, output.detail=output.detail, verbose=verbose))
+            res_list <- foreach::`%dopar%` (foreach::foreach(j=1:ncol(data_unique), .inorder=T), {
+                progress_indicate(i=j, B=ncol(data_unique), 10, flag=T)
+                suppressMessages(doReconstruct(x=data_unique[,j], Ntot=Ntot, Ntip=Ntip, Nnode=Nnode, connectivity=connectivity, e1=e1, e2=e2, output.detail=output.detail, verbose=verbose))
             })
+            
+            ###################################
+            ## return back to input data matrix
+            ind <- match(integer_vec, ind_unique)
+            res_list <- res_list[ind]
+            ###################################            
+            
             if(!is.null(colnames(data))){
                 names(res_list) <- colnames(data)
+            }else{
+                names(res_list) <- 1:ncol(data)
             }
             
             if(!output.detail){
@@ -339,15 +354,24 @@ dcAncestralMP <- function(data, phy, output.detail=F, parallel=T, multicores=NUL
     
     ###### non-parallel computing
     if(flag_parallel==F){
-        res_list <- lapply(1:ncol(data),function(j) {
-            progress_indicate(i=j, B=ncol(data), 10, flag=T)
-            da <- data[,j]
-            suppressMessages(doReconstruct(x=data[,j], Ntot=Ntot, Ntip=Ntip, Nnode=Nnode, mrca_node=mrca_node, e1=e1, e2=e2, output.detail=output.detail, verbose=verbose))
+        res_list <- lapply(1:ncol(data_unique),function(j) {
+            progress_indicate(i=j, B=ncol(data_unique), 10, flag=T)
+            da <- data_unique[,j]
+            suppressMessages(doReconstruct(x=data_unique[,j], Ntot=Ntot, Ntip=Ntip, Nnode=Nnode, connectivity=connectivity, e1=e1, e2=e2, output.detail=output.detail, verbose=verbose))
         })
+        
+        ###################################
+        ## return back to input data matrix
+        ind <- match(integer_vec, ind_unique)
+        res_list <- res_list[ind]
+        ###################################  
+        
         if(!is.null(colnames(data))){
             names(res_list) <- colnames(data)
+        }else{
+            names(res_list) <- 1:ncol(data)
         }
-            
+        
         if(!output.detail){
             res <- do.call(base::cbind, res_list)
             if(is.numeric(data)){

@@ -24,26 +24,26 @@
 #' @note
 #' This fast dynamic programming for ancestral discrete state reconstruction is partially inspired by a joint estimation procedure as described in \url{http://mbe.oxfordjournals.org/content/17/6/890.full}
 #' @export
-#' @seealso \code{\link{dcAncestralMP}}
+#' @seealso \code{\link{dcAncestralMP}}, \code{\link{dcDuplicated}}
 #' @include dcAncestralML.r
 #' @examples
-#' # 1) provide the phylo-formatted tree
-#' tree <- "((((t10:5,t2:5):2,(t9:4,t5:4):3):2,(t3:4,t7:4):6):2,((t6:4,t1:4):2,(t8:2,t4:2):4):6);"
-#' phy <- ape::read.tree(text=paste(tree, collapse=""))
+#' # 1) a newick tree that is imported as a phylo-formatted tree
+#' tree <- "(((t1:5,t2:5):2,(t3:4,t4:4):3):2,(t5:4,t6:4):6);"
+#' phy <- ape::read.tree(text=tree)
 #'
-#' # 2) an input data matrix storing discrete states for tips (in rows) X two characters (in columns)
-#' data1 <- matrix(c(0,rep(1,4),rep(0,5)), ncol=1)
-#' data2 <- matrix(c(0,rep(0,4),rep(1,5)), ncol=1)
-#' data <- cbind(data1, data2)
-#' colnames(data) <- c("C1", "C2")
+#' # 2) an input data matrix storing discrete states for tips (in rows) X four characters (in columns)
+#' data1 <- matrix(c(0,rep(1,3),rep(0,2)), ncol=1)
+#' data2 <- matrix(c(rep(0,4),rep(1,2)), ncol=1)
+#' data <- cbind(data1, data1, data1, data2)
+#' colnames(data) <- c("C1", "C2", "C3", "C4")
 #' ## reconstruct ancestral states, without detailed output
 #' res <- dcAncestralML(data, phy, parallel=FALSE)
 #' res
 #'
 #' # 3) an input data matrix storing discrete states for tips (in rows) X only one character
-#' data <- matrix(c(0,rep(0,4),rep(1,5)), ncol=1)
+#' data <- matrix(c(0,rep(1,3),rep(0,2)), ncol=1)
 #' ## reconstruct ancestral states, with detailed output
-#' res <- dcAncestralML(data, phy, parallel=FALSE, output.detail=TRUE, verbose=TRUE)
+#' res <- dcAncestralML(data, phy, parallel=FALSE, output.detail=TRUE)
 #' res
 #' ## get the inner-most list
 #' res <- res[[1]]
@@ -124,6 +124,7 @@ dcAncestralML <- function(data, phy, transition.model=c("different","symmetric",
     
     
     ######################################################################################
+    
     ## A function to do prediction
     doReconstruct <- function(x, Ntot, Ntip, Nnode, E, e1, e2, output.detail, verbose){
 
@@ -379,18 +380,35 @@ dcAncestralML <- function(data, phy, transition.model=c("different","symmetric",
     }
     
     ######################################################################################
+    integer_vec <- suppressMessages(dcDuplicated(data, pattern.wise="column", verbose=verbose))
+    ind_unique <- sort(unique(integer_vec))
+    data_unique <- as.matrix(data[, ind_unique], ncol=length(ind_unique))
+    
+    if(verbose){
+        message(sprintf("The input data has %d characters/columns (with %d distinct patterns).", ncol(data), ncol(data_unique)), appendLF=T)
+    }
+    
     ###### parallel computing
     flag_parallel <- F
     if(parallel){
         flag_parallel <- dnet::dCheckParallel(multicores=multicores, verbose=verbose)
         if(flag_parallel){
             j <- 1
-            res_list <- foreach::`%dopar%` (foreach::foreach(j=1:ncol(data), .inorder=T), {
-                progress_indicate(i=j, B=ncol(data), 10, flag=T)
-                suppressMessages(doReconstruct(x=data[,j], Ntot=Ntot, Ntip=Ntip, Nnode=Nnode, E=E, e1=e1, e2=e2, output.detail=output.detail, verbose=verbose))
+            res_list <- foreach::`%dopar%` (foreach::foreach(j=1:ncol(data_unique), .inorder=T), {
+                progress_indicate(i=j, B=ncol(data_unique), 10, flag=T)
+                suppressMessages(doReconstruct(x=data_unique[,j], Ntot=Ntot, Ntip=Ntip, Nnode=Nnode, E=E, e1=e1, e2=e2, output.detail=output.detail, verbose=verbose))
             })
+            
+            ###################################
+            ## return back to input data matrix
+            ind <- match(integer_vec, ind_unique)
+            res_list <- res_list[ind]
+            ###################################      
+            
             if(!is.null(colnames(data))){
                 names(res_list) <- colnames(data)
+            }else{
+                names(res_list) <- 1:ncol(data)
             }
             
             if(!output.detail){
@@ -415,13 +433,22 @@ dcAncestralML <- function(data, phy, transition.model=c("different","symmetric",
     
     ###### non-parallel computing
     if(flag_parallel==F){
-        res_list <- lapply(1:ncol(data),function(j) {
-            progress_indicate(i=j, B=ncol(data), 10, flag=T)
-            da <- data[,j]
-            suppressMessages(doReconstruct(x=data[,j], Ntot=Ntot, Ntip=Ntip, Nnode=Nnode, E=E, e1=e1, e2=e2, output.detail=output.detail, verbose=verbose))
+        res_list <- lapply(1:ncol(data_unique),function(j) {
+            progress_indicate(i=j, B=ncol(data_unique), 10, flag=T)
+            da <- data_unique[,j]
+            suppressMessages(doReconstruct(x=data_unique[,j], Ntot=Ntot, Ntip=Ntip, Nnode=Nnode, E=E, e1=e1, e2=e2, output.detail=output.detail, verbose=verbose))
         })
+        
+        ###################################
+        ## return back to input data matrix
+        ind <- match(integer_vec, ind_unique)
+        res_list <- res_list[ind]
+        ###################################  
+        
         if(!is.null(colnames(data))){
             names(res_list) <- colnames(data)
+        }else{
+            names(res_list) <- 1:ncol(data)
         }
             
         if(!output.detail){

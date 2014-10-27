@@ -7,13 +7,13 @@ dcAncestralMP(data, phy, output.detail = F, parallel = T,
 multicores = NULL, verbose = T)
 }
 \arguments{
-\item{data}{an input data matrix storing discrete states for tips (in
-rows) X characters (in columns). The rows in the matrix are for tips.
-If the row names do not exist, then addumedly they have the same order
-as in the tree tips. More wisely, users provide row names which can be
-matched to the tip labels of the tree. The row names can be more than
-found in the tree labels, and they should contain all those in the tree
-labels}
+\item{data}{an input data matrix/frame storing discrete states for tips
+(in rows) X characters (in columns). The rows in the matrix are for
+tips. If the row names do not exist, then addumedly they have the same
+order as in the tree tips. More wisely, users provide row names which
+can be matched to the tip labels of the tree. The row names can be more
+than found in the tree labels, and they should contain all those in the
+tree labels}
 
 \item{phy}{an object of class 'phylo'}
 
@@ -78,25 +78,23 @@ reconstruction is attributable to the basic idea as described in
 \url{http://sysbio.oxfordjournals.org/content/20/4/406.short}
 }
 \examples{
-# 1) provide the phylo-formatted tree
-tree <-
-"((((t10:5,t2:5):2,(t9:4,t5:4):3):2,(t3:4,t7:4):6):2,((t6:4,t1:4):2,(t8:2,t4:2):4):6);"
-phy <- ape::read.tree(text=paste(tree, collapse=""))
+# 1) a newick tree that is imported as a phylo-formatted tree
+tree <- "(((t1:5,t2:5):2,(t3:4,t4:4):3):2,(t5:4,t6:4):6);"
+phy <- ape::read.tree(text=tree)
 
-# 2) an input data matrix storing discrete states for tips (in rows) X two characters (in columns)
-data1 <- matrix(c(0,rep(1,4),rep(0,5)), ncol=1)
-data2 <- matrix(c(0,rep(0,4),rep(1,5)), ncol=1)
-data <- cbind(data1, data2)
-colnames(data) <- c("C1", "C2")
+# 2) an input data matrix storing discrete states for tips (in rows) X four characters (in columns)
+data1 <- matrix(c(0,rep(1,3),rep(0,2)), ncol=1)
+data2 <- matrix(c(rep(0,4),rep(1,2)), ncol=1)
+data <- cbind(data1, data1, data1, data2)
+colnames(data) <- c("C1", "C2", "C3", "C4")
 ## reconstruct ancestral states, without detailed output
 res <- dcAncestralMP(data, phy, parallel=FALSE)
 res
 
 # 3) an input data matrix storing discrete states for tips (in rows) X only one character
-data <- matrix(c(0,rep(0,4),rep(1,5)), ncol=1)
+data <- matrix(c(0,rep(1,3),rep(0,2)), ncol=1)
 ## reconstruct ancestral states, with detailed output
-res <- dcAncestralMP(data, phy, parallel=FALSE, output.detail=TRUE,
-verbose=TRUE)
+res <- dcAncestralMP(data, phy, parallel=FALSE, output.detail=TRUE)
 res
 ## get the inner-most list
 res <- res[[1]]
@@ -119,6 +117,7 @@ ape::nodelabels(text=res$states[Ntip+1:Nnode], node=Ntip+1:Nnode,
 frame="none", col="red", bg="transparent", cex=0.75)
 }
 \seealso{
-\code{\link{dcAncestralML}}
+\code{\link{dcAncestralML}}, \code{\link{dcTreeConnectivity}},
+\code{\link{dcDuplicated}}
 }
 

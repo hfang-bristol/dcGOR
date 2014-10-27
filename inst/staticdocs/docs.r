@@ -127,7 +127,11 @@ list(
                 "Ancestral_domainome",
                 "eTOL",
                 "dcAncestralML",
-                "dcAncestralMP"
+                "dcAncestralMP",
+                "dcSubtreeClade",
+                "dcSubtreeTips",
+                "dcTreeConnectivity",
+                "dcDuplicated"
             )
         ),
         sd_section("Functions for ontology term predictions",

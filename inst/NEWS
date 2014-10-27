@@ -7,8 +7,10 @@ NEW FEATURES
     
     o Add databases used for domain-centric ontology term predictions
     
-    o Add functions 'dcAncestralML' and 'dcAncestralMP' for ancestral discrete state reconstruction
-
+    o Add functions 'dcAncestralML', 'dcAncestralMP' and 'dcDuplicated' for ancestral discrete state reconstruction
+    
+    o Add functions 'dcSubtreeClade', 'dcSubtreeTips' and 'dcTreeConnectivity' for phylo-formatted tree operations
+    
 
 CHANGES IN VERSION 1.0.3
 -----------------------
