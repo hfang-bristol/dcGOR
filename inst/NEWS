@@ -3,7 +3,7 @@ CHANGES IN VERSION 1.0.4
 
 NEW FEATURES
 
-    o Add functions 'dcAlgoPropagate', 'dcAlgoPredict' and 'dcAlgoPredictMain' for domain-centric ontology term predictions
+    o Add functions 'dcAlgoPropagate', 'dcAlgoPredict', 'dcAlgoPredictMain' and 'dcAlgoPredictGenome' for domain-centric ontology term predictions
     
     o Add databases used for domain-centric ontology term predictions
     

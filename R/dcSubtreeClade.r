@@ -87,7 +87,7 @@ dcSubtreeClade <- function(phy, choose.node=NULL, choose.node.label=NULL, verbos
             phy_tmp$node.label <- (Ntip+1):Ntot
         }
         ## extract all children
-        connectivity <- dcTreeConnectivity(phy_tmp, verbose=verbose)
+        connectivity <- suppressMessages(dcTreeConnectivity(phy_tmp, verbose=verbose))
         all_children <- which(connectivity[k-Ntip,]==1)
         ## get all tips that need to remove
         len.tip.remove <- setdiff(1:Ntip, all_children)

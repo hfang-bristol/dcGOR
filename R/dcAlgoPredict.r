@@ -235,9 +235,17 @@ dcAlgoPredict <- function(data, RData.HIS=c("Feature2GOBP.sf","Feature2GOMF.sf",
             score_scaled <- score
         }else if(scale.method=='linear'){
             score_scaled <- (score-min(score))/(max(score)-min(score))
+            #### force min(score_scaled) to be 0.0001
+            score_scaled[score_scaled==0] <- 0.0001
+            score_scaled <- signif(score_scaled, digits=4)
+            ####
         }else if(scale.method=='log'){
             score <- log(score)
             score_scaled <- (score-min(score))/(max(score)-min(score))
+            #### force min(score_scaled) to be 0.0001
+            score_scaled[score_scaled==0] <- 0.0001
+            score_scaled <- signif(score_scaled, digits=4)
+            ####
         }
         
         return(sort(score_scaled, decreasing=T))

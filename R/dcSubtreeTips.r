@@ -47,7 +47,7 @@ dcSubtreeTips <- function(phy, choose.tip.labels=NULL, subtree.type=c("clade","t
     Ntip <- ape::Ntip(phy)
     Nnode <- ape::Nnode(phy)
     Ntot <- Ntip+Nnode
-       
+    
     ######################################################################################
     
     if(subtree.type=="tips_only"){
@@ -74,7 +74,7 @@ dcSubtreeTips <- function(phy, choose.tip.labels=NULL, subtree.type=c("clade","t
         }
     }else if(subtree.type=="clade"){
         ## extract all parents
-        connectivity <- dcTreeConnectivity(phy, verbose=verbose)
+        connectivity <- suppressMessages(dcTreeConnectivity(phy, verbose=verbose))
         parents_flag <- apply(connectivity[,ind_query]==1,1,sum)==length(ind_query)
         all_parents <- as.numeric(names(which(parents_flag)))
         ## get most recent common ancestor

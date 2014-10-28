@@ -109,12 +109,19 @@ dcAncestralML <- function(data, phy, transition.model=c("different","symmetric",
     }
     
     if (!is.null(rownames(data))) {
-    
+       
         ind <- match(rownames(data), phy$tip.label)
-        data <- data[ind[!is.na(ind)],]
+        data <- data[!is.na(ind),]
         
         if(nrow(data) != Ntip){
             stop(message(sprintf("The row names of input 'data' do not contain all of the tip labels of the input 'phy': %d NOT FOUND!", Ntip-nrow(data)), appendLF=T))
+        }
+        
+        ind <- match(phy$tip.label, rownames(data))
+        data <- data[ind,]
+    }else{
+        if(nrow(data) != Ntip){
+            stop(message(sprintf("The row number of input 'data' do not equal the tip number of the input 'phy'!"), appendLF=T))
         }
     }
 
@@ -435,7 +442,6 @@ dcAncestralML <- function(data, phy, transition.model=c("different","symmetric",
     if(flag_parallel==F){
         res_list <- lapply(1:ncol(data_unique),function(j) {
             progress_indicate(i=j, B=ncol(data_unique), 10, flag=T)
-            da <- data_unique[,j]
             suppressMessages(doReconstruct(x=data_unique[,j], Ntot=Ntot, Ntip=Ntip, Nnode=Nnode, E=E, e1=e1, e2=e2, output.detail=output.detail, verbose=verbose))
         })
         

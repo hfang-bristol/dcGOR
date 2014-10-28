@@ -19,7 +19,7 @@
 #' @note
 #' When 'output.file' is specified, a tab-delimited text file is output, with the column names: the first two (the same as input file), 3rd for 'Term' (predicted ontology terms), 4th for 'Score' (along with predicted scores)
 #' @export
-#' @seealso \code{\link{dcRDataLoader}}, \code{\link{dcConverter}}, \code{\link{dcAlgoPredict}}
+#' @seealso \code{\link{dcRDataLoader}}, \code{\link{dcAlgoPredict}}
 #' @include dcAlgoPredictMain.r
 #' @examples
 #' \dontrun{
@@ -82,6 +82,7 @@ dcAlgoPredictMain <- function(input.file, output.file=NULL, RData.HIS=c("Feature
         x <- pscore[[i]]
         if(!is.null(x)){
             tmp_df <- cbind(rep(input_copynum[i],length(x)), names(x), as.numeric(x))
+            return(tmp_df)
         }
     })
     pscore_mat <- base::do.call(base::rbind, output_list)
@@ -111,6 +112,10 @@ dcAlgoPredictMain <- function(input.file, output.file=NULL, RData.HIS=c("Feature
     }
     ## scale to the range from 0 to 1
     sscore <- (sscore-min(sscore))/(max(sscore)-min(sscore))
+    #### force min(sscore) to be 0.0001
+    sscore[sscore==0] <- 0.0001
+    sscore <- signif(sscore, digits=4)
+    ####
     
     if(!is.null(output.file)){
     

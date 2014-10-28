@@ -139,7 +139,8 @@ list(
             c(
                 "dcAlgoPropagate",
                 "dcAlgoPredict",
-                "dcAlgoPredictMain"
+                "dcAlgoPredictMain",
+                "dcAlgoPredictGenome"
             )
         ),
         sd_section("Databases used for ontology term predictions",

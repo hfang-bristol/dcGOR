@@ -82,7 +82,7 @@ dcAncestralMP <- function(data, phy, output.detail=F, parallel=T, multicores=NUL
     e2 <- phy$edge[, 2]
     
     ## calculate the sparse connectivity matrix between parents and children
-    connectivity <- dcTreeConnectivity(phy, verbose=verbose)
+    connectivity <- suppressMessages(dcTreeConnectivity(phy, verbose=verbose))
     
     if (Nnode != Ntip-1){
         stop("The input 'phy' is not binary and rooted!")
@@ -100,12 +100,19 @@ dcAncestralMP <- function(data, phy, output.detail=F, parallel=T, multicores=NUL
     }
     
     if (!is.null(rownames(data))) {
-    
+        
         ind <- match(rownames(data), phy$tip.label)
-        data <- data[ind[!is.na(ind)],]
+        data <- data[!is.na(ind),]
         
         if(nrow(data) != Ntip){
             stop(message(sprintf("The row names of input 'data' do not contain all of the tip labels of the input 'phy': %d NOT FOUND!", Ntip-nrow(data)), appendLF=T))
+        }
+        
+        ind <- match(phy$tip.label, rownames(data))
+        data <- data[ind,]
+    }else{
+        if(nrow(data) != Ntip){
+            stop(message(sprintf("The row number of input 'data' do not equal the tip number of the input 'phy'!"), appendLF=T))
         }
     }
 
@@ -356,7 +363,6 @@ dcAncestralMP <- function(data, phy, output.detail=F, parallel=T, multicores=NUL
     if(flag_parallel==F){
         res_list <- lapply(1:ncol(data_unique),function(j) {
             progress_indicate(i=j, B=ncol(data_unique), 10, flag=T)
-            da <- data_unique[,j]
             suppressMessages(doReconstruct(x=data_unique[,j], Ntot=Ntot, Ntip=Ntip, Nnode=Nnode, connectivity=connectivity, e1=e1, e2=e2, output.detail=output.detail, verbose=verbose))
         })
         
