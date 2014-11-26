@@ -33,9 +33,9 @@ For details on the eligibility for pairs of input domain and ontology,
 please refer to the online Documentations at
 \url{http://supfam.org/dcGOR/docs.html}}
 
-\item{output.file}{an output file used to save the built object as an
-RData-formatted file. If NULL, this file will be saved into "HIS.RData"
-in the current working local directory}
+\item{output.file}{an output file used to save the \code{HIS} object as
+an RData-formatted file (see 'Value' for details). If NULL, this file
+will be saved into "HIS.RData" in the current working local directory}
 
 \item{verbose}{logical to indicate whether the messages will be
 displayed in the screen. By default, it sets to TRUE for display}
@@ -94,9 +94,21 @@ names(Feature2GOMF.sf)
 Feature2GOMF.sf$hscore[1]
 Feature2GOMF.sf$ic[1:10]
 Feature2GOMF.sf$slim[1]
+
+# extract hscore as a matrix with 3 columns (Feature_id, Term_id, Score)
+hscore <- Feature2GOMF.sf$hscore
+output_list <- lapply(1:length(hscore), function(i){
+x <- hscore[[i]]
+y <- rep(names(hscore)[i],length(x))
+cbind(Feature_id=y, Term_id=names(x), Score=as.numeric(x))
+})
+hscore_mat <- base::do.call(base::rbind, output_list)
+dim(hscore_mat)
+hscore_mat[1:10,]
 }
 }
 \seealso{
-\code{\link{dcRDataLoader}}, \code{\link{dcConverter}}
+\code{\link{dcRDataLoader}}, \code{\link{dcConverter}},
+\code{\link{dcAlgo}}
 }
 

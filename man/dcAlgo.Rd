@@ -9,7 +9,7 @@ c(NA,
 "UP"),
 feature.mode = c("supra", "individual", "comb"), min.overlap = 3,
 fdr.cutoff = 0.001, parallel = TRUE, multicores = NULL, verbose = T,
-ontology.RData = NULL,
+RData.ontology.customised = NULL,
 RData.location = "http://dcgor.r-forge.r-project.org/data")
 }
 \arguments{
@@ -47,7 +47,9 @@ and clinical course, "MP" for Mammalian Phenotype, "EC" for Enzyme
 Commission, "KW" for UniProtKB KeyWords, "UP" for UniProtKB UniPathway.
 For details on the eligibility for pairs of input domain and ontology,
 please refer to the online Documentations at
-\url{http://supfam.org/dcGOR/docs.html}}
+\url{http://supfam.org/dcGOR/docs.html}. If NA, then the user has to
+input a customised RData-formatted file (see
+\code{RData.ontology.customised} below)}
 
 \item{feature.mode}{the mode of how to define the features thereof. It
 can be: "supra" for combinations of one or two successive domains
@@ -79,11 +81,11 @@ This option only works when parallel computation is enabled}
 \item{verbose}{logical to indicate whether the messages will be
 displayed in the screen. By default, it sets to TRUE for display}
 
-\item{ontology.RData}{a file name for RData-formatted file containing
-an object of S4 class 'Onto' (i.g. ontology). By default, it is NULL.
-It is only needed when the user wants to perform customised analysis
-using their own ontology. See \code{\link{dcBuildOnto}} for how to
-creat this object}
+\item{RData.ontology.customised}{a file name for RData-formatted file
+containing an object of S4 class 'Onto' (i.g. ontology). By default, it
+is NULL. It is only needed when the user wants to perform customised
+analysis using their own ontology. See \code{\link{dcBuildOnto}} for
+how to creat this object}
 
 \item{RData.location}{the characters to tell the location of built-in
 RData files. By default, it remotely locates at
@@ -130,6 +132,7 @@ feature.mode="supra", parallel=FALSE)
 }
 \seealso{
 \code{\link{dcRDataLoader}}, \code{\link{dcSplitArch}},
-\code{\link{dcConverter}}, \code{\link{dcDuplicated}}
+\code{\link{dcConverter}}, \code{\link{dcDuplicated}},
+\code{\link{dcAlgoPropagate}}
 }
 

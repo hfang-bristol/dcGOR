@@ -3,7 +3,7 @@
 #' \code{dcAlgoPredictGenome} is supposed to predict ontology terms for genomes with domain architectures (including individual domains). 
 #'
 #' @param input.file an input file containing genomes and their domain architectures (including individual domains). For example, a file containing Hominidae genomes and their domain architectures can be found in \url{http://dcgor.r-forge.r-project.org/data/Feature/Hominidae.txt}. As seen in this example, the input file must contain the header (in the first row) and two columns: 1st column for 'Genome' (a genome like a container), 2nd column for 'Architecture' (SCOP domain architectures, each represented as comma-separated domains). Alternatively, the input.file can be a matrix or data frame, assuming that input file has been read
-#' @param RData.HIS RData to load. This RData conveys two bits of information: 1) feature (domain) type; 2) ontology. It stores the hypergeometric scores (hscore) between features (individual domains or consecutive domain combinations) and ontology terms. The RData name tells which domain type and which ontology to use. It can be: SCOP sf domains/combinations (including "Feature2GOBP.sf", "Feature2GOMF.sf", "Feature2GOCC.sf", "Feature2HPPA.sf"), Pfam domains/combinations (including "Feature2GOBP.pfam", "Feature2GOMF.pfam", "Feature2GOCC.pfam", "Feature2HPPA.pfam"), InterPro domains (including "Feature2GOBP.interpro", "Feature2GOMF.interpro", "Feature2GOCC.interpro", "Feature2HPPA.interpro")
+#' @param RData.HIS RData to load. This RData conveys two bits of information: 1) feature (domain) type; 2) ontology. It stores the hypergeometric scores (hscore) between features (individual domains or consecutive domain combinations) and ontology terms. The RData name tells which domain type and which ontology to use. It can be: SCOP sf domains/combinations (including "Feature2GOBP.sf", "Feature2GOMF.sf", "Feature2GOCC.sf", "Feature2HPPA.sf"), Pfam domains/combinations (including "Feature2GOBP.pfam", "Feature2GOMF.pfam", "Feature2GOCC.pfam", "Feature2HPPA.pfam"), InterPro domains (including "Feature2GOBP.interpro", "Feature2GOMF.interpro", "Feature2GOCC.interpro", "Feature2HPPA.interpro"). If NA, then the user has to input a customised RData-formatted file (see \code{RData.HIS.customised} below)
 #' @param weight.method the method used how to weight predictions. It can be one of "none" (no weighting; by default), "copynum" for weighting copynumber of architectures, and "ic" for weighting information content (ic) of the term, "both" for weighting both copynumber and ic
 #' @param merge.method the method used to merge predictions for each component feature (individual domains and their combinations derived from domain architecture). It can be one of "sum" for summing up, "max" for the maximum, and "sequential" for the sequential merging. The sequential merging is done via: \eqn{\sum_{i=1}{\frac{R_{i}}{i}}}, where \eqn{R_{i}} is the \eqn{i^{th}} ranked highest hscore 
 #' @param scale.method the method used to scale the predictive scores. It can be: "none" for no scaling, "linear" for being linearily scaled into the range between 0 and 1, "log" for the same as "linear" but being first log-transformed before being scaled. The scaling between 0 and 1 is done via: \eqn{\frac{S - S_{min}}{S_{max} - S_{min}}}, where \eqn{S_{min}} and \eqn{S_{max}} are the minimum and maximum values for \eqn{S}
@@ -12,13 +12,14 @@
 #' @param parallel logical to indicate whether parallel computation with multicores is used. By default, it sets to true, but not necessarily does so. Partly because parallel backends available will be system-specific (now only Linux or Mac OS). Also, it will depend on whether these two packages "foreach" and "doMC" have been installed. It can be installed via: \code{source("http://bioconductor.org/biocLite.R"); biocLite(c("foreach","doMC"))}. If not yet installed, this option will be disabled
 #' @param multicores an integer to specify how many cores will be registered as the multicore parallel backend to the 'foreach' package. If NULL, it will use a half of cores available in a user's computer. This option only works when parallel computation is enabled
 #' @param verbose logical to indicate whether the messages will be displayed in the screen. By default, it sets to TRUE for display
+#' @param RData.HIS.customised a file name for RData-formatted file containing an object of S3 class 'HIS'. By default, it is NULL. It is only needed when the user wants to perform customised analysis. See \code{\link{dcAlgoPropagate}} on how this object is created
 #' @param RData.location the characters to tell the location of built-in RData files. By default, it remotely locates at "http://supfam.org/dcGOR/data" or "http://dcgor.r-forge.r-project.org/data". For the user equipped with fast internet connection, this option can be just left as default. But it is always advisable to download these files locally. Especially when the user needs to run this function many times, there is no need to ask the function to remotely download every time (also it will unnecessarily increase the runtime). For examples, these files (as a whole or part of them) can be first downloaded into your current working directory, and then set this option as: \eqn{RData.location="."}. If RData to load is already part of package itself, this parameter can be ignored (since this function will try to load it via function \code{data} first)
 #' @return 
 #' a matrix of terms X genomes, containing the predicted scores (per genome) as a whole
 #' @note
 #' none
 #' @export
-#' @seealso \code{\link{dcRDataLoader}}, \code{\link{dcAlgoPredict}}
+#' @seealso \code{\link{dcRDataLoader}}, \code{\link{dcAlgoPropagate}}, \code{\link{dcAlgoPredict}}
 #' @include dcAlgoPredictGenome.r
 #' @examples
 #' \dontrun{
@@ -28,7 +29,7 @@
 #' output[1:10,]
 #' }
 
-dcAlgoPredictGenome <- function(input.file, RData.HIS=c("Feature2GOBP.sf","Feature2GOMF.sf","Feature2GOCC.sf","Feature2HPPA.sf","Feature2GOBP.pfam","Feature2GOMF.pfam","Feature2GOCC.pfam","Feature2HPPA.pfam","Feature2GOBP.interpro","Feature2GOMF.interpro","Feature2GOCC.interpro","Feature2HPPA.interpro"), weight.method=c("none","copynum","ic","both"), merge.method=c("sum","max","sequential"), scale.method=c("log","linear","none"), feature.mode=c("supra","individual","comb"), slim.level=NULL, parallel=TRUE, multicores=NULL, verbose=T, RData.location="http://dcgor.r-forge.r-project.org/data")
+dcAlgoPredictGenome <- function(input.file, RData.HIS=c(NA,"Feature2GOBP.sf","Feature2GOMF.sf","Feature2GOCC.sf","Feature2HPPA.sf","Feature2GOBP.pfam","Feature2GOMF.pfam","Feature2GOCC.pfam","Feature2HPPA.pfam","Feature2GOBP.interpro","Feature2GOMF.interpro","Feature2GOCC.interpro","Feature2HPPA.interpro"), weight.method=c("none","copynum","ic","both"), merge.method=c("sum","max","sequential"), scale.method=c("log","linear","none"), feature.mode=c("supra","individual","comb"), slim.level=NULL, parallel=TRUE, multicores=NULL, verbose=T, RData.HIS.customised=NULL, RData.location="http://dcgor.r-forge.r-project.org/data")
 {
 
     startT <- Sys.time()
@@ -45,7 +46,7 @@ dcAlgoPredictGenome <- function(input.file, RData.HIS=c("Feature2GOBP.sf","Featu
     
     ## for the interpro, only 'individual' are supported
     if(length(grep("interpro", RData.HIS, perl=T))!=0){
-        feature.mode <- "individual"
+        #feature.mode <- "individual"
     }
     
     if(is.matrix(input.file) | is.data.frame(input.file)){
@@ -68,7 +69,7 @@ dcAlgoPredictGenome <- function(input.file, RData.HIS=c("Feature2GOBP.sf","Featu
     if(verbose){
         message(sprintf("Predictions for %d sequences (%d distinct architectures) using '%s' RData, '%s' merge method, '%s' scale method and '%s' feature mode (%s) ...", nrow(input), length(data), RData.HIS, merge.method, scale.method, feature.mode, as.character(Sys.time())), appendLF=T)
     }
-    pscore <- suppressMessages(dcAlgoPredict(data=data, RData.HIS=RData.HIS, merge.method=merge.method, scale.method=scale.method, feature.mode=feature.mode, slim.level=slim.level, parallel=parallel, multicores=multicores, verbose=verbose, RData.location=RData.location))
+    pscore <- suppressMessages(dcAlgoPredict(data=data, RData.HIS=RData.HIS, merge.method=merge.method, scale.method=scale.method, feature.mode=feature.mode, slim.level=slim.level, parallel=parallel, multicores=multicores, verbose=verbose, RData.HIS.customised=RData.HIS.customised, RData.location=RData.location))
     
     
     ########################################################################################################
@@ -142,7 +143,24 @@ dcAlgoPredictGenome <- function(input.file, RData.HIS=c("Feature2GOBP.sf","Featu
     ##########################
         
     ## load RData containing information on 'hscore', 'ic' and 'slim'
-    x <- suppressMessages(dcRDataLoader(RData=RData.HIS, verbose=verbose, RData.location=RData.location))
+    if(!is.na(RData.HIS)){
+        if(verbose){
+            now <- Sys.time()
+            message(sprintf("Load the HIS object '%s' (%s) ...", RData.HIS, as.character(now)), appendLF=T)
+        }
+        x <- dcRDataLoader(RData=RData.HIS, verbose=verbose, RData.location=RData.location)
+    }else if(file.exists(RData.HIS.customised)){
+        if(verbose){
+            now <- Sys.time()
+            message(sprintf("Load the customised HIS object '%s' (%s)...", RData.HIS.customised, as.character(now)), appendLF=T)
+        }
+        ## load ontology informatio
+        x <- ''
+        eval(parse(text=paste("x <- get(load('", RData.HIS.customised,"'))", sep="")))
+        RData.HIS <- RData.HIS.customised
+    }else{
+        stop("There is no input for HIS object! Please input one of two parameters ('RData.HIS' or 'RData.HIS.customised').\n")
+    }
     ic <- x$ic
     
     ### split into a list of genomes

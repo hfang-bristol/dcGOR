@@ -49,6 +49,7 @@ ind <- sort(unique(res))
 ## they are in columns (1, 2, 4). The column 3 is duplicated from column 1.
 }
 \seealso{
-\code{\link{dcAncestralMP}}, \code{\link{dcAncestralMP}}
+\code{\link{dcAncestralMP}}, \code{\link{dcAncestralMP}},
+\code{\link{dcAlgo}}
 }
 

@@ -3,7 +3,7 @@
 \alias{dcAlgoPredictGenome}
 \title{Function to predict ontology terms for genomes with domain architectures (including individual domains)}
 \usage{
-dcAlgoPredictGenome(input.file, RData.HIS = c("Feature2GOBP.sf",
+dcAlgoPredictGenome(input.file, RData.HIS = c(NA, "Feature2GOBP.sf",
 "Feature2GOMF.sf", "Feature2GOCC.sf", "Feature2HPPA.sf",
 "Feature2GOBP.pfam",
 "Feature2GOMF.pfam", "Feature2GOCC.pfam", "Feature2HPPA.pfam",
@@ -13,7 +13,7 @@ dcAlgoPredictGenome(input.file, RData.HIS = c("Feature2GOBP.sf",
 "both"), merge.method = c("sum", "max", "sequential"),
 scale.method = c("log", "linear", "none"), feature.mode = c("supra",
 "individual", "comb"), slim.level = NULL, parallel = TRUE,
-multicores = NULL, verbose = T,
+multicores = NULL, verbose = T, RData.HIS.customised = NULL,
 RData.location = "http://dcgor.r-forge.r-project.org/data")
 }
 \arguments{
@@ -39,7 +39,9 @@ domains/combinations (including "Feature2GOBP.sf", "Feature2GOMF.sf",
 (including "Feature2GOBP.pfam", "Feature2GOMF.pfam",
 "Feature2GOCC.pfam", "Feature2HPPA.pfam"), InterPro domains (including
 "Feature2GOBP.interpro", "Feature2GOMF.interpro",
-"Feature2GOCC.interpro", "Feature2HPPA.interpro")}
+"Feature2GOCC.interpro", "Feature2HPPA.interpro"). If NA, then the user
+has to input a customised RData-formatted file (see
+\code{RData.HIS.customised} below)}
 
 \item{weight.method}{the method used how to weight predictions. It can
 be one of "none" (no weighting; by default), "copynum" for weighting
@@ -92,6 +94,11 @@ This option only works when parallel computation is enabled}
 \item{verbose}{logical to indicate whether the messages will be
 displayed in the screen. By default, it sets to TRUE for display}
 
+\item{RData.HIS.customised}{a file name for RData-formatted file
+containing an object of S3 class 'HIS'. By default, it is NULL. It is
+only needed when the user wants to perform customised analysis. See
+\code{\link{dcAlgoPropagate}} on how this object is created}
+
 \item{RData.location}{the characters to tell the location of built-in
 RData files. By default, it remotely locates at
 "http://supfam.org/dcGOR/data" or
@@ -128,6 +135,7 @@ output[1:10,]
 }
 }
 \seealso{
-\code{\link{dcRDataLoader}}, \code{\link{dcAlgoPredict}}
+\code{\link{dcRDataLoader}}, \code{\link{dcAlgoPropagate}},
+\code{\link{dcAlgoPredict}}
 }
 

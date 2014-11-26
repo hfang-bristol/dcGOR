@@ -10,7 +10,7 @@
 #' @note
 #' none
 #' @export
-#' @seealso \code{\link{dcAncestralMP}}, \code{\link{dcAncestralMP}}
+#' @seealso \code{\link{dcAncestralMP}}, \code{\link{dcAncestralMP}}, \code{\link{dcAlgo}}
 #' @include dcDuplicated.r
 #' @examples
 #' # an input data matrix storing discrete states for tips (in rows) X four characters (in columns)

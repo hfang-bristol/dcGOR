@@ -5,14 +5,14 @@
 #' @param anno.file an annotation file containing annotations between proteins/genes and ontology terms. For example, a file containing annotations between human genes and HP terms can be found in \url{http://dcgor.r-forge.r-project.org/data/Algo/HP_anno.txt}. As seen in this example, the input file must contain the header (in the first row) and two columns: 1st column for 'SeqID' (actually these IDs can be anything), 2nd column for 'termID' (HP terms)
 #' @param architecture.file an architecture file containing domain architectures (including individual domains) for proteins/genes. For example, a file containing human genes and domain architectures can be found in \url{http://dcgor.r-forge.r-project.org/data/Algo/SCOP_architecture.txt}. As seen in this example, the input file must contain the header (in the first row) and two columns: 1st column for 'SeqID' (actually these IDs can be anything), 2nd column for 'Architecture' (SCOP domain architectures, each represented as comma-separated domains)
 #' @param output.file an output file containing results. If not NULL, a tab-delimited text file will be also written out, with 1st column 'Feature_id' for features/domains, 2nd column 'Term_id' for ontology terms, 3rd column 'Score' for hypergeometric scores (indicative of strength for feature-term associations). Otherwise, there is no output file (by default)
-#' @param ontology the ontology identity. It can be "GOBP" for Gene Ontology Biological Process, "GOMF" for Gene Ontology Molecular Function, "GOCC" for Gene Ontology Cellular Component, "DO" for Disease Ontology, "HPPA" for Human Phenotype Phenotypic Abnormality, "HPMI" for Human Phenotype Mode of Inheritance, "HPON" for Human Phenotype ONset and clinical course, "MP" for Mammalian Phenotype, "EC" for Enzyme Commission, "KW" for UniProtKB KeyWords, "UP" for UniProtKB UniPathway. For details on the eligibility for pairs of input domain and ontology, please refer to the online Documentations at \url{http://supfam.org/dcGOR/docs.html}
+#' @param ontology the ontology identity. It can be "GOBP" for Gene Ontology Biological Process, "GOMF" for Gene Ontology Molecular Function, "GOCC" for Gene Ontology Cellular Component, "DO" for Disease Ontology, "HPPA" for Human Phenotype Phenotypic Abnormality, "HPMI" for Human Phenotype Mode of Inheritance, "HPON" for Human Phenotype ONset and clinical course, "MP" for Mammalian Phenotype, "EC" for Enzyme Commission, "KW" for UniProtKB KeyWords, "UP" for UniProtKB UniPathway. For details on the eligibility for pairs of input domain and ontology, please refer to the online Documentations at \url{http://supfam.org/dcGOR/docs.html}. If NA, then the user has to input a customised RData-formatted file (see \code{RData.ontology.customised} below)
 #' @param feature.mode the mode of how to define the features thereof. It can be: "supra" for combinations of one or two successive domains (including individual domains; considering the order), "individual" for individual domains only, and "comb" for all possible combinations (including individual domains; ignoring the order)
 #' @param min.overlap the minimum number of overlaps with each term in consideration. By default, it sets to a minimum of 3
 #' @param fdr.cutoff the fdr cutoff to call the significant associations between features and terms. By default, it sets to 1e-3
 #' @param parallel logical to indicate whether parallel computation with multicores is used. By default, it sets to true, but not necessarily does so. Partly because parallel backends available will be system-specific (now only Linux or Mac OS). Also, it will depend on whether these two packages "foreach" and "doMC" have been installed. It can be installed via: \code{source("http://bioconductor.org/biocLite.R"); biocLite(c("foreach","doMC"))}. If not yet installed, this option will be disabled
 #' @param multicores an integer to specify how many cores will be registered as the multicore parallel backend to the 'foreach' package. If NULL, it will use a half of cores available in a user's computer. This option only works when parallel computation is enabled
 #' @param verbose logical to indicate whether the messages will be displayed in the screen. By default, it sets to TRUE for display
-#' @param ontology.RData a file name for RData-formatted file containing an object of S4 class 'Onto' (i.g. ontology). By default, it is NULL. It is only needed when the user wants to perform customised analysis using their own ontology. See \code{\link{dcBuildOnto}} for how to creat this object
+#' @param RData.ontology.customised a file name for RData-formatted file containing an object of S4 class 'Onto' (i.g. ontology). By default, it is NULL. It is only needed when the user wants to perform customised analysis using their own ontology. See \code{\link{dcBuildOnto}} for how to creat this object
 #' @param RData.location the characters to tell the location of built-in RData files. By default, it remotely locates at "http://supfam.org/dcGOR/data" or "http://dcgor.r-forge.r-project.org/data". For the user equipped with fast internet connection, this option can be just left as default. But it is always advisable to download these files locally. Especially when the user needs to run this function many times, there is no need to ask the function to remotely download every time (also it will unnecessarily increase the runtime). For examples, these files (as a whole or part of them) can be first downloaded into your current working directory, and then set this option as: \eqn{RData.location="."}. If RData to load is already part of package itself, this parameter can be ignored (since this function will try to load it via function \code{data} first)
 #' @return 
 #' a data frame containing three columns: 1st column 'Feature_id' for features, 2nd 'Term_id' for terms, and 3rd 'Score' for the hypergeometric score indicative of strength of associations beteen features and terms
@@ -20,7 +20,7 @@
 #' When 'output.file' is specified, a tab-delimited text file is output, with the column names: 1st column 'Feature_id' for features, 2nd 'Term_id' for terms, and 3rd 'Score' for the hypergeometric score indicative of strength of associations beteen features and terms
 #' @export
 #' @importFrom dnet dDAGannotate dDAGinduce dCheckParallel
-#' @seealso \code{\link{dcRDataLoader}}, \code{\link{dcSplitArch}}, \code{\link{dcConverter}}, \code{\link{dcDuplicated}}
+#' @seealso \code{\link{dcRDataLoader}}, \code{\link{dcSplitArch}}, \code{\link{dcConverter}}, \code{\link{dcDuplicated}}, \code{\link{dcAlgoPropagate}}
 #' @include dcAlgo.r
 #' @examples
 #' \dontrun{
@@ -29,7 +29,7 @@
 #' res <- dcAlgo(anno.file, architecture.file, ontology="HPPA", feature.mode="supra", parallel=FALSE)
 #' }
 
-dcAlgo <- function(anno.file, architecture.file, output.file=NULL, ontology=c(NA,"GOBP","GOMF","GOCC","DO","HPPA","HPMI","HPON","MP","EC","KW","UP"), feature.mode=c("supra","individual","comb"), min.overlap=3, fdr.cutoff=1e-3, parallel=TRUE, multicores=NULL, verbose=T, ontology.RData=NULL, RData.location="http://dcgor.r-forge.r-project.org/data")
+dcAlgo <- function(anno.file, architecture.file, output.file=NULL, ontology=c(NA,"GOBP","GOMF","GOCC","DO","HPPA","HPMI","HPON","MP","EC","KW","UP"), feature.mode=c("supra","individual","comb"), min.overlap=3, fdr.cutoff=1e-3, parallel=TRUE, multicores=NULL, verbose=T, RData.ontology.customised=NULL, RData.location="http://dcgor.r-forge.r-project.org/data")
 {
 
     startT <- Sys.time()
@@ -68,23 +68,23 @@ dcAlgo <- function(anno.file, architecture.file, output.file=NULL, ontology=c(NA
             g <- dcConverter(g, from='Onto', to='igraph', verbose=F)
         }
         
-    }else if(file.exists(ontology.RData)){
+    }else if(file.exists(RData.ontology.customised)){
     
         if(verbose){
             now <- Sys.time()
-            message(sprintf("First, load customised ontology '%s' (%s)...", ontology.RData, as.character(now)), appendLF=T)
+            message(sprintf("First, load customised ontology '%s' (%s)...", RData.ontology.customised, as.character(now)), appendLF=T)
         }
     
         ## load ontology informatio
         g <- ''
-        eval(parse(text=paste("g <- get(load('", ontology.RData,"'))", sep="")))
+        eval(parse(text=paste("g <- get(load('", RData.ontology.customised,"'))", sep="")))
         if(class(g)=="Onto"){
             g <- dcConverter(g, from='Onto', to='igraph', verbose=F)
         }
-        ontology <- ontology.RData
+        ontology <- RData.ontology.customised
 
     }else{
-        stop("There is no input for ontology! Please input parameters ('ontology' and 'ontology.RData').\n")
+        stop("There is no input for ontology! Please input one of two parameters ('ontology' and 'RData.ontology.customised').\n")
     }
     
     ########################################################

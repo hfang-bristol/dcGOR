@@ -3,7 +3,7 @@
 #' \code{dcAlgoPredict} is supposed to predict ontology terms given domain architectures (including individual domains). It involves 3 steps: 1) splitting an architecture into individual domains and all possible consecutive domain combinations (viewed as component features); 2) merging hscores among component features; 3) scaling merged hscores into predictive scores across terms.
 #'
 #' @param data an input data vector containing domain architectures. An architecture is represented in the form of comma-separated domains
-#' @param RData.HIS RData to load. This RData conveys two bits of information: 1) feature (domain) type; 2) ontology. It stores the hypergeometric scores (hscore) between features (individual domains or consecutive domain combinations) and ontology terms. The RData name tells which domain type and which ontology to use. It can be: SCOP sf domains/combinations (including "Feature2GOBP.sf", "Feature2GOMF.sf", "Feature2GOCC.sf", "Feature2HPPA.sf"), Pfam domains/combinations (including "Feature2GOBP.pfam", "Feature2GOMF.pfam", "Feature2GOCC.pfam", "Feature2HPPA.pfam"), InterPro domains (including "Feature2GOBP.interpro", "Feature2GOMF.interpro", "Feature2GOCC.interpro", "Feature2HPPA.interpro")
+#' @param RData.HIS RData to load. This RData conveys two bits of information: 1) feature (domain) type; 2) ontology. It stores the hypergeometric scores (hscore) between features (individual domains or consecutive domain combinations) and ontology terms. The RData name tells which domain type and which ontology to use. It can be: SCOP sf domains/combinations (including "Feature2GOBP.sf", "Feature2GOMF.sf", "Feature2GOCC.sf", "Feature2HPPA.sf"), Pfam domains/combinations (including "Feature2GOBP.pfam", "Feature2GOMF.pfam", "Feature2GOCC.pfam", "Feature2HPPA.pfam"), InterPro domains (including "Feature2GOBP.interpro", "Feature2GOMF.interpro", "Feature2GOCC.interpro", "Feature2HPPA.interpro"). If NA, then the user has to input a customised RData-formatted file (see \code{RData.HIS.customised} below)
 #' @param merge.method the method used to merge predictions for each component feature (individual domains and their combinations derived from domain architecture). It can be one of "sum" for summing up, "max" for the maximum, and "sequential" for the sequential weighting. The sequential weighting is done via: \eqn{\sum_{i=1}{\frac{R_{i}}{i}}}, where \eqn{R_{i}} is the \eqn{i^{th}} ranked highest hscore 
 #' @param scale.method the method used to scale the predictive scores. It can be: "none" for no scaling, "linear" for being linearily scaled into the range between 0 and 1, "log" for the same as "linear" but being first log-transformed before being scaled. The scaling between 0 and 1 is done via: \eqn{\frac{S - S_{min}}{S_{max} - S_{min}}}, where \eqn{S_{min}} and \eqn{S_{max}} are the minimum and maximum values for \eqn{S}
 #' @param feature.mode the mode of how to define the features thereof. It can be: "supra" for combinations of one or two successive domains (including individual domains; considering the order), "individual" for individual domains only, and "comb" for all possible combinations (including individual domains; ignoring the order)
@@ -11,12 +11,13 @@
 #' @param parallel logical to indicate whether parallel computation with multicores is used. By default, it sets to true, but not necessarily does so. Partly because parallel backends available will be system-specific (now only Linux or Mac OS). Also, it will depend on whether these two packages "foreach" and "doMC" have been installed. It can be installed via: \code{source("http://bioconductor.org/biocLite.R"); biocLite(c("foreach","doMC"))}. If not yet installed, this option will be disabled
 #' @param multicores an integer to specify how many cores will be registered as the multicore parallel backend to the 'foreach' package. If NULL, it will use a half of cores available in a user's computer. This option only works when parallel computation is enabled
 #' @param verbose logical to indicate whether the messages will be displayed in the screen. By default, it sets to TRUE for display
+#' @param RData.HIS.customised a file name for RData-formatted file containing an object of S3 class 'HIS'. By default, it is NULL. It is only needed when the user wants to perform customised analysis. See \code{\link{dcAlgoPropagate}} on how this object is created
 #' @param RData.location the characters to tell the location of built-in RData files. By default, it remotely locates at "http://supfam.org/dcGOR/data" or "http://dcgor.r-forge.r-project.org/data". For the user equipped with fast internet connection, this option can be just left as default. But it is always advisable to download these files locally. Especially when the user needs to run this function many times, there is no need to ask the function to remotely download every time (also it will unnecessarily increase the runtime). For examples, these files (as a whole or part of them) can be first downloaded into your current working directory, and then set this option as: \eqn{RData.location="."}. If RData to load is already part of package itself, this parameter can be ignored (since this function will try to load it via function \code{data} first)
 #' @return 
 #' a named list of architectures, each containing predictive scores
 #' @note none
 #' @export
-#' @seealso \code{\link{dcRDataLoader}}, \code{\link{dcSplitArch}}, \code{\link{dcConverter}}, \code{\link{dcAlgoPredictMain}}, \code{\link{dcAlgoPredictGenome}}
+#' @seealso \code{\link{dcRDataLoader}}, \code{\link{dcSplitArch}}, \code{\link{dcConverter}}, \code{\link{dcAlgoPropagate}}, \code{\link{dcAlgoPredictMain}}, \code{\link{dcAlgoPredictGenome}}
 #' @include dcAlgoPredict.r
 #' @examples
 #' \dontrun{
@@ -45,7 +46,7 @@
 #' dnet::visDAG(g=subg, data=data, node.info="term_id")
 #' }
 
-dcAlgoPredict <- function(data, RData.HIS=c("Feature2GOBP.sf","Feature2GOMF.sf","Feature2GOCC.sf","Feature2HPPA.sf","Feature2GOBP.pfam","Feature2GOMF.pfam","Feature2GOCC.pfam","Feature2HPPA.pfam","Feature2GOBP.interpro","Feature2GOMF.interpro","Feature2GOCC.interpro","Feature2HPPA.interpro"), merge.method=c("sum","max","sequential"), scale.method=c("log","linear","none"), feature.mode=c("supra","individual","comb"), slim.level=NULL, parallel=TRUE, multicores=NULL, verbose=T, RData.location="http://dcgor.r-forge.r-project.org/data")
+dcAlgoPredict <- function(data, RData.HIS=c(NA,"Feature2GOBP.sf","Feature2GOMF.sf","Feature2GOCC.sf","Feature2HPPA.sf","Feature2GOBP.pfam","Feature2GOMF.pfam","Feature2GOCC.pfam","Feature2HPPA.pfam","Feature2GOBP.interpro","Feature2GOMF.interpro","Feature2GOCC.interpro","Feature2HPPA.interpro"), merge.method=c("sum","max","sequential"), scale.method=c("log","linear","none"), feature.mode=c("supra","individual","comb"), slim.level=NULL, parallel=TRUE, multicores=NULL, verbose=T, RData.HIS.customised=NULL, RData.location="http://dcgor.r-forge.r-project.org/data")
 {
 
     startT <- Sys.time()
@@ -69,11 +70,28 @@ dcAlgoPredict <- function(data, RData.HIS=c("Feature2GOBP.sf","Feature2GOMF.sf",
     
     ## for the interpro, only 'domains' are supported
     if(length(grep("interpro", RData.HIS, perl=T))!=0){
-        feature.mode <- "domains"
+        #feature.mode <- "domains"
     }
     
     ## load RData containing information on 'hscore', 'ic' and 'slim'
-    x <- dcRDataLoader(RData=RData.HIS, verbose=verbose, RData.location=RData.location)
+    if(!is.na(RData.HIS)){
+        if(verbose){
+            now <- Sys.time()
+            message(sprintf("Load the HIS object '%s' (%s) ...", RData.HIS, as.character(now)), appendLF=T)
+        }
+        x <- dcRDataLoader(RData=RData.HIS, verbose=verbose, RData.location=RData.location)
+    }else if(file.exists(RData.HIS.customised)){
+        if(verbose){
+            now <- Sys.time()
+            message(sprintf("Load the customised HIS object '%s' (%s)...", RData.HIS.customised, as.character(now)), appendLF=T)
+        }
+        ## load ontology informatio
+        x <- ''
+        eval(parse(text=paste("x <- get(load('", RData.HIS.customised,"'))", sep="")))
+        RData.HIS <- RData.HIS.customised
+    }else{
+        stop("There is no input for HIS object! Please input one of two parameters ('RData.HIS' or 'RData.HIS.customised').\n")
+    }
     
     ########################################################
     ## A function to indicate the running progress
