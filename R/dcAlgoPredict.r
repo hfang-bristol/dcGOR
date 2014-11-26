@@ -6,7 +6,7 @@
 #' @param RData.HIS RData to load. This RData conveys two bits of information: 1) feature (domain) type; 2) ontology. It stores the hypergeometric scores (hscore) between features (individual domains or consecutive domain combinations) and ontology terms. The RData name tells which domain type and which ontology to use. It can be: SCOP sf domains/combinations (including "Feature2GOBP.sf", "Feature2GOMF.sf", "Feature2GOCC.sf", "Feature2HPPA.sf"), Pfam domains/combinations (including "Feature2GOBP.pfam", "Feature2GOMF.pfam", "Feature2GOCC.pfam", "Feature2HPPA.pfam"), InterPro domains (including "Feature2GOBP.interpro", "Feature2GOMF.interpro", "Feature2GOCC.interpro", "Feature2HPPA.interpro")
 #' @param merge.method the method used to merge predictions for each component feature (individual domains and their combinations derived from domain architecture). It can be one of "sum" for summing up, "max" for the maximum, and "sequential" for the sequential weighting. The sequential weighting is done via: \eqn{\sum_{i=1}{\frac{R_{i}}{i}}}, where \eqn{R_{i}} is the \eqn{i^{th}} ranked highest hscore 
 #' @param scale.method the method used to scale the predictive scores. It can be: "none" for no scaling, "linear" for being linearily scaled into the range between 0 and 1, "log" for the same as "linear" but being first log-transformed before being scaled. The scaling between 0 and 1 is done via: \eqn{\frac{S - S_{min}}{S_{max} - S_{min}}}, where \eqn{S_{min}} and \eqn{S_{max}} are the minimum and maximum values for \eqn{S}
-#' @param feature.mode the mode of how to use the features thereof. It can be: "supradomains" for using all possible domain combinations (ie supradomains; including individual domains), "domains" for using individual domains only
+#' @param feature.mode the mode of how to define the features thereof. It can be: "supra" for combinations of one or two successive domains (including individual domains; considering the order), "individual" for individual domains only, and "comb" for all possible combinations (including individual domains; ignoring the order)
 #' @param slim.level whether only slim terms are returned. By defaut, it is NULL and all predicted terms will be reported. If it is specified as a vector containing any values from 1 to 4, then only slim terms at these levels will be reported. Here is the meaning of these values: '1' for very general terms, '2' for general terms, '3' for specific terms, and '4' for very specific terms
 #' @param parallel logical to indicate whether parallel computation with multicores is used. By default, it sets to true, but not necessarily does so. Partly because parallel backends available will be system-specific (now only Linux or Mac OS). Also, it will depend on whether these two packages "foreach" and "doMC" have been installed. It can be installed via: \code{source("http://bioconductor.org/biocLite.R"); biocLite(c("foreach","doMC"))}. If not yet installed, this option will be disabled
 #' @param multicores an integer to specify how many cores will be registered as the multicore parallel backend to the 'foreach' package. If NULL, it will use a half of cores available in a user's computer. This option only works when parallel computation is enabled
@@ -16,7 +16,7 @@
 #' a named list of architectures, each containing predictive scores
 #' @note none
 #' @export
-#' @seealso \code{\link{dcRDataLoader}}, \code{\link{dcConverter}}, \code{\link{dcAlgoPredictMain}}
+#' @seealso \code{\link{dcRDataLoader}}, \code{\link{dcSplitArch}}, \code{\link{dcConverter}}, \code{\link{dcAlgoPredictMain}}, \code{\link{dcAlgoPredictGenome}}
 #' @include dcAlgoPredict.r
 #' @examples
 #' \dontrun{
@@ -45,7 +45,7 @@
 #' dnet::visDAG(g=subg, data=data, node.info="term_id")
 #' }
 
-dcAlgoPredict <- function(data, RData.HIS=c("Feature2GOBP.sf","Feature2GOMF.sf","Feature2GOCC.sf","Feature2HPPA.sf","Feature2GOBP.pfam","Feature2GOMF.pfam","Feature2GOCC.pfam","Feature2HPPA.pfam","Feature2GOBP.interpro","Feature2GOMF.interpro","Feature2GOCC.interpro","Feature2HPPA.interpro"), merge.method=c("sum","max","sequential"), scale.method=c("log","linear","none"), feature.mode=c("supradomains","domains"), slim.level=NULL, parallel=TRUE, multicores=NULL, verbose=T, RData.location="http://dcgor.r-forge.r-project.org/data")
+dcAlgoPredict <- function(data, RData.HIS=c("Feature2GOBP.sf","Feature2GOMF.sf","Feature2GOCC.sf","Feature2HPPA.sf","Feature2GOBP.pfam","Feature2GOMF.pfam","Feature2GOCC.pfam","Feature2HPPA.pfam","Feature2GOBP.interpro","Feature2GOMF.interpro","Feature2GOCC.interpro","Feature2HPPA.interpro"), merge.method=c("sum","max","sequential"), scale.method=c("log","linear","none"), feature.mode=c("supra","individual","comb"), slim.level=NULL, parallel=TRUE, multicores=NULL, verbose=T, RData.location="http://dcgor.r-forge.r-project.org/data")
 {
 
     startT <- Sys.time()
@@ -84,89 +84,11 @@ dcAlgoPredict <- function(data, RData.HIS=c("Feature2GOBP.sf","Feature2GOMF.sf",
             }
         }
     }
-    
-    ## A function to derive all possible combinations from a given domain architecture
-    comb_from_arch <- function(da){
         
-        ind <- grep("_gap_", da, perl=T)
-        if(length(ind)!=0){
-            ## first, split according to '_gap_'
-            da_tmp <- unlist(strsplit(da,'_gap_'))
-            da_tmp <- da_tmp[da_tmp!='']
-            da_tmp <- gsub('^,|,$','', da_tmp, perl=T)
-            da_tmp <- unique(da_tmp)
-        }else{
-            da_tmp <- da
-        }
-        
-        res <- sapply(da_tmp, function(da){
-        
-            ###################
-            ## then, split according to ','
-            data <- unlist(strsplit(da,','))
-            len <- length(data)
-    
-            if(len==1){
-                res <- da
-                
-            }else if(len <= 4){
-       
-                m <- sapply(0:(2^len-1),function(x){
-                    as.integer(intToBits(x))
-                })
-                m <- t(m[1:len,])
-                flag <- sapply(1:nrow(m), function(x){
-                    tmp <- which(m[x,]==1)
-                    if(length(tmp)==1){
-                        TRUE
-                    }else if(length(tmp)==0){
-                        FALSE
-                    }else{
-                        sum(diff(tmp)==1)==(length(tmp)-1)
-                    }
-                })
-                m <- m[flag,]
-                res <- sapply(1:nrow(m), function(x){
-                    paste(data[which(m[x,]==1)], collapse=',')
-                })
-                res <- unique(res)
-        
-            }else{
-        
-                res <- list()
-                k <- 1
-                st <- 1
-                while(len>=st){
-                    for(i in 1:(len-st+1)){
-                        res[[k]] <- paste(data[i:(i+st-1)], collapse=',')
-                        k <- k+1
-                    }
-                    st <- st+1   
-                }
-                res <- unique(unlist(res))
-        
-            }
-        
-            res
-            ###################
-        })
-        
-        invisible(unlist(res, use.names=F))
-    }
-    
     ## A function to do prediction
     doPredict <- function(da, hscore, merge.method, scale.method, feature.mode, slim.level){
         
-        
-        if(feature.mode=="supradomains"){
-            ## get all possible combinations
-            res <- comb_from_arch(da)      
-        }else if(feature.mode=="domains"){
-            res <- unique(unlist(strsplit(da,',')))
-            #if(length(grep("_gap_", da, perl=T))!=0){
-                res <- res[res!="_gap_"]
-            #}
-        }
+        res <- suppressMessages(dcSplitArch(da=da, feature.mode=feature.mode, sep=",", ignore="_gap_", verbose=verbose))
            
         ## no hscores for all features                 
         if(sum(res %in% names(hscore))==0){

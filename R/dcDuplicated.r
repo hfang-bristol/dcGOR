@@ -1,8 +1,8 @@
-#' Function to determine the duplicated patterns from inut data matrix
+#' Function to determine the duplicated patterns from input data matrix
 #'
 #' \code{dcDuplicated} is supposed to determine the duplicated vectorised patterns from a matrix or data frame. The patterns can come from column-wise vectors or row-wise vectors. It returns an integer vector, in which the value indicates from which it duplicats.
 #'
-#' @param data an an input data matrix/frame
+#' @param data an input data matrix/frame
 #' @param pattern.wise a character specifying in which wise to define patterns from input data. It can be 'column' for column-wise vectors, and 'row' for row-wise vectors
 #' @param verbose logical to indicate whether the messages will be displayed in the screen. By default, it sets to TRUE for display
 #' @return
@@ -53,17 +53,31 @@ dcDuplicated <- function(data, pattern.wise=c("column","row"), verbose=T)
     }else if(pattern.wise=="column"){
         tdata <- data
     }
-        
+    
     colnames(tdata) <- 1:ncol(tdata)
+    
+    if(verbose){
+        now <- Sys.time()
+        message(sprintf("Merge %d patterns (%s) ...", ncol(tdata), as.character(now)), appendLF=T)
+    }
     ## merge a column-wise vector into a string
     xx <- apply(tdata, 2, function(x){
         paste(x, collapse='')
     })
+    
+    if(verbose){
+        now <- Sys.time()
+        message(sprintf("Sort %d patterns (%s) ...", ncol(tdata), as.character(now)), appendLF=T)
+    }
     ## sort merged strings
     xx_sort <- base::sort(xx)
     ## extract names (corresponding to column names of input data matrix)
     ind_sort <- as.numeric(names(xx_sort))
 
+    if(verbose){
+        now <- Sys.time()
+        message(sprintf("Find index from %d patterns (%s) ...", ncol(tdata), as.character(now)), appendLF=T)
+    }
     ## find index of those duplicated from merged strings
     x <- base::duplicated(xx_sort)
     ## create a vector to store duplicated index
@@ -80,7 +94,8 @@ dcDuplicated <- function(data, pattern.wise=c("column","row"), verbose=T)
     res <- df[order(df$from),]$to
     
     if(verbose){
-        message(sprintf("For the input data (with %d patterns), there are %d unique '%s'-wise patterns.", ncol(tdata), length(unique(res)), pattern.wise), appendLF=T)
+        now <- Sys.time()
+        message(sprintf("For the input data (with %d patterns), there are %d unique '%s'-wise patterns (%s)", ncol(tdata), length(unique(res)), pattern.wise, as.character(now)), appendLF=T)
     }
     
     return(invisible(res))

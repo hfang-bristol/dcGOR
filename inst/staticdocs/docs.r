@@ -134,9 +134,11 @@ list(
                 "dcDuplicated"
             )
         ),
-        sd_section("Functions for ontology term predictions",
-            "These functions are used for predicting domain-centric ontology terms.",
+        sd_section("Functions for domain-centric ontology creation and ontology term predictions",
+            "These functions are used for creating domain-centric ontology, which in turn is used for predicting domain-centric ontology terms from input protein domain architectures.",
             c(
+                "dcSplitArch",
+                "dcAlgo",
                 "dcAlgoPropagate",
                 "dcAlgoPredict",
                 "dcAlgoPredictMain",

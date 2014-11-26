@@ -8,7 +8,7 @@
 #' @param weight.method the method used how to weight predictions. It can be one of "none" (no weighting; by default), "copynum" for weighting copynumber of architectures, and "ic" for weighting information content (ic) of the term, "both" for weighting both copynumber and ic
 #' @param merge.method the method used to merge predictions for each component feature (individual domains and their combinations derived from domain architecture). It can be one of "sum" for summing up, "max" for the maximum, and "sequential" for the sequential merging. The sequential merging is done via: \eqn{\sum_{i=1}{\frac{R_{i}}{i}}}, where \eqn{R_{i}} is the \eqn{i^{th}} ranked highest hscore 
 #' @param scale.method the method used to scale the predictive scores. It can be: "none" for no scaling, "linear" for being linearily scaled into the range between 0 and 1, "log" for the same as "linear" but being first log-transformed before being scaled. The scaling between 0 and 1 is done via: \eqn{\frac{S - S_{min}}{S_{max} - S_{min}}}, where \eqn{S_{min}} and \eqn{S_{max}} are the minimum and maximum values for \eqn{S}
-#' @param feature.mode the mode of how to use the features thereof. It can be: "supradomains" for using all possible domain combinations (ie supradomains; including individual domains), "domains" for using individual domains only
+#' @param feature.mode the mode of how to define the features thereof. It can be: "supra" for combinations of one or two successive domains (including individual domains; considering the order), "individual" for individual domains only, and "comb" for all possible combinations (including individual domains; ignoring the order)
 #' @param slim.level whether only slim terms are returned. By defaut, it is NULL and all predicted terms will be reported. If it is specified as a vector containing any values from 1 to 4, then only slim terms at these levels will be reported. Here is the meaning of these values: '1' for very general terms, '2' for general terms, '3' for specific terms, and '4' for very specific terms
 #' @param parallel logical to indicate whether parallel computation with multicores is used. By default, it sets to true, but not necessarily does so. Partly because parallel backends available will be system-specific (now only Linux or Mac OS). Also, it will depend on whether these two packages "foreach" and "doMC" have been installed. It can be installed via: \code{source("http://bioconductor.org/biocLite.R"); biocLite(c("foreach","doMC"))}. If not yet installed, this option will be disabled
 #' @param multicores an integer to specify how many cores will be registered as the multicore parallel backend to the 'foreach' package. If NULL, it will use a half of cores available in a user's computer. This option only works when parallel computation is enabled
@@ -29,7 +29,7 @@
 #' output[1:10]
 #' }
 
-dcAlgoPredictMain <- function(input.file, output.file=NULL, RData.HIS=c("Feature2GOBP.sf","Feature2GOMF.sf","Feature2GOCC.sf","Feature2HPPA.sf","Feature2GOBP.pfam","Feature2GOMF.pfam","Feature2GOCC.pfam","Feature2HPPA.pfam","Feature2GOBP.interpro","Feature2GOMF.interpro","Feature2GOCC.interpro","Feature2HPPA.interpro"), weight.method=c("none","copynum","ic","both"), merge.method=c("sum","max","sequential"), scale.method=c("log","linear","none"), feature.mode=c("supradomains","domains"), slim.level=NULL, parallel=TRUE, multicores=NULL, verbose=T, RData.location="http://dcgor.r-forge.r-project.org/data")
+dcAlgoPredictMain <- function(input.file, output.file=NULL, RData.HIS=c("Feature2GOBP.sf","Feature2GOMF.sf","Feature2GOCC.sf","Feature2HPPA.sf","Feature2GOBP.pfam","Feature2GOMF.pfam","Feature2GOCC.pfam","Feature2HPPA.pfam","Feature2GOBP.interpro","Feature2GOMF.interpro","Feature2GOCC.interpro","Feature2HPPA.interpro"), weight.method=c("none","copynum","ic","both"), merge.method=c("sum","max","sequential"), scale.method=c("log","linear","none"), feature.mode=c("supra","individual","comb"), slim.level=NULL, parallel=TRUE, multicores=NULL, verbose=T, RData.location="http://dcgor.r-forge.r-project.org/data")
 {
 
     startT <- Sys.time()
@@ -44,9 +44,9 @@ dcAlgoPredictMain <- function(input.file, output.file=NULL, RData.HIS=c("Feature
     weight.method <- match.arg(weight.method)
     feature.mode <- match.arg(feature.mode)
     
-    ## for the interpro, only 'domains' are supported
+    ## for the interpro, only 'individual' are supported
     if(length(grep("interpro", RData.HIS, perl=T))!=0){
-        feature.mode <- "domains"
+        feature.mode <- "individual"
     }
     
     if(is.matrix(input.file) | is.data.frame(input.file)){

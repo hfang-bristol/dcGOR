@@ -2,14 +2,14 @@ citEntry(entry="Article",
     author = "Hai Fang",
     title = "dcGOR: an R package for analysing ontologies and protein domain annotations",
     journal = "PLoS Computational Biology",
-    volume = "",
-    number = "",
+    volume = "10",
+    number = "10",
     year = "2014", 
-    pages = "",
-    url = "",
+    pages = "e1003929",
+    url = "http://dx.doi.org/10.1371/journal.pcbi.1003929",
     doi = "10.1371/journal.pcbi.1003929",
     textVersion = paste(
                 "Fang H.",
                 "dcGOR: an R package for analysing ontologies and protein domain annotations.",
-                "PLoS Computational Biology, 2014. http://dx.doi.org/10.1371/journal.pcbi.1003929")
+                "PLoS Computational Biology 10(10):e1003929, 2014. http://dx.doi.org/10.1371/journal.pcbi.1003929")
 )
