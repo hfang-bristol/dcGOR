@@ -11,8 +11,9 @@ dcAlgoPredict(data, RData.HIS = c(NA, "Feature2GOBP.sf",
 "Feature2GOCC.interpro",
 "Feature2HPPA.interpro"), merge.method = c("sum", "max", "sequential"),
 scale.method = c("log", "linear", "none"), feature.mode = c("supra",
-"individual", "comb"), slim.level = NULL, parallel = TRUE,
-multicores = NULL, verbose = T, RData.HIS.customised = NULL,
+"individual", "comb"), slim.level = NULL, max.num = NULL,
+parallel = TRUE, multicores = NULL, verbose = T,
+RData.HIS.customised = NULL,
 RData.location = "http://dcgor.r-forge.r-project.org/data")
 }
 \arguments{
@@ -60,6 +61,12 @@ a vector containing any values from 1 to 4, then only slim terms at
 these levels will be reported. Here is the meaning of these values: '1'
 for very general terms, '2' for general terms, '3' for specific terms,
 and '4' for very specific terms}
+
+\item{max.num}{whether only top terms per sequence are returned. By
+defaut, it is NULL and no constraint is imposed. If an integer is
+specified, then all predicted terms (with scores in a decreasing order)
+beyond this number will be discarded. Notably, this parameter works
+after the preceding parameter \code{slim.level}}
 
 \item{parallel}{logical to indicate whether parallel computation with
 multicores is used. By default, it sets to true, but not necessarily

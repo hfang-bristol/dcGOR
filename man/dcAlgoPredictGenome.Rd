@@ -3,7 +3,7 @@
 \alias{dcAlgoPredictGenome}
 \title{Function to predict ontology terms for genomes with domain architectures (including individual domains)}
 \usage{
-dcAlgoPredictGenome(input.file, RData.HIS = c(NA, "Feature2GOBP.sf",
+dcAlgoPredictGenome(input.file, RData.HIS = c(NULL, "Feature2GOBP.sf",
 "Feature2GOMF.sf", "Feature2GOCC.sf", "Feature2HPPA.sf",
 "Feature2GOBP.pfam",
 "Feature2GOMF.pfam", "Feature2GOCC.pfam", "Feature2HPPA.pfam",
@@ -12,8 +12,9 @@ dcAlgoPredictGenome(input.file, RData.HIS = c(NA, "Feature2GOBP.sf",
 "Feature2HPPA.interpro"), weight.method = c("none", "copynum", "ic",
 "both"), merge.method = c("sum", "max", "sequential"),
 scale.method = c("log", "linear", "none"), feature.mode = c("supra",
-"individual", "comb"), slim.level = NULL, parallel = TRUE,
-multicores = NULL, verbose = T, RData.HIS.customised = NULL,
+"individual", "comb"), slim.level = NULL, max.num = NULL,
+parallel = TRUE, multicores = NULL, verbose = T,
+RData.HIS.customised = NULL,
 RData.location = "http://dcgor.r-forge.r-project.org/data")
 }
 \arguments{
@@ -76,6 +77,12 @@ these levels will be reported. Here is the meaning of these values: '1'
 for very general terms, '2' for general terms, '3' for specific terms,
 and '4' for very specific terms}
 
+\item{max.num}{whether only top terms per sequence are returned. By
+defaut, it is NULL and no constraint is imposed. If an integer is
+specified, then all predicted terms (with scores in a decreasing order)
+beyond this number will be discarded. Notably, this parameter works
+after the preceding parameter \code{slim.level}}
+
 \item{parallel}{logical to indicate whether parallel computation with
 multicores is used. By default, it sets to true, but not necessarily
 does so. Partly because parallel backends available will be
@@ -127,9 +134,25 @@ none
 }
 \examples{
 \dontrun{
+# 1) Prepare an input file containing domain architectures
 input.file <-
 "http://dcgor.r-forge.r-project.org/data/Feature/Hominidae.txt"
-output <- dcAlgoPredictGenome(input.file, RData.HIS="Feature2GOMF.sf")
+
+# 2) Do prediction using built-in data
+output <- dcAlgoPredictGenome(input.file, RData.HIS="Feature2GOMF.sf",
+parallel=FALSE)
+dim(output)
+output[1:10,]
+
+# 3) Advanced usage: using customised data
+x <-
+base::load(base::url("http://dcgor.r-forge.r-project.org/data/Feature2GOMF.sf.RData"))
+RData.HIS.customised <- 'Feature2GOMF.sf.RData'
+base::save(list=x, file=RData.HIS.customised)
+#list.files(pattern='*.RData')
+## you will see an RData file 'Feature2GOMF.sf.RData' in local directory
+output <- dcAlgoPredictGenome(input.file, parallel=FALSE,
+RData.HIS.customised=RData.HIS.customised)
 dim(output)
 output[1:10,]
 }

@@ -8,6 +8,7 @@
 #' @param scale.method the method used to scale the predictive scores. It can be: "none" for no scaling, "linear" for being linearily scaled into the range between 0 and 1, "log" for the same as "linear" but being first log-transformed before being scaled. The scaling between 0 and 1 is done via: \eqn{\frac{S - S_{min}}{S_{max} - S_{min}}}, where \eqn{S_{min}} and \eqn{S_{max}} are the minimum and maximum values for \eqn{S}
 #' @param feature.mode the mode of how to define the features thereof. It can be: "supra" for combinations of one or two successive domains (including individual domains; considering the order), "individual" for individual domains only, and "comb" for all possible combinations (including individual domains; ignoring the order)
 #' @param slim.level whether only slim terms are returned. By defaut, it is NULL and all predicted terms will be reported. If it is specified as a vector containing any values from 1 to 4, then only slim terms at these levels will be reported. Here is the meaning of these values: '1' for very general terms, '2' for general terms, '3' for specific terms, and '4' for very specific terms
+#' @param max.num whether only top terms per sequence are returned. By defaut, it is NULL and no constraint is imposed. If an integer is specified, then all predicted terms (with scores in a decreasing order) beyond this number will be discarded. Notably, this parameter works after the preceding parameter \code{slim.level} 
 #' @param parallel logical to indicate whether parallel computation with multicores is used. By default, it sets to true, but not necessarily does so. Partly because parallel backends available will be system-specific (now only Linux or Mac OS). Also, it will depend on whether these two packages "foreach" and "doMC" have been installed. It can be installed via: \code{source("http://bioconductor.org/biocLite.R"); biocLite(c("foreach","doMC"))}. If not yet installed, this option will be disabled
 #' @param multicores an integer to specify how many cores will be registered as the multicore parallel backend to the 'foreach' package. If NULL, it will use a half of cores available in a user's computer. This option only works when parallel computation is enabled
 #' @param verbose logical to indicate whether the messages will be displayed in the screen. By default, it sets to TRUE for display
@@ -46,7 +47,7 @@
 #' dnet::visDAG(g=subg, data=data, node.info="term_id")
 #' }
 
-dcAlgoPredict <- function(data, RData.HIS=c(NA,"Feature2GOBP.sf","Feature2GOMF.sf","Feature2GOCC.sf","Feature2HPPA.sf","Feature2GOBP.pfam","Feature2GOMF.pfam","Feature2GOCC.pfam","Feature2HPPA.pfam","Feature2GOBP.interpro","Feature2GOMF.interpro","Feature2GOCC.interpro","Feature2HPPA.interpro"), merge.method=c("sum","max","sequential"), scale.method=c("log","linear","none"), feature.mode=c("supra","individual","comb"), slim.level=NULL, parallel=TRUE, multicores=NULL, verbose=T, RData.HIS.customised=NULL, RData.location="http://dcgor.r-forge.r-project.org/data")
+dcAlgoPredict <- function(data, RData.HIS=c(NA,"Feature2GOBP.sf","Feature2GOMF.sf","Feature2GOCC.sf","Feature2HPPA.sf","Feature2GOBP.pfam","Feature2GOMF.pfam","Feature2GOCC.pfam","Feature2HPPA.pfam","Feature2GOBP.interpro","Feature2GOMF.interpro","Feature2GOCC.interpro","Feature2HPPA.interpro"), merge.method=c("sum","max","sequential"), scale.method=c("log","linear","none"), feature.mode=c("supra","individual","comb"), slim.level=NULL, max.num=NULL, parallel=TRUE, multicores=NULL, verbose=T, RData.HIS.customised=NULL, RData.location="http://dcgor.r-forge.r-project.org/data")
 {
 
     startT <- Sys.time()
@@ -188,7 +189,7 @@ dcAlgoPredict <- function(data, RData.HIS=c(NA,"Feature2GOBP.sf","Feature2GOMF.s
             ####
         }
         
-        return(sort(score_scaled, decreasing=T))
+        return(base::sort(score_scaled, decreasing=T))
     }
     ########################################################
     
@@ -228,9 +229,9 @@ dcAlgoPredict <- function(data, RData.HIS=c(NA,"Feature2GOBP.sf","Feature2GOMF.s
             
         terms <- base::unlist(sapply(x$slim[slim.level], function(x){names(x)}), use.names=F)
         if(!is.null(terms)){
-            pscore <- sapply(pscore, function(x){
+            pscore <- lapply(pscore, function(x){
                 ind <- match(names(x), terms)
-                x[!is.na(ind)]
+                base::sort(x[!is.na(ind)], decreasing=T)
             })
             
             if(verbose){
@@ -238,6 +239,23 @@ dcAlgoPredict <- function(data, RData.HIS=c(NA,"Feature2GOBP.sf","Feature2GOMF.s
             }
             
         }
+    }
+    
+    if(!is.null(max.num)){
+        max.num <- as.integer(max.num)
+        
+        if(max.num >0){
+            pscore <- lapply(pscore, function(x){
+                if(length(x) > max.num){
+                    x[1:max.num]
+                }
+            })
+            
+            if(verbose){
+                message(sprintf("Focus on top %d predicted terms for each architecture", max.num), appendLF=T)
+            }
+        }
+
     }
     
     ####################################################################################

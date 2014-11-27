@@ -1,6 +1,6 @@
-#' Function to conduct enrichment analysis given the input data and the ontology in query
+#' Function to apply dcGO algorithm to infer domain-centric ontology
 #'
-#' \code{dcAlgo} is supposed to conduct enrichment analysis given the input data and the ontology in query. It returns an object of class "eTerm". Enrichment analysis is based on either Fisher's exact test or Hypergeometric test. The test can respect the hierarchy of the ontology.
+#' \code{dcAlgo} is supposed to apply dcGO algorithm to infer domain-centric ontology from input files. It requires two input files: 1) an annotation file containing annotations between proteins/genes and ontology terms; 2) an architecture file containing domain architectures for proteins/genes.
 #'
 #' @param anno.file an annotation file containing annotations between proteins/genes and ontology terms. For example, a file containing annotations between human genes and HP terms can be found in \url{http://dcgor.r-forge.r-project.org/data/Algo/HP_anno.txt}. As seen in this example, the input file must contain the header (in the first row) and two columns: 1st column for 'SeqID' (actually these IDs can be anything), 2nd column for 'termID' (HP terms)
 #' @param architecture.file an architecture file containing domain architectures (including individual domains) for proteins/genes. For example, a file containing human genes and domain architectures can be found in \url{http://dcgor.r-forge.r-project.org/data/Algo/SCOP_architecture.txt}. As seen in this example, the input file must contain the header (in the first row) and two columns: 1st column for 'SeqID' (actually these IDs can be anything), 2nd column for 'Architecture' (SCOP domain architectures, each represented as comma-separated domains)
@@ -24,9 +24,22 @@
 #' @include dcAlgo.r
 #' @examples
 #' \dontrun{
+#' # 1) Prepare input file: anno.file and architecture.file
 #' anno.file <- "http://dcgor.r-forge.r-project.org/data/Algo/HP_anno.txt"
 #' architecture.file <- "http://dcgor.r-forge.r-project.org/data/Algo/SCOP_architecture.txt"
+#'
+#' # 2) Do inference using built-in data
 #' res <- dcAlgo(anno.file, architecture.file, ontology="HPPA", feature.mode="supra", parallel=FALSE)
+#' res[1:5,]
+#' 
+#' # 3) Advanced usage: using customised data
+#' x <- base::load(base::url("http://dcgor.r-forge.r-project.org/data/onto.HPPA.RData"))
+#' RData.ontology.customised <- 'onto.HPPA.RData'
+#' base::save(list=x, file=RData.ontology.customised)
+#' #list.files(pattern='*.RData')
+#' ## you will see an RData file 'onto.HPPA.RData' in local directory
+#' res <- dcAlgo(anno.file, architecture.file, feature.mode="supra", parallel=FALSE, RData.ontology.customised=RData.ontology.customised)
+#' res[1:5,]
 #' }
 
 dcAlgo <- function(anno.file, architecture.file, output.file=NULL, ontology=c(NA,"GOBP","GOMF","GOCC","DO","HPPA","HPMI","HPON","MP","EC","KW","UP"), feature.mode=c("supra","individual","comb"), min.overlap=3, fdr.cutoff=1e-3, parallel=TRUE, multicores=NULL, verbose=T, RData.ontology.customised=NULL, RData.location="http://dcgor.r-forge.r-project.org/data")
@@ -96,7 +109,7 @@ dcAlgo <- function(anno.file, architecture.file, output.file=NULL, ontology=c(NA
             }
         }
     }
-        
+    
     ## A function to do prediction
     doEnrichment <- function(genes.group, name.group, anno.sparse, M, N, genes.term.parent.sparse, N_rel, p.adjust.method, min.overlap, fdr.cutoff){
         

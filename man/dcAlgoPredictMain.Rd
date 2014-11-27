@@ -8,12 +8,12 @@ dcAlgoPredictMain(input.file, output.file = NULL, RData.HIS = c(NA,
 "Feature2HPPA.sf",
 "Feature2GOBP.pfam", "Feature2GOMF.pfam", "Feature2GOCC.pfam",
 "Feature2HPPA.pfam", "Feature2GOBP.interpro", "Feature2GOMF.interpro",
-"Feature2GOCC.interpro", "Feature2HPPA.interpro"), weight.method =
-c("none",
-"copynum", "ic", "both"), merge.method = c("sum", "max", "sequential"),
-scale.method = c("log", "linear", "none"), feature.mode = c("supra",
-"individual", "comb"), slim.level = NULL, parallel = TRUE,
-multicores = NULL, verbose = T, RData.HIS.customised = NULL,
+"Feature2GOCC.interpro", "Feature2HPPA.interpro"), merge.method =
+c("sum",
+"max", "sequential"), scale.method = c("log", "linear", "none"),
+feature.mode = c("supra", "individual", "comb"), slim.level = NULL,
+max.num = NULL, parallel = TRUE, multicores = NULL, verbose = T,
+RData.HIS.customised = NULL,
 RData.location = "http://dcgor.r-forge.r-project.org/data")
 }
 \arguments{
@@ -46,11 +46,6 @@ domains/combinations (including "Feature2GOBP.sf", "Feature2GOMF.sf",
 has to input a customised RData-formatted file (see
 \code{RData.HIS.customised} below)}
 
-\item{weight.method}{the method used how to weight predictions. It can
-be one of "none" (no weighting; by default), "copynum" for weighting
-copynumber of architectures, and "ic" for weighting information content
-(ic) of the term, "both" for weighting both copynumber and ic}
-
 \item{merge.method}{the method used to merge predictions for each
 component feature (individual domains and their combinations derived
 from domain architecture). It can be one of "sum" for summing up, "max"
@@ -78,6 +73,12 @@ a vector containing any values from 1 to 4, then only slim terms at
 these levels will be reported. Here is the meaning of these values: '1'
 for very general terms, '2' for general terms, '3' for specific terms,
 and '4' for very specific terms}
+
+\item{max.num}{whether only top terms per sequence are returned. By
+defaut, it is NULL and no constraint is imposed. If an integer is
+specified, then all predicted terms (with scores in a decreasing order)
+beyond this number will be discarded. Notably, this parameter works
+after the preceding parameter \code{slim.level}}
 
 \item{parallel}{logical to indicate whether parallel computation with
 multicores is used. By default, it sets to true, but not necessarily
@@ -118,7 +119,9 @@ itself, this parameter can be ignored (since this function will try to
 load it via function \code{data} first)}
 }
 \value{
-a term-named vector summarising the predicted scores
+a data frame containing three columns: 1st column the same as the input
+file (e.g. 'SeqID'), 2nd for 'Term' (predicted ontology terms), 3rd for
+'Score' (along with predicted scores)
 }
 \description{
 \code{dcAlgoPredictMain} is supposed to predict ontology terms given an
@@ -126,17 +129,31 @@ input file containing domain architectures (including individual
 domains).
 }
 \note{
-When 'output.file' is specified, a tab-delimited text file is output,
-with the column names: the first two (the same as input file), 3rd for
-'Term' (predicted ontology terms), 4th for 'Score' (along with
-predicted scores)
+When 'output.file' is specified, a tab-delimited text file is written
+out, with the column names: 1st column the same as the input file (e.g.
+'SeqID'), 2nd for 'Term' (predicted ontology terms), 3rd for 'Score'
+(along with predicted scores)
 }
 \examples{
 \dontrun{
+# 1) Prepare an input file containing domain architectures
 input.file <- "http://dcgor.r-forge.r-project.org/data/Feature/hs.txt"
-output <- dcAlgoPredictMain(input.file, RData.HIS="Feature2GOMF.sf")
-length(output)
-output[1:10]
+
+# 2) Do prediction using built-in data
+output <- dcAlgoPredictMain(input.file, RData.HIS="Feature2GOMF.sf",
+parallel=FALSE)
+output[1:5,]
+
+# 3) Advanced usage: using customised data
+x <-
+base::load(base::url("http://dcgor.r-forge.r-project.org/data/Feature2GOMF.sf.RData"))
+RData.HIS.customised <- 'Feature2GOMF.sf.RData'
+base::save(list=x, file=RData.HIS.customised)
+#list.files(pattern='*.RData')
+## you will see an RData file 'Feature2GOMF.sf.RData' in local directory
+output <- dcAlgoPredictMain(input.file, parallel=FALSE,
+RData.HIS.customised=RData.HIS.customised)
+output[1:5,]
 }
 }
 \seealso{
