@@ -8,7 +8,7 @@
 #' @param ignore a character string to ignore. By default, it is '_gap_'. Ihis ignored character will affect the features defined as being 'supra' (see examples below)
 #' @param verbose logical to indicate whether the messages will be displayed in the screen. By default, it sets to TRUE for display
 #' @return
-#' an interger vector, in which an entry indicates from which it duplicats. When viewing column-wise patterns (or row-wise patterns), the returned integer vector has the same length as the column number (or the row number) of input data. 
+#' a vector containing splitted features.
 #' @note
 #' none
 #' @export
@@ -40,7 +40,7 @@ dcSplitArch <- function(da, feature.mode=c("supra","individual","comb"), sep=","
     }else{
         da_tmp <- da
     }
-        
+    
     if(feature.mode=='comb'){
         tmp <- paste(da_tmp, collapse=sep)
         data <- unlist(strsplit(tmp,sep))
@@ -118,6 +118,11 @@ dcSplitArch <- function(da, feature.mode=c("supra","individual","comb"), sep=","
     }
     
     res <- unique(unlist(res, use.names=F))
+    
+    # for SCOP fa: to remove those feature as '0'
+    if(1){
+        res <- res[res!='0']
+    }
     
     if(verbose){
         message(sprintf("There are %d unique features (defined as being '%s').", length(res), feature.mode), appendLF=T)

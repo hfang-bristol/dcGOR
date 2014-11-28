@@ -26,10 +26,7 @@ Ihis ignored character will affect the features defined as being
 displayed in the screen. By default, it sets to TRUE for display}
 }
 \value{
-an interger vector, in which an entry indicates from which it
-duplicats. When viewing column-wise patterns (or row-wise patterns),
-the returned integer vector has the same length as the column number
-(or the row number) of input data.
+a vector containing splitted features.
 }
 \description{
 \code{dcSplitArch} is supposed to obtain a list of features via
