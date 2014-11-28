@@ -26,7 +26,8 @@ row) and two columns: 1st column for 'SeqID' (actually these IDs can be
 anything), 2nd column for 'Architecture' (SCOP domain architectures,
 each represented as comma-separated domains). Alternatively, the
 input.file can be a matrix or data frame, assuming that input file has
-been read}
+been read. Note: the file should use the tab delimiter as the field
+separator between columns}
 
 \item{output.file}{an output file containing predicted results. If not
 NULL, a tab-delimited text file will be also written out; otherwise,

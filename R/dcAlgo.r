@@ -2,8 +2,8 @@
 #'
 #' \code{dcAlgo} is supposed to apply dcGO algorithm to infer domain-centric ontology from input files. It requires two input files: 1) an annotation file containing annotations between proteins/genes and ontology terms; 2) an architecture file containing domain architectures for proteins/genes.
 #'
-#' @param anno.file an annotation file containing annotations between proteins/genes and ontology terms. For example, a file containing annotations between human genes and HP terms can be found in \url{http://dcgor.r-forge.r-project.org/data/Algo/HP_anno.txt}. As seen in this example, the input file must contain the header (in the first row) and two columns: 1st column for 'SeqID' (actually these IDs can be anything), 2nd column for 'termID' (HP terms)
-#' @param architecture.file an architecture file containing domain architectures (including individual domains) for proteins/genes. For example, a file containing human genes and domain architectures can be found in \url{http://dcgor.r-forge.r-project.org/data/Algo/SCOP_architecture.txt}. As seen in this example, the input file must contain the header (in the first row) and two columns: 1st column for 'SeqID' (actually these IDs can be anything), 2nd column for 'Architecture' (SCOP domain architectures, each represented as comma-separated domains)
+#' @param anno.file an annotation file containing annotations between proteins/genes and ontology terms. For example, a file containing annotations between human genes and HP terms can be found in \url{http://dcgor.r-forge.r-project.org/data/Algo/HP_anno.txt}. As seen in this example, the input file must contain the header (in the first row) and two columns: 1st column for 'SeqID' (actually these IDs can be anything), 2nd column for 'termID' (HP terms). Note: the file should use the tab delimiter as the field separator between columns
+#' @param architecture.file an architecture file containing domain architectures (including individual domains) for proteins/genes. For example, a file containing human genes and domain architectures can be found in \url{http://dcgor.r-forge.r-project.org/data/Algo/SCOP_architecture.txt}. As seen in this example, the input file must contain the header (in the first row) and two columns: 1st column for 'SeqID' (actually these IDs can be anything), 2nd column for 'Architecture' (SCOP domain architectures, each represented as comma-separated domains). Note: the file should use the tab delimiter as the field separator between columns
 #' @param output.file an output file containing results. If not NULL, a tab-delimited text file will be also written out, with 1st column 'Feature_id' for features/domains, 2nd column 'Term_id' for ontology terms, 3rd column 'Score' for hypergeometric scores (indicative of strength for feature-term associations). Otherwise, there is no output file (by default)
 #' @param ontology the ontology identity. It can be "GOBP" for Gene Ontology Biological Process, "GOMF" for Gene Ontology Molecular Function, "GOCC" for Gene Ontology Cellular Component, "DO" for Disease Ontology, "HPPA" for Human Phenotype Phenotypic Abnormality, "HPMI" for Human Phenotype Mode of Inheritance, "HPON" for Human Phenotype ONset and clinical course, "MP" for Mammalian Phenotype, "EC" for Enzyme Commission, "KW" for UniProtKB KeyWords, "UP" for UniProtKB UniPathway. For details on the eligibility for pairs of input domain and ontology, please refer to the online Documentations at \url{http://supfam.org/dcGOR/docs.html}. If NA, then the user has to input a customised RData-formatted file (see \code{RData.ontology.customised} below)
 #' @param feature.mode the mode of how to define the features thereof. It can be: "supra" for combinations of one or two successive domains (including individual domains; considering the order), "individual" for individual domains only, and "comb" for all possible combinations (including individual domains; ignoring the order)
@@ -190,10 +190,10 @@ dcAlgo <- function(anno.file, architecture.file, output.file=NULL, ontology=c(NA
     }
     
     ## import annotations
-    tab <- read.delim(anno.file, header=F, nrows=50, skip=1)
+    tab <- read.delim(anno.file, header=F, sep="\t", nrows=50, skip=1)
     anno <- read.table(anno.file, header=F, sep="\t", skip=1, colClasses=sapply(tab,class))
     ## import architectures
-    tab <- read.delim(architecture.file, header=F, nrows=50, skip=1)
+    tab <- read.delim(architecture.file, header=F, sep="\t", nrows=50, skip=1)
     arch <- read.table(architecture.file, header=F, sep="\t", skip=1, colClasses=sapply(tab,class))
     
     ## replace proteins with internal id

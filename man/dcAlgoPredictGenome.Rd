@@ -28,7 +28,8 @@ first row) and two columns: 1st column for 'Genome' (a genome like a
 container), 2nd column for 'Architecture' (SCOP domain architectures,
 each represented as comma-separated domains). Alternatively, the
 input.file can be a matrix or data frame, assuming that input file has
-been read}
+been read. Note: the file should use the tab delimiter as the field
+separator between columns}
 
 \item{RData.HIS}{RData to load. This RData conveys two bits of
 information: 1) feature (domain) type; 2) ontology. It stores the

@@ -12,7 +12,8 @@ For example, a file containing InterPro domains (InterPro) can be found
 in \url{http://dcgor.r-forge.r-project.org/data/InterPro/InterPro.txt}.
 As seen in this example, the input file must contain the header (in the
 first row), and entries in the first column intend to be domain ID (and
-must be unique)}
+must be unique). Note: the file should use the tab delimiter as the
+field separator between columns}
 
 \item{term_info.file}{an input file containing term information. For
 example, a file containing Gene Ontology (GO) terms can be found in
@@ -21,7 +22,9 @@ in this example, the input file must contain the header (in the first
 row) and four columns: 1st column for term ID (must be unique), 2nd
 column for term name, 3rd column for term namespace, and 4th column for
 term distance. These four columns must be provided, but the content for
-the last column can be arbitrary (if it is hard to prepare)}
+the last column can be arbitrary (if it is hard to prepare). Note: the
+file should use the tab delimiter as the field separator between
+columns}
 
 \item{association.file}{an input file containing associations between
 domains and terms. For example, a file containing associations between
@@ -31,7 +34,8 @@ As seen in this example, the input file must contain the header (in the
 first row) and two columns: 1st column for domain ID (corresponding to
 the first column in 'domain_info.file'), 2nd column for term ID
 (corresponding to the first column in 'term_info.file'). If there are
-additional columns, these columns will be ignored}
+additional columns, these columns will be ignored. Note: the file
+should use the tab delimiter as the field separator between columns}
 
 \item{output.file}{an output file used to save the built object as an
 RData-formatted file. If NULL, this file will be saved into

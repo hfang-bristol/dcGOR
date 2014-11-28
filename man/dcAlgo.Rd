@@ -19,7 +19,8 @@ annotations between human genes and HP terms can be found in
 \url{http://dcgor.r-forge.r-project.org/data/Algo/HP_anno.txt}. As seen
 in this example, the input file must contain the header (in the first
 row) and two columns: 1st column for 'SeqID' (actually these IDs can be
-anything), 2nd column for 'termID' (HP terms)}
+anything), 2nd column for 'termID' (HP terms). Note: the file should
+use the tab delimiter as the field separator between columns}
 
 \item{architecture.file}{an architecture file containing domain
 architectures (including individual domains) for proteins/genes. For
@@ -29,7 +30,9 @@ found in
 As seen in this example, the input file must contain the header (in the
 first row) and two columns: 1st column for 'SeqID' (actually these IDs
 can be anything), 2nd column for 'Architecture' (SCOP domain
-architectures, each represented as comma-separated domains)}
+architectures, each represented as comma-separated domains). Note: the
+file should use the tab delimiter as the field separator between
+columns}
 
 \item{output.file}{an output file containing results. If not NULL, a
 tab-delimited text file will be also written out, with 1st column

@@ -11,7 +11,8 @@ a file containing InterPro domains (InterPro) can be found in
 \url{http://dcgor.r-forge.r-project.org/data/InterPro/InterPro.txt}. As
 seen in this example, the input file must contain the header (in the
 first row), and entries in the first column intend to be domain
-identities (and must be unique)}
+identities (and must be unique). Note: the file should use the tab
+delimiter as the field separator between columns}
 
 \item{output.file}{an output file used to save the built object as an
 RData-formatted file. If NULL, this file will be saved into

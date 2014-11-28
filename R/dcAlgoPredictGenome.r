@@ -2,7 +2,7 @@
 #'
 #' \code{dcAlgoPredictGenome} is supposed to predict ontology terms for genomes with domain architectures (including individual domains). 
 #'
-#' @param input.file an input file containing genomes and their domain architectures (including individual domains). For example, a file containing Hominidae genomes and their domain architectures can be found in \url{http://dcgor.r-forge.r-project.org/data/Feature/Hominidae.txt}. As seen in this example, the input file must contain the header (in the first row) and two columns: 1st column for 'Genome' (a genome like a container), 2nd column for 'Architecture' (SCOP domain architectures, each represented as comma-separated domains). Alternatively, the input.file can be a matrix or data frame, assuming that input file has been read
+#' @param input.file an input file containing genomes and their domain architectures (including individual domains). For example, a file containing Hominidae genomes and their domain architectures can be found in \url{http://dcgor.r-forge.r-project.org/data/Feature/Hominidae.txt}. As seen in this example, the input file must contain the header (in the first row) and two columns: 1st column for 'Genome' (a genome like a container), 2nd column for 'Architecture' (SCOP domain architectures, each represented as comma-separated domains). Alternatively, the input.file can be a matrix or data frame, assuming that input file has been read. Note: the file should use the tab delimiter as the field separator between columns
 #' @param RData.HIS RData to load. This RData conveys two bits of information: 1) feature (domain) type; 2) ontology. It stores the hypergeometric scores (hscore) between features (individual domains or consecutive domain combinations) and ontology terms. The RData name tells which domain type and which ontology to use. It can be: SCOP sf domains/combinations (including "Feature2GOBP.sf", "Feature2GOMF.sf", "Feature2GOCC.sf", "Feature2HPPA.sf"), Pfam domains/combinations (including "Feature2GOBP.pfam", "Feature2GOMF.pfam", "Feature2GOCC.pfam", "Feature2HPPA.pfam"), InterPro domains (including "Feature2GOBP.interpro", "Feature2GOMF.interpro", "Feature2GOCC.interpro", "Feature2HPPA.interpro"). If NA, then the user has to input a customised RData-formatted file (see \code{RData.HIS.customised} below)
 #' @param weight.method the method used how to weight predictions. It can be one of "none" (no weighting; by default), "copynum" for weighting copynumber of architectures, and "ic" for weighting information content (ic) of the term, "both" for weighting both copynumber and ic
 #' @param merge.method the method used to merge predictions for each component feature (individual domains and their combinations derived from domain architecture). It can be one of "sum" for summing up, "max" for the maximum, and "sequential" for the sequential merging. The sequential merging is done via: \eqn{\sum_{i=1}{\frac{R_{i}}{i}}}, where \eqn{R_{i}} is the \eqn{i^{th}} ranked highest hscore 
@@ -72,7 +72,7 @@ dcAlgoPredictGenome <- function(input.file, RData.HIS=c(NULL,"Feature2GOBP.sf","
         if(verbose){
             message(sprintf("Reading the input file '%s' ...", input.file), appendLF=T)
         }
-        input <- as.matrix(utils::read.delim(input.file, header=T))
+        input <- as.matrix(utils::read.delim(input.file, header=T, sep="\t"))
     }else{
         stop("The file 'input.file' must be provided!\n")
     }

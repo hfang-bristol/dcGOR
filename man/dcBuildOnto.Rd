@@ -12,7 +12,8 @@ relations between GO Molecular Function (GOMF) terms can be found in
 \url{http://dcgor.r-forge.r-project.org/data/onto/igraph_GOMF_edges.txt}.
 As seen in this example, the input file must contain the header (in the
 first row) and two columns: 1st column for parent term ID, and 2nd
-column for child term ID}
+column for child term ID. Note: the file should use the tab delimiter
+as the field separator between columns}
 
 \item{nodes.file}{an input file containing term/node information. For
 example, a file containing GO Molecular Function (GOMF) terms can be
@@ -25,7 +26,8 @@ term ID; must be unique), 2nd column 'term_id' for term ID, 3rd
 namespace, and 5th column 'term_distance' for term distance. These five
 columns must be provided, the content in the first two columns are
 identical, and the content for the last column can be arbitrary (if it
-is hard to prepare)}
+is hard to prepare). Note: the file should use the tab delimiter as the
+field separator between columns}
 
 \item{output.file}{an output file used to save the built object as an
 RData-formatted file. If NULL, this file will be saved into

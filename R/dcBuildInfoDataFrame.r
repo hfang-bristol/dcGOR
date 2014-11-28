@@ -2,7 +2,7 @@
 #'
 #' \code{dcBuildInfoDataFrame} is supposed to build an object of of the S4 class \code{\link{InfoDataFrame}}, given an input file. This input file can, for example, contain the domain information. 
 #'
-#' @param input.file an input file used to build the object. For example, a file containing InterPro domains (InterPro) can be found in \url{http://dcgor.r-forge.r-project.org/data/InterPro/InterPro.txt}. As seen in this example, the input file must contain the header (in the first row), and entries in the first column intend to be domain identities (and must be unique)
+#' @param input.file an input file used to build the object. For example, a file containing InterPro domains (InterPro) can be found in \url{http://dcgor.r-forge.r-project.org/data/InterPro/InterPro.txt}. As seen in this example, the input file must contain the header (in the first row), and entries in the first column intend to be domain identities (and must be unique). Note: the file should use the tab delimiter as the field separator between columns
 #' @param output.file an output file used to save the built object as an RData-formatted file. If NULL, this file will be saved into "InfoDataFrame.RData" in the current working local directory
 #' @return 
 #' Any use-specified variable that is given on the right side of the assigement sign '<-', which contains the built \code{dcBuildInfoDataFrame} object.
@@ -30,7 +30,7 @@ dcBuildInfoDataFrame <- function(input.file, output.file="InfoDataFrame.RData")
     }
     
     ## read the input file
-    domain_info <- read.delim(input.file, header=T)
+    domain_info <- read.delim(input.file, header=T, sep="\t")
     rownames(domain_info) <- domain_info[,1]
     domain_info <- domain_info[order(domain_info[,1]),] # order according to the first column
     
