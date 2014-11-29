@@ -247,7 +247,10 @@ dcAlgoPredict <- function(data, RData.HIS=c(NA,"Feature2GOBP.sf","Feature2GOMF.s
         if(max.num >0){
             pscore <- lapply(pscore, function(x){
                 if(length(x) > max.num){
-                    x[1:max.num]
+                    val_cf <- x[max.num]
+                    x[x>=val_cf]
+                }else{
+                    x
                 }
             })
             

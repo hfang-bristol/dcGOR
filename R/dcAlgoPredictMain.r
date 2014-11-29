@@ -74,6 +74,10 @@ dcAlgoPredictMain <- function(input.file, output.file=NULL, RData.HIS=c(NA,"Feat
         stop("The file 'input.file' must be provided!\n")
     }
     
+    if(nrow(input)==0){
+        return(NULL)
+    }
+    
     # determine the distinct architectures
     tmp <- base::table(input[,2])
     copynum <- as.numeric(tmp)
@@ -108,16 +112,20 @@ dcAlgoPredictMain <- function(input.file, output.file=NULL, RData.HIS=c(NA,"Feat
         }
     })
     output <- base::do.call(base::rbind, output_list)
-    #colnames(output) <- c(colnames(input), "Term", "Score")
-    colnames(output) <- c(colnames(input)[1], "Term", "Score")
+    if(!is.null(output)){
     
-    if(!is.null(output.file)){
-        write.table(output, file=output.file, quote=F, row.names=F, sep="\t")
-        if(file.exists(output.file)){
-            message(sprintf("The predictions have been saved into '%s'.", file.path(getwd(),output.file)), appendLF=T)
+        #colnames(output) <- c(colnames(input), "Term", "Score")
+        colnames(output) <- c(colnames(input)[1], "Term", "Score")
+    
+        if(!is.null(output.file)){
+            write.table(output, file=output.file, quote=F, row.names=F, sep="\t")
+            if(file.exists(output.file)){
+                message(sprintf("The predictions have been saved into '%s'.", file.path(getwd(),output.file)), appendLF=T)
+            }
         }
+    }else{
+        return(NULL)
     }
-
     ####################################################################################
     endT <- Sys.time()
     message(paste(c("\nEnd at ",as.character(endT)), collapse=""), appendLF=T)
