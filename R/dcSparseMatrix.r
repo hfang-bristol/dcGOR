@@ -33,7 +33,7 @@ dcSparseMatrix <- function(input.file, verbose=T)
         }
         x <- as.matrix(utils::read.delim(input.file, header=F, sep="\t"))
     }else{
-        stop("The file 'input.file' must be provided!\n")
+        return(NULL)
     }
     
     if(!is.null(x)){
