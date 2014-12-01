@@ -138,6 +138,8 @@ list(
             "These functions are used for creating domain-centric ontology, which in turn is used for predicting domain-centric ontology terms from input protein domain architectures.",
             c(
                 "dcSplitArch",
+                "dcFunArgs",
+                "dcSparseMatrix",
                 "dcAlgo",
                 "dcAlgoPropagate",
                 "dcAlgoPredict",
