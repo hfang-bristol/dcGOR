@@ -77,6 +77,10 @@ dcAlgoPredictGenome <- function(input.file, RData.HIS=c(NULL,"Feature2GOBP.sf","
         stop("The file 'input.file' must be provided!\n")
     }
     
+    if(nrow(input)==0){
+        return(NULL)
+    }
+    
     # determine the distinct architectures
     data <- sort(unique(input[,2]))
 
@@ -224,7 +228,7 @@ dcAlgoPredictGenome <- function(input.file, RData.HIS=c(NULL,"Feature2GOBP.sf","
         res[names(x)] <- as.numeric(x)
         res
     })
-    tg_matrix <- do.call(cbind, res_list)
+    tg_matrix <- base::do.call(base::cbind, res_list)
     
     ####################################################################################
     endT <- Sys.time()
