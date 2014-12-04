@@ -140,6 +140,7 @@ list(
                 "dcSplitArch",
                 "dcFunArgs",
                 "dcSparseMatrix",
+                "dcList2Matrix",
                 "dcAlgo",
                 "dcAlgoPropagate",
                 "dcAlgoPredict",
