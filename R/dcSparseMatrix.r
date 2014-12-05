@@ -24,7 +24,7 @@ dcSparseMatrix <- function(input.file, verbose=T)
     
     if(is.matrix(input.file) | is.data.frame(input.file)){
         if(verbose){
-            message(sprintf("Load the input file ..."), appendLF=T)
+            message(sprintf("Load the input data matrix of %d X %d ...", dim(input.file)[1], dim(input.file)[2]), appendLF=T)
         }
         x <- as.matrix(input.file)
     }else if(is.character(input.file) & input.file!=''){
