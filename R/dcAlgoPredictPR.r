@@ -190,9 +190,11 @@ dcAlgoPredictPR <- function(GSP.file, prediction.file, ontology=c(NA,"GOBP","GOM
         res <- sapply(t, function(x){
             ### a set of predicted terms with score greater than or equal to t
             ind <- which(x_pred>=x)
-            callP <- length(ind)
+            called_names <- unique(names(ind)) # in case that one sequence has many different architectures
+            
+            callP <- length(called_names)
             ### a set of predicted terms (with score greater than or equal to t) overlapped in GSP
-            ind2 <- match(names(ind), x_gsp)
+            ind2 <- match(called_names, x_gsp)
             TP <- sum(!is.na(ind2))
             return(rbind(TP,callP))
         })
@@ -220,7 +222,7 @@ dcAlgoPredictPR <- function(GSP.file, prediction.file, ontology=c(NA,"GOBP","GOM
     }
     pr_ave <- pr_sum / pr_sum_deno
     
-    ## Recall at threshold t is average over all proteins in GSP
+    ## Recall at threshold t is averaged over all proteins in GSP
     rc_sum <- rep(0, length(t))
     for(i in 1:length(res_list)){
         rc_sum <- rc_sum + res_list[[i]][,2]

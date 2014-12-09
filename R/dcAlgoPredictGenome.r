@@ -93,7 +93,7 @@ dcAlgoPredictGenome <- function(input.file, RData.HIS=c(NULL,"Feature2GOBP.sf","
     }
 
     if(verbose){
-        message(sprintf("Predictions for %d sequences (%d distinct architectures) using '%s' RData, '%s' merge method, '%s' scale method and '%s' feature mode (%s) ...", nrow(input), length(data), tmp.RData.HIS, merge.method, scale.method, feature.mode, as.character(Sys.time())), appendLF=T)
+        message(sprintf("Predictions for %d sequences (%d distinct architectures) using '%s' RData, '%s' merge method, '%s' scale method and '%s' feature mode (%s) ...", length(unique(input[,1])), length(data), tmp.RData.HIS, merge.method, scale.method, feature.mode, as.character(Sys.time())), appendLF=T)
     }
     pscore <- suppressMessages(dcAlgoPredict(data=data, RData.HIS=RData.HIS, merge.method=merge.method, scale.method=scale.method, feature.mode=feature.mode, slim.level=slim.level, max.num=max.num, parallel=parallel, multicores=multicores, verbose=verbose, RData.HIS.customised=RData.HIS.customised, RData.location=RData.location))
     
