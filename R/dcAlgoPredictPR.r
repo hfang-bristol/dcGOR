@@ -149,8 +149,8 @@ dcAlgoPredictPR <- function(GSP.file, prediction.file, ontology=c(NA,"GOBP","GOM
     
     ## split into a list of proteins/genes
     ### proteins/genes, terms, score
-    tmp_term <- split(x=pred[,2], f=as.numeric(pred[,1]))
-    tmp_score <- split(x=as.numeric(pred[,3]), f=as.numeric(pred[,1]))
+    tmp_term <- base::split(x=pred[,2], f=as.numeric(pred[,1]))
+    tmp_score <- base::split(x=as.numeric(pred[,3]), f=as.numeric(pred[,1]))
     pred.list.gene <- list()
     for(i in 1:length(tmp_score)){
         pred.list.gene[[i]] <- tmp_score[[i]]

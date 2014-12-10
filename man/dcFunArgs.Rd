@@ -3,10 +3,14 @@
 \alias{dcFunArgs}
 \title{Function to assign (and evaluate) arguments with default values for an input function}
 \usage{
-dcFunArgs(fun, verbose = T)
+dcFunArgs(fun, action = F, verbose = T)
 }
 \arguments{
 \item{fun}{an input function name (character string)}
+
+\item{action}{logical to indicate whether the function will act as it
+should be (with assigned values in the current environment). By
+default, it sets to FALSE}
 
 \item{verbose}{logical to indicate whether the messages will be
 displayed in the screen. By default, it sets to TRUE for display}
