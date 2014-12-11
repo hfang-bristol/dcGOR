@@ -191,7 +191,7 @@ dcAlgoPropagate <- function(input.file, ontology=c("GOBP","GOMF","GOCC","DO","HP
     fAnnos <- lapply(1:length(tmp_score), function(i){
         x <- tmp_score[[i]]
         names(x) <- tmp_term[[i]]
-        
+        return(x)
     })
     names(fAnnos) <- names(tmp_score)
     

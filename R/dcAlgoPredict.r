@@ -107,8 +107,8 @@ dcAlgoPredict <- function(data, RData.HIS=c(NA,"Feature2GOBP.sf","Feature2GOMF.s
     ## A function to do prediction
     doPredict <- function(da, hscore, merge.method, scale.method, feature.mode){
         
-        #res <- suppressMessages(dcSplitArch(da=da, feature.mode=feature.mode, sep=",", ignore="_gap_", verbose=verbose))
-        res <- dcSplitArch(da=da, feature.mode=feature.mode, sep=",", ignore="_gap_", verbose=verbose)
+        res <- suppressMessages(dcSplitArch(da=da, feature.mode=feature.mode, sep=",", ignore="_gap_", verbose=verbose))
+        #res <- dcSplitArch(da=da, feature.mode=feature.mode, sep=",", ignore="_gap_", verbose=verbose)
            
         ## no hscores for all features                 
         if(sum(res %in% names(hscore))==0){
