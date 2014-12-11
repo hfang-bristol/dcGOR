@@ -93,16 +93,18 @@ dcAlgoPredictPR <- function(GSP.file, prediction.file, ontology=c(NA,"GOBP","GOM
     }
     
     ## import annotations
-    tab <- read.delim(GSP.file, header=F, sep="\t", nrows=50, skip=1)
-    gsp <- read.table(GSP.file, header=F, sep="\t", skip=1, colClasses=sapply(tab,class))
+    #tab <- read.delim(GSP.file, header=F, sep="\t", nrows=50, skip=1)
+    #gsp <- read.table(GSP.file, header=F, sep="\t", skip=1, colClasses=sapply(tab,class))
+    gsp <- utils::read.delim(GSP.file, header=T, sep="\t", colClasses="character")
     ## import architectures
-    tab <- read.delim(prediction.file, header=F, sep="\t", nrows=50, skip=1)
-    pred <- read.table(prediction.file, header=F, sep="\t", skip=1, colClasses=sapply(tab,class))
+    #tab <- read.delim(prediction.file, header=F, sep="\t", nrows=50, skip=1)
+    #pred <- read.table(prediction.file, header=F, sep="\t", skip=1, colClasses=sapply(tab,class))
+    pred <- utils::read.delim(prediction.file, header=T, sep="\t", colClasses="character")
     
     ## replace proteins with internal id
-    all <- unique(c(unique(as.character(gsp[,1])), unique(as.character(pred[,1]))))
-    gsp[,1] <- match(as.character(gsp[,1]), all)
-    pred[,1] <- match(as.character(pred[,1]), all)
+    all <- unique(c(unique(gsp[,1]), unique(pred[,1])))
+    gsp[,1] <- match(gsp[,1], all)
+    pred[,1] <- match(pred[,1], all)
     
     ###############################################################################################
     if(verbose){
@@ -151,11 +153,11 @@ dcAlgoPredictPR <- function(GSP.file, prediction.file, ontology=c(NA,"GOBP","GOM
     ### proteins/genes, terms, score
     tmp_term <- base::split(x=pred[,2], f=as.numeric(pred[,1]))
     tmp_score <- base::split(x=as.numeric(pred[,3]), f=as.numeric(pred[,1]))
-    pred.list.gene <- list()
-    for(i in 1:length(tmp_score)){
-        pred.list.gene[[i]] <- tmp_score[[i]]
-        names(pred.list.gene[[i]]) <- tmp_term[[i]]
-    }
+    pred.list.gene <- lapply(1:length(tmp_score), function(i) {
+        x <- tmp_score[[i]]
+        names(x) <- tmp_term[[i]]
+        return(x)
+    })
     names(pred.list.gene) <- names(tmp_score)
     
     if(verbose){
@@ -178,8 +180,9 @@ dcAlgoPredictPR <- function(GSP.file, prediction.file, ontology=c(NA,"GOBP","GOM
     }
     
     ## get all decision threshold
-    max_pred <- base::max(pred[,3])
-    min_pred <- base::min(pred[,3])
+    tmp <- as.numeric(pred[,3])
+    max_pred <- base::max(tmp)
+    min_pred <- base::min(tmp)
     t <- base::seq(from=max_pred, to=min_pred, length.out=num.threshold+1)
     
     ## For each target protein/gene and decision threshold t, calculate the precision and recall

@@ -105,9 +105,10 @@ dcAlgoPredict <- function(data, RData.HIS=c(NA,"Feature2GOBP.sf","Feature2GOMF.s
     }
         
     ## A function to do prediction
-    doPredict <- function(da, hscore, merge.method, scale.method, feature.mode, slim.level){
+    doPredict <- function(da, hscore, merge.method, scale.method, feature.mode){
         
-        res <- suppressMessages(dcSplitArch(da=da, feature.mode=feature.mode, sep=",", ignore="_gap_", verbose=verbose))
+        #res <- suppressMessages(dcSplitArch(da=da, feature.mode=feature.mode, sep=",", ignore="_gap_", verbose=verbose))
+        res <- dcSplitArch(da=da, feature.mode=feature.mode, sep=",", ignore="_gap_", verbose=verbose)
            
         ## no hscores for all features                 
         if(sum(res %in% names(hscore))==0){
@@ -208,7 +209,7 @@ dcAlgoPredict <- function(data, RData.HIS=c(NA,"Feature2GOBP.sf","Feature2GOMF.s
             pscore <- foreach::`%dopar%` (foreach::foreach(j=1:length(data), .inorder=T), {
                 progress_indicate(i=j, B=length(data), 10, flag=T)
                 da <- data[j]
-                doPredict(da=da, hscore=hscore, merge.method=merge.method, scale.method=scale.method, feature.mode=feature.mode, slim.level=slim.level)
+                doPredict(da=da, hscore=hscore, merge.method=merge.method, scale.method=scale.method, feature.mode=feature.mode)
             })
             names(pscore) <- data
         }
@@ -219,7 +220,7 @@ dcAlgoPredict <- function(data, RData.HIS=c(NA,"Feature2GOBP.sf","Feature2GOMF.s
         pscore <- lapply(1:length(data),function(j) {
             progress_indicate(i=j, B=length(data), 10, flag=T)
             da <- data[j]
-            doPredict(da=da, hscore=hscore, merge.method=merge.method, scale.method=scale.method, feature.mode=feature.mode, slim.level=slim.level)
+            doPredict(da=da, hscore=hscore, merge.method=merge.method, scale.method=scale.method, feature.mode=feature.mode)
         })
         names(pscore) <- data
     }

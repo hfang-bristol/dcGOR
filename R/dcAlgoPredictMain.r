@@ -64,12 +64,18 @@ dcAlgoPredictMain <- function(input.file, output.file=NULL, RData.HIS=c(NA,"Feat
         if(verbose){
             message(sprintf("Load the input file ..."), appendLF=T)
         }
-        input <- as.matrix(input.file)
+        if(is.data.frame(input.file)){
+            input <- cbind(as.character(input.file[,1]), as.character(input.file[,2]))    
+        }else{
+            input <- input.file
+        }
     }else if(is.character(input.file) & input.file!=''){
         if(verbose){
             message(sprintf("Reading the input file '%s' ...", input.file), appendLF=T)
         }
-        input <- as.matrix(utils::read.delim(input.file, header=T, sep="\t"))
+        #tab <- read.delim(input.file, header=F, sep="\t", nrows=50, skip=1)
+        #input <- read.table(input.file, header=F, sep="\t", skip=1, colClasses=sapply(tab,class))
+        input <- utils::read.delim(input.file, header=T, sep="\t", colClasses="character")
     }else{
         stop("The file 'input.file' must be provided!\n")
     }
@@ -93,10 +99,16 @@ dcAlgoPredictMain <- function(input.file, output.file=NULL, RData.HIS=c(NA,"Feat
 
     if(verbose){
         message(sprintf("Predictions for %d sequences (with %d distinct architectures) using '%s' RData, '%s' merge method, '%s' scale method and '%s' feature mode (%s) ...", length(unique(input[,1])), length(copynum), tmp.RData.HIS, merge.method, scale.method, feature.mode, as.character(Sys.time())), appendLF=T)
+        message(paste(c("\n##############################"), collapse=""), appendLF=T)
+        message(paste(c("'dcAlgoPredict' is called"), collapse=""), appendLF=T)
+        message(paste(c("##############################\n"), collapse=""), appendLF=T)
     }
-    pscore <- suppressMessages(dcAlgoPredict(data=names(copynum), RData.HIS=RData.HIS, merge.method=merge.method, scale.method=scale.method, feature.mode=feature.mode, slim.level=slim.level, max.num=max.num, parallel=parallel, multicores=multicores, verbose=verbose, RData.HIS.customised=RData.HIS.customised, RData.location=RData.location))
+    pscore <- dcAlgoPredict(data=names(copynum), RData.HIS=RData.HIS, merge.method=merge.method, scale.method=scale.method, feature.mode=feature.mode, slim.level=slim.level, max.num=max.num, parallel=parallel, multicores=multicores, verbose=verbose, RData.HIS.customised=RData.HIS.customised, RData.location=RData.location)
     
     if(verbose){
+        message(paste(c("##############################"), collapse=""), appendLF=T)
+        message(paste(c("'dcAlgoPredict' is completed"), collapse=""), appendLF=T)
+        message(paste(c("##############################\n"), collapse=""), appendLF=T)
         message(sprintf("Preparations for output (%s)...", as.character(Sys.time())), appendLF=T)
     }
     # prepare the output

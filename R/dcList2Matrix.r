@@ -28,8 +28,10 @@ dcList2Matrix <- function(x, verbose=T)
         stop("The input 'x' must be a list!\n")
     }else{
         tmp <- x[[1]]
-        if (!is.vector(tmp) | is.null(names(tmp))){
-            stop("The components of input list 'x' must be a named vector!\n")
+        if(!is.null(tmp)){
+            if (!is.vector(tmp) | is.null(names(tmp))){
+                stop("The components of input list 'x' must be a named vector!\n")
+            }
         }
     }
     

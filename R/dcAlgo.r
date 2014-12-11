@@ -190,16 +190,18 @@ dcAlgo <- function(anno.file, architecture.file, output.file=NULL, ontology=c(NA
     }
     
     ## import annotations
-    tab <- read.delim(anno.file, header=F, sep="\t", nrows=50, skip=1)
-    anno <- read.table(anno.file, header=F, sep="\t", skip=1, colClasses=sapply(tab,class))
+    #tab <- read.delim(anno.file, header=F, sep="\t", nrows=50, skip=1)
+    #anno <- read.table(anno.file, header=F, sep="\t", skip=1, colClasses=sapply(tab,class))
+    anno <- utils::read.delim(anno.file, header=T, sep="\t", colClasses="character")
     ## import architectures
-    tab <- read.delim(architecture.file, header=F, sep="\t", nrows=50, skip=1)
-    arch <- read.table(architecture.file, header=F, sep="\t", skip=1, colClasses=sapply(tab,class))
+    #tab <- read.delim(architecture.file, header=F, sep="\t", nrows=50, skip=1)
+    #arch <- read.table(architecture.file, header=F, sep="\t", skip=1, colClasses=sapply(tab,class))
+    arch <- utils::read.delim(architecture.file, header=T, sep="\t", colClasses="character")
     
     ## replace proteins with internal id
-    all <- unique(c(unique(as.character(anno[,1])), unique(as.character(arch[,1]))))
-    anno[,1] <- match(as.character(anno[,1]), all)
-    arch[,1] <- match(as.character(arch[,1]), all)
+    all <- unique(c(unique(anno[,1]), unique(arch[,1])))
+    anno[,1] <- match(anno[,1], all)
+    arch[,1] <- match(arch[,1], all)
     
     ###############################################################################################
     if(verbose){

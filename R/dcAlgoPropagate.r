@@ -62,16 +62,19 @@ dcAlgoPropagate <- function(input.file, ontology=c("GOBP","GOMF","GOCC","DO","HP
     if(verbose){
         message(sprintf("Reading the file '%s' ...", input.file), appendLF=T)
     }
-    input <- as.matrix(utils::read.delim(input.file, header=T))
     
-    ## original annotations
+    #tab <- read.delim(input.file, header=F, sep="\t", nrows=50, skip=1)
+    #input <- read.table(input.file, header=F, sep="\t", skip=1, colClasses=sapply(tab,class))
+    input <- utils::read.delim(input.file, header=T, sep="\t", colClasses="character")
+    
+    ## original annotations: Feature_id, Term_id, Score
     tmp_feature <- base::split(x=input[,1], f=input[,2], drop=T)
-    tmp_score <- base::split(x=input[,3], f=input[,2], drop=T)
-    oAnnos <- list()
-    for(i in 1:length(tmp_score)){
-        oAnnos[[i]] <- tmp_score[[i]]
-        names(oAnnos[[i]]) <- tmp_feature[[i]]
-    }
+    tmp_score <- base::split(x=as.numeric(input[,3]), f=input[,2], drop=T)
+    oAnnos <- lapply(1:length(tmp_score), function(i){
+        x <- tmp_score[[i]]
+        names(x) <- tmp_feature[[i]]
+        return(x)
+    })
     names(oAnnos) <- names(tmp_score)
     
     ## load ontology information
@@ -184,13 +187,12 @@ dcAlgoPropagate <- function(input.file, ontology=c("GOBP","GOMF","GOCC","DO","HP
     res <- t(rbind(tmp_xxx, as.numeric(all)))
     ### split into a list of features
     tmp_term <- split(x=res[,1], f=res[,2])
-    tmp_score <- split(x=res[,3], f=res[,2])
-    fAnnos <- list()
-    for(i in 1:length(tmp_score)){
-        fAnnos[[i]] <- tmp_score[[i]]
-        fAnnos[[i]] <- as.numeric(as.vector(fAnnos[[i]]))
-        names(fAnnos[[i]]) <- tmp_term[[i]]
-    }
+    tmp_score <- split(x=as.numeric(res[,3]), f=res[,2])
+    fAnnos <- lapply(1:length(tmp_score), function(i){
+        x <- tmp_score[[i]]
+        names(x) <- tmp_term[[i]]
+        
+    })
     names(fAnnos) <- names(tmp_score)
     
     if(verbose){
