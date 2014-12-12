@@ -9,6 +9,7 @@
 #' @param feature.mode the mode of how to define the features thereof. It can be: "supra" for combinations of one or two successive domains (including individual domains; considering the order), "individual" for individual domains only, and "comb" for all possible combinations (including individual domains; ignoring the order)
 #' @param min.overlap the minimum number of overlaps with each term in consideration. By default, it sets to a minimum of 3
 #' @param fdr.cutoff the fdr cutoff to call the significant associations between features and terms. By default, it sets to 1e-3
+#' @param hscore.type the type of defining the hypergeometric score. It can be: "zscore" for z-score (by default), "fdr" for fdr (after being transformed via \eqn{-1*log_2(fdr)})
 #' @param parallel logical to indicate whether parallel computation with multicores is used. By default, it sets to true, but not necessarily does so. Partly because parallel backends available will be system-specific (now only Linux or Mac OS). Also, it will depend on whether these two packages "foreach" and "doMC" have been installed. It can be installed via: \code{source("http://bioconductor.org/biocLite.R"); biocLite(c("foreach","doMC"))}. If not yet installed, this option will be disabled
 #' @param multicores an integer to specify how many cores will be registered as the multicore parallel backend to the 'foreach' package. If NULL, it will use a half of cores available in a user's computer. This option only works when parallel computation is enabled
 #' @param verbose logical to indicate whether the messages will be displayed in the screen. By default, it sets to TRUE for display
@@ -42,7 +43,7 @@
 #' res[1:5,]
 #' }
 
-dcAlgo <- function(anno.file, architecture.file, output.file=NULL, ontology=c(NA,"GOBP","GOMF","GOCC","DO","HPPA","HPMI","HPON","MP","EC","KW","UP"), feature.mode=c("supra","individual","comb"), min.overlap=3, fdr.cutoff=1e-3, parallel=TRUE, multicores=NULL, verbose=T, RData.ontology.customised=NULL, RData.location="http://dcgor.r-forge.r-project.org/data")
+dcAlgo <- function(anno.file, architecture.file, output.file=NULL, ontology=c(NA,"GOBP","GOMF","GOCC","DO","HPPA","HPMI","HPON","MP","EC","KW","UP"), feature.mode=c("supra","individual","comb"), min.overlap=3, fdr.cutoff=1e-3, hscore.type=c("zscore","fdr"), parallel=TRUE, multicores=NULL, verbose=T, RData.ontology.customised=NULL, RData.location="http://dcgor.r-forge.r-project.org/data")
 {
 
     startT <- Sys.time()
@@ -53,6 +54,7 @@ dcAlgo <- function(anno.file, architecture.file, output.file=NULL, ontology=c(NA
     ## match.arg matches arg against a table of candidate values as specified by choices, where NULL means to take the first one
     ontology <- match.arg(ontology)
     feature.mode <- match.arg(feature.mode)
+    hscore.type <- match.arg(hscore.type)
     
     p.adjust.method <- c("BH","BY","bonferroni","holm","hochberg","hommel")[1]
     min.overlap <- as.integer(min.overlap)
@@ -170,15 +172,48 @@ dcAlgo <- function(anno.file, architecture.file, output.file=NULL, ontology=c(NA
         #########
         ## get final hscore and fdr
         hscore <- signif(apply(cbind(zscore,zscore.rel), 1, min), digits=2)
-        fdr <- signif(apply(cbind(adjpvals,adjpvals.rel), 1, max), digits=2)
-    
-        res <- data.frame(Feature_id=rep(name.group,length(X)), Term_id=names(M), X, M, K=rep(K,length(X)), N=rep(N,length(X)), zscore, p.value, adjpvals, K_rel, N_rel, zscore.rel, p.value.rel, adjpvals.rel, Score=hscore, fdr, row.names=NULL)
         
-        ind <- which(res$X >= min.overlap & res$fdr < fdr.cutoff)
-        if(length(ind)>=1){
-            res[ind,c(1:2,15)]
-        }else{
-            NULL   
+        if(hscore.type=='zscore'){
+            
+            ####################################################
+            fdr <- apply(cbind(adjpvals,adjpvals.rel), 1, max)
+            
+            flag <- fdr==0
+            fdr[flag] <- min(fdr[!flag])
+            fdr <- signif(fdr, digits=2)
+            
+            res <- data.frame(Feature_id=rep(name.group,length(X)), Term_id=names(M), X, M, K=rep(K,length(X)), N=rep(N,length(X)), zscore, p.value, adjpvals, K_rel, N_rel, zscore.rel, p.value.rel, adjpvals.rel, hscore, fdr, row.names=NULL)
+            
+            ind <- which(res$X >= min.overlap & res$fdr < fdr.cutoff)
+            if(length(ind)>=1){
+                return(res[ind,c(1:2,15)])
+            }else{
+                return(NULL)
+            }
+            ####################################################
+            
+        }else if(hscore.type=='fdr'){
+            
+            ####################################################       
+            pval <- apply(cbind(p.value,p.value.rel), 1, max)
+            fdr <- stats::p.adjust(pval, method=p.adjust.method)
+        
+            fdr <- -1*log10(fdr)
+            flag <- is.infinite(fdr)
+            fdr[flag] <- max(fdr[!flag])
+            fdr <- signif(fdr, digits=2)
+            
+            res <- data.frame(Feature_id=rep(name.group,length(X)), Term_id=names(M), X, M, K=rep(K,length(X)), N=rep(N,length(X)), zscore, p.value, adjpvals, K_rel, N_rel, zscore.rel, p.value.rel, adjpvals.rel, hscore, fdr, row.names=NULL)
+            
+            ind <- which(res$X >= min.overlap & res$fdr > -1*log10(fdr.cutoff))
+            #res$fdr <- res$fdr + log10(fdr.cutoff)
+            if(length(ind)>=1){
+                return(res[ind,c(1:2,16)])
+            }else{
+                return(NULL)
+            }
+            ####################################################
+            
         }
 
     }
@@ -429,6 +464,7 @@ dcAlgo <- function(anno.file, architecture.file, output.file=NULL, ontology=c(NA
     
     feature2term_score <- base::do.call(base::rbind, res_list)
     rownames(feature2term_score) <- NULL
+    colnames(feature2term_score) <- c("Feature_id", "Term_id", "Score")
     
     if(!is.null(output.file)){
     

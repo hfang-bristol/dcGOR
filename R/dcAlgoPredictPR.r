@@ -193,8 +193,10 @@ dcAlgoPredictPR <- function(GSP.file, prediction.file, ontology=c(NA,"GOBP","GOM
         res <- sapply(t, function(x){
             ### a set of predicted terms with score greater than or equal to t
             ind <- which(x_pred>=x)
+            ###########################
             called_names <- unique(names(ind)) # in case that one sequence has many different architectures
-            
+            ###########################
+                        
             callP <- length(called_names)
             ### a set of predicted terms (with score greater than or equal to t) overlapped in GSP
             ind2 <- match(called_names, x_gsp)

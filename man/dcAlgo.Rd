@@ -8,8 +8,8 @@ c(NA,
 "GOBP", "GOMF", "GOCC", "DO", "HPPA", "HPMI", "HPON", "MP", "EC", "KW",
 "UP"),
 feature.mode = c("supra", "individual", "comb"), min.overlap = 3,
-fdr.cutoff = 0.001, parallel = TRUE, multicores = NULL, verbose = T,
-RData.ontology.customised = NULL,
+fdr.cutoff = 0.001, hscore.type = c("zscore", "fdr"), parallel = TRUE,
+multicores = NULL, verbose = T, RData.ontology.customised = NULL,
 RData.location = "http://dcgor.r-forge.r-project.org/data")
 }
 \arguments{
@@ -65,6 +65,10 @@ consideration. By default, it sets to a minimum of 3}
 
 \item{fdr.cutoff}{the fdr cutoff to call the significant associations
 between features and terms. By default, it sets to 1e-3}
+
+\item{hscore.type}{the type of defining the hypergeometric score. It
+can be: "zscore" for z-score (by default), "fdr" for fdr (after being
+transformed via \eqn{-1*log_2(fdr)})}
 
 \item{parallel}{logical to indicate whether parallel computation with
 multicores is used. By default, it sets to true, but not necessarily
