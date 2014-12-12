@@ -172,47 +172,33 @@ dcAlgo <- function(anno.file, architecture.file, output.file=NULL, ontology=c(NA
         #########
         ## get final hscore and fdr
         hscore <- signif(apply(cbind(zscore,zscore.rel), 1, min), digits=2)
+        #pval <- apply(cbind(p.value,p.value.rel), 1, max)
+        #fdr <- stats::p.adjust(pval, method=p.adjust.method)
+        fdr <- apply(cbind(adjpvals,adjpvals.rel), 1, max)
+
+        flag <- fdr==0
+        fdr[flag] <- min(fdr[!flag])
+        
+        res <- data.frame(Feature_id=rep(name.group,length(X)), Term_id=names(M), X, M, K=rep(K,length(X)), N=rep(N,length(X)), zscore, p.value, adjpvals, K_rel, N_rel, zscore.rel, p.value.rel, adjpvals.rel, hscore, fdr, row.names=NULL)
         
         if(hscore.type=='zscore'){
-            
-            ####################################################
-            fdr <- apply(cbind(adjpvals,adjpvals.rel), 1, max)
-            
-            flag <- fdr==0
-            fdr[flag] <- min(fdr[!flag])
-            fdr <- signif(fdr, digits=2)
-            
-            res <- data.frame(Feature_id=rep(name.group,length(X)), Term_id=names(M), X, M, K=rep(K,length(X)), N=rep(N,length(X)), zscore, p.value, adjpvals, K_rel, N_rel, zscore.rel, p.value.rel, adjpvals.rel, hscore, fdr, row.names=NULL)
-            
+
             ind <- which(res$X >= min.overlap & res$fdr < fdr.cutoff)
             if(length(ind)>=1){
                 return(res[ind,c(1:2,15)])
             }else{
                 return(NULL)
             }
-            ####################################################
             
         }else if(hscore.type=='fdr'){
             
-            ####################################################       
-            pval <- apply(cbind(p.value,p.value.rel), 1, max)
-            fdr <- stats::p.adjust(pval, method=p.adjust.method)
-        
-            fdr <- -1*log10(fdr)
-            flag <- is.infinite(fdr)
-            fdr[flag] <- max(fdr[!flag])
-            fdr <- signif(fdr, digits=2)
-            
-            res <- data.frame(Feature_id=rep(name.group,length(X)), Term_id=names(M), X, M, K=rep(K,length(X)), N=rep(N,length(X)), zscore, p.value, adjpvals, K_rel, N_rel, zscore.rel, p.value.rel, adjpvals.rel, hscore, fdr, row.names=NULL)
-            
-            ind <- which(res$X >= min.overlap & res$fdr > -1*log10(fdr.cutoff))
-            #res$fdr <- res$fdr + log10(fdr.cutoff)
+            ind <- which(res$X >= min.overlap & res$fdr < fdr.cutoff)
+            res$fdr <- signif(-1*log10(res$fdr), digits=2)
             if(length(ind)>=1){
                 return(res[ind,c(1:2,16)])
             }else{
                 return(NULL)
             }
-            ####################################################
             
         }
 
