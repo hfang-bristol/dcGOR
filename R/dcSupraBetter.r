@@ -51,7 +51,7 @@ dcSupraBetter <- function(input.file, output.file=NULL, verbose=T)
     flist_multiple <- flist[tmp_length>=2]
     
     if(verbose){
-        message(sprintf("There are %d supra-domains and %d individuals.", length(flist_multiple), length(flist_single)), appendLF=T)
+        message(sprintf("There are %d supra-domains and %d individual domains.", length(flist_multiple), length(flist_single)), appendLF=T)
     }
     
     ## find all supra with better score
@@ -102,7 +102,7 @@ dcSupraBetter <- function(input.file, output.file=NULL, verbose=T)
     colnames(supra_mat_additional) <- c("Feature_id","Term_id","Score")
     
     if(verbose){
-        message(sprintf("A total of %d supra-domains and %d annotations have better scores.", length(unique(supra_mat_additional[,1])), nrow(supra_mat_additional)), appendLF=T)
+        message(sprintf("A total of %d annotations (for %d supra-domains) have better scores.", nrow(supra_mat_additional), length(unique(supra_mat_additional[,1]))), appendLF=T)
     }
     
     if(!is.null(output.file)){

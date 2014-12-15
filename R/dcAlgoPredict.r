@@ -182,6 +182,7 @@ dcAlgoPredict <- function(data, RData.HIS=c(NA,"Feature2GOBP.sf","Feature2GOMF.s
             score_scaled <- signif(score_scaled, digits=4)
             ####
         }else if(scale.method=='log'){
+            score <- score[score>0] ## make sure that all scores are positive
             score <- log(score)
             score_scaled <- (score-min(score))/(max(score)-min(score))
             #### force min(score_scaled) to be 0.0001

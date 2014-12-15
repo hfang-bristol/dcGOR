@@ -67,6 +67,12 @@ dcAlgoPropagate <- function(input.file, ontology=c("GOBP","GOMF","GOCC","DO","HP
     #input <- read.table(input.file, header=F, sep="\t", skip=1, colClasses=sapply(tab,class))
     input <- utils::read.delim(input.file, header=T, sep="\t", colClasses="character")
     
+    # how to deal with negative scores
+    if(1){
+        ## only retain all entries with positive score
+        input <- input[as.numeric(input[,3])>0, ]
+    }
+    
     ## original annotations: Feature_id, Term_id, Score
     tmp_feature <- base::split(x=input[,1], f=input[,2], drop=T)
     tmp_score <- base::split(x=as.numeric(input[,3]), f=input[,2], drop=T)

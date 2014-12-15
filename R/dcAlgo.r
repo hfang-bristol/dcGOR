@@ -452,6 +452,12 @@ dcAlgo <- function(anno.file, architecture.file, output.file=NULL, ontology=c(NA
     rownames(feature2term_score) <- NULL
     colnames(feature2term_score) <- c("Feature_id", "Term_id", "Score")
     
+    # how to deal with non-positive scores
+    if(1){
+        ## only retain all entries with positive score (otherwise, there will be problematic for prediction)
+        feature2term_score <- feature2term_score[as.numeric(feature2term_score[,3])>0, ]
+    }
+    
     if(!is.null(output.file)){
     
         output <- feature2term_score
