@@ -141,6 +141,7 @@ list(
                 "dcFunArgs",
                 "dcSparseMatrix",
                 "dcList2Matrix",
+                "dcSupraBetter",
                 "dcAlgo",
                 "dcAlgoPropagate",
                 "dcAlgoPredict",

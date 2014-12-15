@@ -121,6 +121,9 @@ dcAlgoPredictMain <- function(input.file, output.file=NULL, RData.HIS=c(NA,"Feat
         if(!is.null(x)){
             #tmp_df <- cbind(rep(tmp_seq[i],length(x)), rep(tmp_da[i],length(x)), names(x), as.numeric(x))
             tmp_df <- cbind(rep(tmp_seq[i],length(x)), names(x), as.numeric(x))
+            return(tmp_df)
+        }else{
+            return(NULL)
         }
     })
     output <- base::do.call(base::rbind, output_list)

@@ -3,7 +3,7 @@ CHANGES IN VERSION 1.0.5
 
 NEW FEATURES
 
-    o Add functions 'dcList2Matrix', 'dcAlgoPredictPR'
+    o Add functions 'dcList2Matrix', 'dcAlgoPredictPR', 'dcSupraBetter'
     
 
 CHANGES IN VERSION 1.0.4
