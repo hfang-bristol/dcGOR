@@ -6,6 +6,7 @@
 #' @param prediction.file a prediction file containing proteins/genes, their predicted terms along with predictive scores. As seen in an example below, this file is usually created via \code{\link{dcAlgoPredictMain}}, containing three columns: 1st column for 'SeqID' (actually these IDs can be anything), 2nd column for 'Term' (ontology terms), 3rd column for 'Score' (predictive score). Note: the file should use the tab delimiter as the field separator between columns
 #' @param ontology the ontology identity. It can be "GOBP" for Gene Ontology Biological Process, "GOMF" for Gene Ontology Molecular Function, "GOCC" for Gene Ontology Cellular Component, "DO" for Disease Ontology, "HPPA" for Human Phenotype Phenotypic Abnormality, "HPMI" for Human Phenotype Mode of Inheritance, "HPON" for Human Phenotype ONset and clinical course, "MP" for Mammalian Phenotype, "EC" for Enzyme Commission, "KW" for UniProtKB KeyWords, "UP" for UniProtKB UniPathway. For details on the eligibility for pairs of input domain and ontology, please refer to the online Documentations at \url{http://supfam.org/dcGOR/docs.html}. If NA, then the user has to input a customised RData-formatted file (see \code{RData.ontology.customised} below)
 #' @param num.threshold an integer to specify how many PR points (as a function of the score threshold) will be calculated
+#' @param bin how to bin the scores. It can be "uniform" for binning scores with equal interval (ie with uniform distribution), and 'quantile' for binning scores with eual frequency (ie with equal number)
 #' @param verbose logical to indicate whether the messages will be displayed in the screen. By default, it sets to TRUE for display
 #' @param RData.ontology.customised a file name for RData-formatted file containing an object of S4 class 'Onto' (i.g. ontology). By default, it is NULL. It is only needed when the user wants to perform customised analysis using their own ontology. See \code{\link{dcBuildOnto}} for how to creat this object
 #' @param RData.location the characters to tell the location of built-in RData files. By default, it remotely locates at "http://supfam.org/dcGOR/data" or "http://dcgor.r-forge.r-project.org/data". For the user equipped with fast internet connection, this option can be just left as default. But it is always advisable to download these files locally. Especially when the user needs to run this function many times, there is no need to ask the function to remotely download every time (also it will unnecessarily increase the runtime). For examples, these files (as a whole or part of them) can be first downloaded into your current working directory, and then set this option as: \eqn{RData.location="."}. If RData to load is already part of package itself, this parameter can be ignored (since this function will try to load it via function \code{data} first)
@@ -34,7 +35,7 @@
 #' plot(res_PR[,2], res_PR[,1], type="b", xlab="Recall", ylab="Precision")
 #' }
 
-dcAlgoPredictPR <- function(GSP.file, prediction.file, ontology=c(NA,"GOBP","GOMF","GOCC","DO","HPPA","HPMI","HPON","MP","EC","KW","UP"), num.threshold=10, verbose=T, RData.ontology.customised=NULL, RData.location="http://dcgor.r-forge.r-project.org/data")
+dcAlgoPredictPR <- function(GSP.file, prediction.file, ontology=c(NA,"GOBP","GOMF","GOCC","DO","HPPA","HPMI","HPON","MP","EC","KW","UP"), num.threshold=10, bin=c("uniform","quantile"), verbose=T, RData.ontology.customised=NULL, RData.location="http://dcgor.r-forge.r-project.org/data")
 {
 
     startT <- Sys.time()
@@ -44,6 +45,7 @@ dcAlgoPredictPR <- function(GSP.file, prediction.file, ontology=c(NA,"GOBP","GOM
     
     ## match.arg matches arg against a table of candidate values as specified by choices, where NULL means to take the first one
     ontology <- match.arg(ontology)
+    bin <- match.arg(bin)
     
     if(is.null(GSP.file) | is.na(GSP.file)){
         stop("The file 'GSP.file' must be provided!\n")
@@ -180,10 +182,15 @@ dcAlgoPredictPR <- function(GSP.file, prediction.file, ontology=c(NA,"GOBP","GOM
     }
     
     ## get all decision threshold
-    tmp <- as.numeric(pred[,3])
-    max_pred <- base::max(tmp)
-    min_pred <- base::min(tmp)
-    t <- base::seq(from=max_pred, to=min_pred, length.out=num.threshold+1)
+    #tmp <- as.numeric(pred[,3])
+    tmp <- unlist(pred.list.both, use.names=F)
+    if(bin=='uniform'){
+        max_pred <- base::max(tmp)
+        min_pred <- base::min(tmp)
+        t <- base::seq(from=max_pred, to=min_pred, length.out=num.threshold+1)
+    }else if(bin=='quantile'){
+        t <- as.vector( stats::quantile(x=tmp, probs=base::seq(from=1, to=0, length.out=num.threshold+1)) )
+    }
     
     ## For each target protein/gene and decision threshold t, calculate the precision and recall
     res_list <- lapply(1:length(both.names), function(j){

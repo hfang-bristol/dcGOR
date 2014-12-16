@@ -6,7 +6,8 @@
 dcAlgoPredictPR(GSP.file, prediction.file, ontology = c(NA, "GOBP",
 "GOMF",
 "GOCC", "DO", "HPPA", "HPMI", "HPON", "MP", "EC", "KW", "UP"),
-num.threshold = 10, verbose = T, RData.ontology.customised = NULL,
+num.threshold = 10, bin = c("uniform", "quantile"), verbose = T,
+RData.ontology.customised = NULL,
 RData.location = "http://dcgor.r-forge.r-project.org/data")
 }
 \arguments{
@@ -44,6 +45,11 @@ input a customised RData-formatted file (see
 
 \item{num.threshold}{an integer to specify how many PR points (as a
 function of the score threshold) will be calculated}
+
+\item{bin}{how to bin the scores. It can be "uniform" for binning
+scores with equal interval (ie with uniform distribution), and
+'quantile' for binning scores with eual frequency (ie with equal
+number)}
 
 \item{verbose}{logical to indicate whether the messages will be
 displayed in the screen. By default, it sets to TRUE for display}
