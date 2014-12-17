@@ -60,7 +60,8 @@ dcAlgoPropagate <- function(input.file, ontology=c("GOBP","GOMF","GOCC","DO","HP
     }
     
     if(verbose){
-        message(sprintf("Reading the file '%s' ...", input.file), appendLF=T)
+        now <- Sys.time()
+        message(sprintf("Reading the file '%s' (%s) ...", input.file, as.character(now)), appendLF=T)
     }
     
     #tab <- read.delim(input.file, header=F, sep="\t", nrows=50, skip=1)
@@ -96,7 +97,13 @@ dcAlgoPropagate <- function(input.file, ontology=c("GOBP","GOMF","GOCC","DO","HP
     ####################################################################################
     
     if(verbose){
-        message(sprintf("Do propagation ..."), appendLF=T)
+        now <- Sys.time()
+        message(sprintf("Do propagation (%s) ...", as.character(now)), appendLF=T)
+    }
+    
+    if(verbose){
+        now <- Sys.time()
+        message(sprintf("\tassign original annotations (%s) ...", as.character(now)), appendLF=T)
     }
     
     ## node2domain.HoH: 1st key (node/term), 2nd key (domain), value (score)
@@ -117,6 +124,11 @@ dcAlgoPropagate <- function(input.file, ontology=c("GOBP","GOMF","GOCC","DO","HP
         }
         assign(node, e, envir=node2domain.HoH)
     })
+    
+    if(verbose){
+        now <- Sys.time()
+        message(sprintf("\tpropagate annotations (%s) ...", as.character(now)), appendLF=T)
+    }
     
     ## get the levels list
     level2node <- dnet::dDAGlevel(dag, level.mode="longest_path", return.mode="level2node")
@@ -306,11 +318,7 @@ dcAlgoPropagate <- function(input.file, ontology=c("GOBP","GOMF","GOCC","DO","HP
     names(level_ic) <- paste("", 1:length(IC_cutoff), sep='')
     
     ########################
-    # remove the RData extension 
-    output.var <- gsub(".RData$", "", output.file, ignore.case=T, perl=T)
-    output.var <- gsub(".RDat$", "", output.var, ignore.case=T, perl=T)
-    output.var <- gsub(".RDa$", "", output.var, ignore.case=T, perl=T)
-    
+   
     # all terms in an order: first by ic and then by level (ie longest path)
     terms <- unlist(level2node, use.names=F)
     times <- sapply(level2node, function(x){
@@ -328,13 +336,20 @@ dcAlgoPropagate <- function(input.file, ontology=c("GOBP","GOMF","GOCC","DO","HP
               )
     class(x) <- "HIS"
     
-    do.call(assign, list(output.var, x))
-    save(list=output.var, file=output.file)
-
-    if(file.exists(output.file)){
-        message(sprintf("An object of S3 class 'HIS' has been built and saved into '%s'.", file.path(getwd(),output.file)), appendLF=T)
+    if(!is.na(output.file)){
+        # remove the RData extension 
+        output.var <- gsub(".RData$", "", output.file, ignore.case=T, perl=T)
+        output.var <- gsub(".RDat$", "", output.var, ignore.case=T, perl=T)
+        output.var <- gsub(".RDa$", "", output.var, ignore.case=T, perl=T)
+    
+        do.call(assign, list(output.var, x))
+        save(list=output.var, file=output.file)
+    
+        if(file.exists(output.file)){
+            message(sprintf("An object of S3 class 'HIS' has been built and saved into '%s'.", file.path(getwd(),output.file)), appendLF=T)
+        }
+        
     }
-
     ####################################################################################
     endT <- Sys.time()
     message(paste(c("\nEnd at ",as.character(endT)), collapse=""), appendLF=T)

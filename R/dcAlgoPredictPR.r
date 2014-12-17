@@ -214,6 +214,10 @@ dcAlgoPredictPR <- function(GSP.file, prediction.file, ontology=c(NA,"GOBP","GOM
         x_pr <- res[1,] / res[2,]
         x_rc <- res[1,] / length(x_gsp)
         
+        ##########
+        x_pr[is.na(x_pr)] <- 0 # in case there are no called
+        ##########
+        
         return(cbind(precision=x_pr, recall=x_rc))
     })
     names(res_list) <- both.names

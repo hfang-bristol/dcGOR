@@ -271,6 +271,7 @@ dcDAGdomainSim <- function (g, domains=NULL, method.domain=c("BM.average","BM.ma
         flag_parallel <- dnet::dCheckParallel(multicores=multicores, verbose=verbose)
         if(flag_parallel){
             if(method.domain=='average'){
+                i <- 1
                 sim <- foreach::`%dopar%` (foreach::foreach(i=1:(num_domains-1), .inorder=T, .combine=rbind), {
                     ind1 <- domains2terms_index[[i]]
                     progress_indicate(i, num_domains, 10, flag=T)
@@ -289,6 +290,7 @@ dcDAGdomainSim <- function (g, domains=NULL, method.domain=c("BM.average","BM.ma
                     }
                 })
             }else if(method.domain=='max'){
+                i <- 1
                 sim <- foreach::`%dopar%` (foreach::foreach(i=1:(num_domains-1), .inorder=T, .combine=rbind), {
                     ind1 <- domains2terms_index[[i]]
                     progress_indicate(i, num_domains, 10, flag=T)
@@ -307,6 +309,7 @@ dcDAGdomainSim <- function (g, domains=NULL, method.domain=c("BM.average","BM.ma
                     }
                 })
             }else if(method.domain=='BM.average'){
+                i <- 1
                 sim <- foreach::`%dopar%` (foreach::foreach(i=1:(num_domains-1), .inorder=T, .combine=rbind), {
                     ind1 <- domains2terms_index[[i]]
                     progress_indicate(i, num_domains, 10, flag=T)
@@ -326,6 +329,7 @@ dcDAGdomainSim <- function (g, domains=NULL, method.domain=c("BM.average","BM.ma
                     }
                 })
             }else if(method.domain=='BM.max'){
+                i <- 1
                 sim <- foreach::`%dopar%` (foreach::foreach(i=1:(num_domains-1), .inorder=T, .combine=rbind), {
                     ind1 <- domains2terms_index[[i]]
                     progress_indicate(i, num_domains, 10, flag=T)
@@ -345,6 +349,7 @@ dcDAGdomainSim <- function (g, domains=NULL, method.domain=c("BM.average","BM.ma
                     }
                 })
             }else if(method.domain=='BM.complete'){
+                i <- 1
                 sim <- foreach::`%dopar%` (foreach::foreach(i=1:(num_domains-1), .inorder=T, .combine=rbind), {
                     ind1 <- domains2terms_index[[i]]
                     progress_indicate(i, num_domains, 10, flag=T)
