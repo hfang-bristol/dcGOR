@@ -215,7 +215,7 @@ dcAlgoPredictPR <- function(GSP.file, prediction.file, ontology=c(NA,"GOBP","GOM
         x_rc <- res[1,] / length(x_gsp)
         
         ##########
-        x_pr[is.na(x_pr)] <- 0 # in case there are no called
+        #x_pr[is.na(x_pr)] <- 0 # in case there are no called
         ##########
         
         return(cbind(precision=x_pr, recall=x_rc))
@@ -233,8 +233,14 @@ dcAlgoPredictPR <- function(GSP.file, prediction.file, ontology=c(NA,"GOBP","GOM
     pr_sum <- rep(0, length(t))
     pr_sum_deno <- rep(0, length(t))
     for(i in 1:length(res_list)){
-        pr_sum <- pr_sum + res_list[[i]][,1]
-        pr_sum_deno <- pr_sum_deno + (res_list[[i]][,1]!=0)
+        ###############
+        # in case there are no called
+        tmp <- res_list[[i]][,1]
+        tmp[is.na(tmp)] <- 0
+        ###############
+        pr_sum <- pr_sum + tmp
+        
+        pr_sum_deno <- pr_sum_deno + !is.na(res_list[[i]][,1]) # only preditable seq are considered
     }
     pr_ave <- pr_sum / pr_sum_deno
     
@@ -249,7 +255,7 @@ dcAlgoPredictPR <- function(GSP.file, prediction.file, ontology=c(NA,"GOBP","GOM
     Pcoverage <- max(pr_sum_deno) / length(gsp.names)
     
     ## F-measure: the maximum (over all thresholds t) of a harmonic mean between precision and recall
-    Fmeasure <- base::max( (2 * pr_ave * rc_ave) / (pr_ave + rc_ave) )
+    Fmeasure <- base::max( (2 * pr_ave * rc_ave) / (pr_ave + rc_ave), na.rm=T)
     
     ##############################################################################################
     

@@ -35,7 +35,8 @@ please refer to the online Documentations at
 
 \item{output.file}{an output file used to save the \code{HIS} object as
 an RData-formatted file (see 'Value' for details). If NULL, this file
-will be saved into "HIS.RData" in the current working local directory}
+will be saved into "HIS.RData" in the current working local directory.
+If NA, there will be no output file}
 
 \item{verbose}{logical to indicate whether the messages will be
 displayed in the screen. By default, it sets to TRUE for display}
@@ -87,8 +88,9 @@ None
 \examples{
 \dontrun{
 # build an "HIS" object for GO Molecular Function
-Feature2GOMF.sf <-
-dcAlgoPropagate(input.file="http://dcgor.r-forge.r-project.org/data/Feature/Feature2GO.sf.txt",
+input.file <-
+"http://dcgor.r-forge.r-project.org/data/Feature/Feature2GO.sf.txt"
+Feature2GOMF.sf <- dcAlgoPropagate(input.file=input.file,
 ontology="GOMF", output.file="Feature2GOMF.sf.RData")
 names(Feature2GOMF.sf)
 Feature2GOMF.sf$hscore[1]
@@ -97,18 +99,14 @@ Feature2GOMF.sf$slim[1]
 
 # extract hscore as a matrix with 3 columns (Feature_id, Term_id, Score)
 hscore <- Feature2GOMF.sf$hscore
-output_list <- lapply(1:length(hscore), function(i){
-x <- hscore[[i]]
-y <- rep(names(hscore)[i],length(x))
-cbind(Feature_id=y, Term_id=names(x), Score=as.numeric(x))
-})
-hscore_mat <- base::do.call(base::rbind, output_list)
+hscore_mat <- dcList2Matrix(hscore)
+colnames(hscore_mat) <- c("Feature_id", "Term_id", "Score")
 dim(hscore_mat)
 hscore_mat[1:10,]
 }
 }
 \seealso{
 \code{\link{dcRDataLoader}}, \code{\link{dcConverter}},
-\code{\link{dcAlgo}}
+\code{\link{dcAlgo}}, \code{\link{dcList2Matrix}}
 }
 
