@@ -102,6 +102,7 @@ dcAlgoPredictPR <- function(GSP.file, prediction.file, ontology=c(NA,"GOBP","GOM
     #tab <- read.delim(prediction.file, header=F, sep="\t", nrows=50, skip=1)
     #pred <- read.table(prediction.file, header=F, sep="\t", skip=1, colClasses=sapply(tab,class))
     pred <- utils::read.delim(prediction.file, header=T, sep="\t", colClasses="character")
+    pred <- pred[!is.na(pred[,3]),]
     
     ## replace proteins with internal id
     all <- unique(c(unique(gsp[,1]), unique(pred[,1])))
@@ -162,6 +163,9 @@ dcAlgoPredictPR <- function(GSP.file, prediction.file, ontology=c(NA,"GOBP","GOM
     })
     names(pred.list.gene) <- names(tmp_score)
     
+    tmp <- unlist(tmp_score, use.names=F)
+    sum(is.na(tmp))
+    
     if(verbose){
         now <- Sys.time()
         message(sprintf("\tThere are %d genes/proteins in predictions (%s).", length(pred.list.gene), as.character(now)), appendLF=T)
@@ -184,6 +188,7 @@ dcAlgoPredictPR <- function(GSP.file, prediction.file, ontology=c(NA,"GOBP","GOM
     ## get all decision threshold
     #tmp <- as.numeric(pred[,3])
     tmp <- unlist(pred.list.both, use.names=F)
+    tmp <- unlist(pred.list.gene, use.names=F)
     if(bin=='uniform'){
         max_pred <- base::max(tmp)
         min_pred <- base::min(tmp)

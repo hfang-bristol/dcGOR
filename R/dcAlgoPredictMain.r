@@ -71,7 +71,7 @@ dcAlgoPredictMain <- function(input.file, output.file=NULL, RData.HIS=c(NA,"Feat
         }
     }else if(is.character(input.file) & input.file!=''){
         if(verbose){
-            message(sprintf("Reading the input file '%s' ...", input.file), appendLF=T)
+            message(sprintf("Read the input file '%s' ...", input.file), appendLF=T)
         }
         #tab <- read.delim(input.file, header=F, sep="\t", nrows=50, skip=1)
         #input <- read.table(input.file, header=F, sep="\t", skip=1, colClasses=sapply(tab,class))

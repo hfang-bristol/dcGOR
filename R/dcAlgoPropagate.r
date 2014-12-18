@@ -2,7 +2,7 @@
 #'
 #' \code{dcAlgoPropagate} is supposed to propagate ontology annotations, given an input file. This input file contains original annotations between domains/features and ontology terms, along with the hypergeometric scores (hscore) in support for their annotations. The annotations are propagated to the ontology root (retaining the maximum hscore). After the propogation, the ontology terms of increasing levels are determined based on the concept of Information Content (IC) to product a slim version of ontology. It returns an object of S3 class "HIS" with three components: "hscore", "ic" and "slim".
 #'
-#' @param input.file an input file used to build the object. This input file contains original annotations between domains/features and ontology terms, along with the hypergeometric scores (hscore) in support for their annotations. For example, a file containing original annotations between SCOP domain architectures and GO terms can be found in \url{http://dcgor.r-forge.r-project.org/data/Feature/Feature2GO.sf.txt}. As seen in this example, the input file must contain the header (in the first row) and three columns: 1st column for 'Feature_id' (here SCOP domain architectures), 2nd column for 'Term_id' (GO terms), and 3rd column for 'Score' (hscore)
+#' @param input.file an input file used to build the object. This input file contains original annotations between domains/features and ontology terms, along with the hypergeometric scores (hscore) in support for their annotations. For example, a file containing original annotations between SCOP domain architectures and GO terms can be found in \url{http://dcgor.r-forge.r-project.org/data/Feature/Feature2GO.sf.txt}. As seen in this example, the input file must contain the header (in the first row) and three columns: 1st column for 'Feature_id' (here SCOP domain architectures), 2nd column for 'Term_id' (GO terms), and 3rd column for 'Score' (hscore). Alternatively, the input.file can be a matrix or data frame, assuming that input file has been read. Note: the file should use the tab delimiter as the field separator between columns
 #' @param ontology the ontology identity. It can be "GOBP" for Gene Ontology Biological Process, "GOMF" for Gene Ontology Molecular Function, "GOCC" for Gene Ontology Cellular Component, "DO" for Disease Ontology, "HPPA" for Human Phenotype Phenotypic Abnormality, "HPMI" for Human Phenotype Mode of Inheritance, "HPON" for Human Phenotype ONset and clinical course, "MP" for Mammalian Phenotype, "EC" for Enzyme Commission, "KW" for UniProtKB KeyWords, "UP" for UniProtKB UniPathway. For details on the eligibility for pairs of input domain and ontology, please refer to the online Documentations at \url{http://supfam.org/dcGOR/docs.html}
 #' @param output.file an output file used to save the \code{HIS} object as an RData-formatted file (see 'Value' for details). If NULL, this file will be saved into "HIS.RData" in the current working local directory. If NA, there will be no output file
 #' @param verbose logical to indicate whether the messages will be displayed in the screen. By default, it sets to TRUE for display
@@ -47,23 +47,31 @@ dcAlgoPropagate <- function(input.file, ontology=c("GOBP","GOMF","GOCC","DO","HP
     ## match.arg matches arg against a table of candidate values as specified by choices, where NULL means to take the first one
     ontology <- match.arg(ontology)
     
-    if(is.null(input.file) | is.na(input.file)){
+    if(is.matrix(input.file) | is.data.frame(input.file)){
+        if(verbose){
+            now <- Sys.time()
+            message(sprintf("Load the input file (%s) ...", as.character(now)), appendLF=T)
+        }
+        if(is.data.frame(input.file)){
+            input <- cbind(as.character(input.file[,1]), as.character(input.file[,2]), as.character(input.file[,3]))
+        }else{
+            input <- input.file
+        }
+    }else if(is.character(input.file) & input.file!='' & !is.null(input.file) & !is.na(input.file)){
+        if(verbose){
+            message(sprintf("Read the input file '%s' (%s) ...", input.file, as.character(now)), appendLF=T)
+        }
+        #tab <- read.delim(input.file, header=F, sep="\t", nrows=50, skip=1)
+        #input <- read.table(input.file, header=F, sep="\t", skip=1, colClasses=sapply(tab,class))
+        input <- utils::read.delim(input.file, header=T, sep="\t", colClasses="character")
+    }else{
         stop("The file 'input.file' must be provided!\n")
     }
-    
+
     if(is.null(output.file)){
         warnings("Since the output file is not provided, the function will use the default output file 'HIS.RData'!\n")   
         output.file <- "HIS.RData"
     }
-    
-    if(verbose){
-        now <- Sys.time()
-        message(sprintf("Reading the file '%s' (%s) ...", input.file, as.character(now)), appendLF=T)
-    }
-    
-    #tab <- read.delim(input.file, header=F, sep="\t", nrows=50, skip=1)
-    #input <- read.table(input.file, header=F, sep="\t", skip=1, colClasses=sapply(tab,class))
-    input <- utils::read.delim(input.file, header=T, sep="\t", colClasses="character")
     
     # how to deal with negative scores
     if(1){
@@ -98,14 +106,13 @@ dcAlgoPropagate <- function(input.file, ontology=c("GOBP","GOMF","GOCC","DO","HP
         message(sprintf("Do propagation (%s) ...", as.character(now)), appendLF=T)
     }
     
-    if(0){
+    #######################
+    ## Propagate using list
+    if(1){
         ## initialise annotations    
         pAnnos <- oAnnos[allNodes]
         names(pAnnos) <- allNodes
-        
-        match(allNodes[211],unlist(level2node))
-        
-        
+
         ## get the levels list
         level2node <- dnet::dDAGlevel(dag, level.mode="longest_path", return.mode="level2node")
         nLevels <- length(level2node)
@@ -119,7 +126,7 @@ dcAlgoPropagate <- function(input.file, ontology=c("GOBP","GOMF","GOCC","DO","HP
             })
             names(adjNodesList) <- currNodes
 
-            ## push the domains from level i to level i - 1
+            ## inherit the annotations from level i to level i - 1
             for(k in 1:length(currNodes)){
                 node <- currNodes[k]
                 ## get the domain annotations from this current node
@@ -153,9 +160,9 @@ dcAlgoPropagate <- function(input.file, ontology=c("GOBP","GOMF","GOCC","DO","HP
         
         }
         
-        #ind <- which(sapply(pAnnos,length)>0)
-        #pAnnos <- pAnnos[ind]
-        
+
+    #######################
+    ## Propagate using environment
     }else{
    
         if(verbose){

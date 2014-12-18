@@ -20,7 +20,10 @@ in
 As seen in this example, the input file must contain the header (in the
 first row) and three columns: 1st column for 'Feature_id' (here SCOP
 domain architectures), 2nd column for 'Term_id' (GO terms), and 3rd
-column for 'Score' (hscore)}
+column for 'Score' (hscore). Alternatively, the input.file can be a
+matrix or data frame, assuming that input file has been read. Note: the
+file should use the tab delimiter as the field separator between
+columns}
 
 \item{ontology}{the ontology identity. It can be "GOBP" for Gene
 Ontology Biological Process, "GOMF" for Gene Ontology Molecular
