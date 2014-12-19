@@ -59,6 +59,7 @@ dcAlgoPropagate <- function(input.file, ontology=c("GOBP","GOMF","GOCC","DO","HP
         }
     }else if(is.character(input.file) & input.file!='' & !is.null(input.file) & !is.na(input.file)){
         if(verbose){
+            now <- Sys.time()
             message(sprintf("Read the input file '%s' (%s) ...", input.file, as.character(now)), appendLF=T)
         }
         #tab <- read.delim(input.file, header=F, sep="\t", nrows=50, skip=1)

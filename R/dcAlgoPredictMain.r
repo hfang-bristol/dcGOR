@@ -77,7 +77,7 @@ dcAlgoPredictMain <- function(input.file, output.file=NULL, RData.HIS=c(NA,"Feat
         #input <- read.table(input.file, header=F, sep="\t", skip=1, colClasses=sapply(tab,class))
         input <- utils::read.delim(input.file, header=T, sep="\t", colClasses="character")
     }else{
-        stop("The file 'input.file' must be provided!\n")
+        return(NULL)
     }
     
     if(nrow(input)==0){

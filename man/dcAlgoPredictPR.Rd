@@ -99,7 +99,7 @@ along PR curve
 # 1) Generate prediction file with HPPA predicitions for human genes
 architecture.file <-
 "http://dcgor.r-forge.r-project.org/data/Algo/SCOP_architecture.txt"
-prediction.file <- "SCOP_architecture.txt.HPPA_predicted"
+prediction.file <- "SCOP_architecture.HPPA_predicted.txt"
 res <- dcAlgoPredictMain(input.file=architecture.file,
 output.file=prediction.file, RData.HIS="Feature2HPPA.sf",
 parallel=FALSE)

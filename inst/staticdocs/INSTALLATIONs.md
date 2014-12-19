@@ -46,7 +46,7 @@ Second, install the package `dcGOR` under [stable release version hosted in CRAN
 Third (`highly recommended`), update the package `dcGOR` from [latest development version hosted in GitHub](https://github.com/hfang-bristol/dcGOR):
 
     library(devtools)
-    for(pkg in c("dcGOR","dnet")){
+    for(pkg in c("dnet","dcGOR")){
         if(pkg %in% rownames(installed.packages())) remove.packages(pkg)
         install_github(repo=paste("hfang-bristol",pkg,sep="/"))
     }

@@ -135,12 +135,12 @@ anno.file <- "http://dcgor.r-forge.r-project.org/data/Algo/HP_anno.txt"
 architecture.file <-
 "http://dcgor.r-forge.r-project.org/data/Algo/SCOP_architecture.txt"
 
-# 2) Do inference using built-in data
+# 2) Do inference using built-in ontology
 res <- dcAlgo(anno.file, architecture.file, ontology="HPPA",
 feature.mode="supra", parallel=FALSE)
 res[1:5,]
 
-# 3) Advanced usage: using customised data
+# 3) Advanced usage: using customised ontology
 x <-
 base::load(base::url("http://dcgor.r-forge.r-project.org/data/onto.HPPA.RData"))
 RData.ontology.customised <- 'onto.HPPA.RData'

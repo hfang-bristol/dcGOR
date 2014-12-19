@@ -80,7 +80,7 @@ dcAlgoPredictGenome <- function(input.file, RData.HIS=c(NULL,"Feature2GOBP.sf","
         #input <- read.table(input.file, header=F, sep="\t", skip=1, colClasses=sapply(tab,class))
         input <- utils::read.delim(input.file, header=T, sep="\t", colClasses="character")
     }else{
-        stop("The file 'input.file' must be provided!\n")
+        return(NULL)
     }
     
     if(nrow(input)==0){

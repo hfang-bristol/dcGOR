@@ -26,16 +26,29 @@ dcSparseMatrix <- function(input.file, verbose=T)
         if(verbose){
             message(sprintf("Load the input data matrix of %d X %d ...", dim(input.file)[1], dim(input.file)[2]), appendLF=T)
         }
-        x <- as.matrix(input.file)
+        
+        if(ncol(input.file)==2){
+            input.file <- cbind(input.file, rep(1,nrow(input.file)))
+        }
+        
+        if(is.data.frame(input.file)){
+            input <- cbind(as.character(input.file[,1]), as.character(input.file[,2]), as.character(input.file[,3]))
+        }else{
+            input <- input.file
+        }
     }else if(is.character(input.file) & input.file!=''){
         if(verbose){
-            message(sprintf("Reading the input file '%s' ...", input.file), appendLF=T)
+            message(sprintf("Read the input file '%s' ...", input.file), appendLF=T)
+        }       
+        input <- utils::read.delim(input.file, header=T, sep="\t", colClasses="character")
+        if(ncol(input)==2){
+            input <- cbind(input, rep(1,nrow(input)))
         }
-        x <- as.matrix(utils::read.delim(input.file, header=F, sep="\t"))
     }else{
         return(NULL)
     }
     
+    x <- input
     if(!is.null(x)){
         x_row <- sort(unique(x[,1]))
         x_col <- sort(unique(x[,2]))
