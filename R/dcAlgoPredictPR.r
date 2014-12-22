@@ -178,9 +178,6 @@ dcAlgoPredictPR <- function(GSP.file, prediction.file, ontology=c(NA,"GOBP","GOM
     })
     names(pred.list.gene) <- names(tmp_score)
     
-    tmp <- unlist(tmp_score, use.names=F)
-    sum(is.na(tmp))
-    
     if(verbose){
         now <- Sys.time()
         message(sprintf("\tThere are %d genes/proteins in predictions (%s).", length(pred.list.gene), as.character(now)), appendLF=T)
