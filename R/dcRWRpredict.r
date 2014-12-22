@@ -135,12 +135,17 @@ dcRWRpredict <- function(data, g, output.file=NULL, ontology=c(NA,"GOBP","GOMF",
         method <- 'indirect'
     }
     
-    if(method=='indirect'){
+    if(verbose){
+        message(sprintf("\tusing '%s' method to do RWR (%s)...", method, as.character(Sys.time())), appendLF=T)
+        
+        message(paste(c("\n##############################"), collapse=""), appendLF=T)
+        message(paste(c("'dnet::dRWR' is called"), collapse=""), appendLF=T)
+        message(paste(c("##############################\n"), collapse=""), appendLF=T)
+        
+    }
     
-        if(verbose){
-            message(sprintf("\tusing '%s' method to do RWR (%s)...", method, as.character(Sys.time())), appendLF=T)
-        }
-        sAmatrix <- suppressWarnings(suppressMessages(dnet::dRWR(g=ig, normalise=normalise, restart=restart, normalise.affinity.matrix=normalise.affinity.matrix, parallel=parallel, multicores=multicores)))
+    if(method=='indirect'){
+        sAmatrix <- suppressWarnings(dnet::dRWR(g=ig, normalise=normalise, restart=restart, normalise.affinity.matrix=normalise.affinity.matrix, parallel=parallel, multicores=multicores))
         
         sAmatrix <- as.matrix(sAmatrix)
         if(leave.one.out){
@@ -177,13 +182,18 @@ dcRWRpredict <- function(data, g, output.file=NULL, ontology=c(NA,"GOBP","GOMF",
         
     }else if(method=='direct'){
         ## RWR of a Matrix
-        AAmatrix <- suppressWarnings(suppressMessages(dnet::dRWR(g=ig, normalise=normalise, setSeeds=P0matrix, restart=restart, normalise.affinity.matrix=normalise.affinity.matrix, parallel=parallel, multicores=multicores)))
+        AAmatrix <- suppressWarnings(dnet::dRWR(g=ig, normalise=normalise, setSeeds=P0matrix, restart=restart, normalise.affinity.matrix=normalise.affinity.matrix, parallel=parallel, multicores=multicores))
         
-        AAmatrix <- Matrix::Matrix(AAmatrix, sparse=T)
+        colnames(AAmatrix) <- colnames(P0matrix)
+        rownames(AAmatrix) <- rownames(P0matrix)
     }
     
     ####################################################
     if(verbose){
+        message(paste(c("##############################"), collapse=""), appendLF=T)
+        message(paste(c("'dnet::dRWR' is completed"), collapse=""), appendLF=T)
+        message(paste(c("##############################\n"), collapse=""), appendLF=T)
+    
         message(sprintf("Second, propagate '%s' ontology annotations (%s)...", ontology, as.character(Sys.time())), appendLF=T)
     }
     
@@ -191,10 +201,21 @@ dcRWRpredict <- function(data, g, output.file=NULL, ontology=c(NA,"GOBP","GOMF",
     term_names <- colnames(AAmatrix)
     idx <- which(AAmatrix>1e-6, arr.ind=TRUE, useNames=FALSE)
     output <- cbind(SeqID=seq_names[idx[,1]], Term=term_names[idx[,2]], Score=signif(AAmatrix[idx], digits=4))
+    
+    if(verbose){
+        message(paste(c("\n##############################"), collapse=""), appendLF=T)
+        message(paste(c("'dcAlgoPropagate' is called"), collapse=""), appendLF=T)
+        message(paste(c("##############################\n"), collapse=""), appendLF=T)
+    }
+    
     res_RData <- suppressMessages(dcAlgoPropagate(input.file=output, ontology=ontology, output.file=NA, verbose=verbose, RData.ontology.customised=RData.ontology.customised, RData.location=RData.location))
     score <- res_RData$hscore
     
     if(verbose){
+        message(paste(c("##############################"), collapse=""), appendLF=T)
+        message(paste(c("'dcAlgoPropagate' is completed"), collapse=""), appendLF=T)
+        message(paste(c("##############################\n"), collapse=""), appendLF=T)
+    
         message(sprintf("Third, rescale predictive score using '%s' method (%s)...", scale.method, as.character(Sys.time())), appendLF=T)
     }
     
