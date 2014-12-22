@@ -208,7 +208,7 @@ dcRWRpredict <- function(data, g, output.file=NULL, ontology=c(NA,"GOBP","GOMF",
         message(paste(c("##############################\n"), collapse=""), appendLF=T)
     }
     
-    res_RData <- suppressMessages(dcAlgoPropagate(input.file=output, ontology=ontology, output.file=NA, verbose=verbose, RData.ontology.customised=RData.ontology.customised, RData.location=RData.location))
+    res_RData <- dcAlgoPropagate(input.file=output, ontology=ontology, output.file=NA, verbose=verbose, RData.ontology.customised=RData.ontology.customised, RData.location=RData.location)
     score <- res_RData$hscore
     
     if(verbose){
