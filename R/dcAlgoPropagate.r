@@ -3,9 +3,10 @@
 #' \code{dcAlgoPropagate} is supposed to propagate ontology annotations, given an input file. This input file contains original annotations between domains/features and ontology terms, along with the hypergeometric scores (hscore) in support for their annotations. The annotations are propagated to the ontology root (retaining the maximum hscore). After the propogation, the ontology terms of increasing levels are determined based on the concept of Information Content (IC) to product a slim version of ontology. It returns an object of S3 class "HIS" with three components: "hscore", "ic" and "slim".
 #'
 #' @param input.file an input file used to build the object. This input file contains original annotations between domains/features and ontology terms, along with the hypergeometric scores (hscore) in support for their annotations. For example, a file containing original annotations between SCOP domain architectures and GO terms can be found in \url{http://dcgor.r-forge.r-project.org/data/Feature/Feature2GO.sf.txt}. As seen in this example, the input file must contain the header (in the first row) and three columns: 1st column for 'Feature_id' (here SCOP domain architectures), 2nd column for 'Term_id' (GO terms), and 3rd column for 'Score' (hscore). Alternatively, the input.file can be a matrix or data frame, assuming that input file has been read. Note: the file should use the tab delimiter as the field separator between columns
-#' @param ontology the ontology identity. It can be "GOBP" for Gene Ontology Biological Process, "GOMF" for Gene Ontology Molecular Function, "GOCC" for Gene Ontology Cellular Component, "DO" for Disease Ontology, "HPPA" for Human Phenotype Phenotypic Abnormality, "HPMI" for Human Phenotype Mode of Inheritance, "HPON" for Human Phenotype ONset and clinical course, "MP" for Mammalian Phenotype, "EC" for Enzyme Commission, "KW" for UniProtKB KeyWords, "UP" for UniProtKB UniPathway. For details on the eligibility for pairs of input domain and ontology, please refer to the online Documentations at \url{http://supfam.org/dcGOR/docs.html}
+#' @param ontology the ontology identity. It can be "GOBP" for Gene Ontology Biological Process, "GOMF" for Gene Ontology Molecular Function, "GOCC" for Gene Ontology Cellular Component, "DO" for Disease Ontology, "HPPA" for Human Phenotype Phenotypic Abnormality, "HPMI" for Human Phenotype Mode of Inheritance, "HPON" for Human Phenotype ONset and clinical course, "MP" for Mammalian Phenotype, "EC" for Enzyme Commission, "KW" for UniProtKB KeyWords, "UP" for UniProtKB UniPathway. For details on the eligibility for pairs of input domain and ontology, please refer to the online Documentations at \url{http://supfam.org/dcGOR/docs.html}. If NA, then the user has to input a customised RData-formatted file (see \code{RData.ontology.customised} below)
 #' @param output.file an output file used to save the \code{HIS} object as an RData-formatted file (see 'Value' for details). If NULL, this file will be saved into "HIS.RData" in the current working local directory. If NA, there will be no output file
 #' @param verbose logical to indicate whether the messages will be displayed in the screen. By default, it sets to TRUE for display
+#' @param RData.ontology.customised a file name for RData-formatted file containing an object of S4 class 'Onto' (i.g. ontology). By default, it is NULL. It is only needed when the user wants to perform customised analysis using their own ontology. See \code{\link{dcBuildOnto}} for how to creat this object
 #' @param RData.location the characters to tell the location of built-in RData files. By default, it remotely locates at "http://supfam.org/dcGOR/data" or "http://dcgor.r-forge.r-project.org/data". For the user equipped with fast internet connection, this option can be just left as default. But it is always advisable to download these files locally. Especially when the user needs to run this function many times, there is no need to ask the function to remotely download every time (also it will unnecessarily increase the runtime). For examples, these files (as a whole or part of them) can be first downloaded into your current working directory, and then set this option as: \eqn{RData.location="."}. If RData to load is already part of package itself, this parameter can be ignored (since this function will try to load it via function \code{data} first)
 #' @return 
 #' an object of S3 class \code{HIS}, with following components:
@@ -37,7 +38,7 @@
 #' hscore_mat[1:10,]
 #' }
 
-dcAlgoPropagate <- function(input.file, ontology=c("GOBP","GOMF","GOCC","DO","HPPA","HPMI","HPON","MP","EC","KW","UP"), output.file="HIS.RData", verbose=T, RData.location="http://dcgor.r-forge.r-project.org/data")
+dcAlgoPropagate <- function(input.file, ontology=c(NA,"GOBP","GOMF","GOCC","DO","HPPA","HPMI","HPON","MP","EC","KW","UP"), output.file="HIS.RData", verbose=T, RData.ontology.customised=NULL, RData.location="http://dcgor.r-forge.r-project.org/data")
 {
     startT <- Sys.time()
     message(paste(c("Start at ",as.character(startT)), collapse=""), appendLF=T)
@@ -91,9 +92,37 @@ dcAlgoPropagate <- function(input.file, ontology=c("GOBP","GOMF","GOCC","DO","HP
     names(oAnnos) <- names(tmp_score)
     
     ## load ontology information
-    g <- dcRDataLoader(paste('onto.', ontology, sep=''), RData.location=RData.location)
-    if(class(g)=="Onto"){
-        g <- dcConverter(g, from='Onto', to='igraph', verbose=F)
+    if(!is.na(ontology)){
+    
+        if(verbose){
+            now <- Sys.time()
+            message(sprintf("Load the ontology '%s' (%s) ...", ontology, as.character(now)), appendLF=T)
+        }
+        
+        #########
+        ## load ontology information
+        g <- dcRDataLoader(paste('onto.', ontology, sep=''), RData.location=RData.location)
+        if(class(g)=="Onto"){
+            g <- dcConverter(g, from='Onto', to='igraph', verbose=F)
+        }
+        
+    }else if(file.exists(RData.ontology.customised)){
+    
+        if(verbose){
+            now <- Sys.time()
+            message(sprintf("Load customised ontology '%s' (%s)...", RData.ontology.customised, as.character(now)), appendLF=T)
+        }
+    
+        ## load ontology informatio
+        g <- ''
+        eval(parse(text=paste("g <- get(load('", RData.ontology.customised,"'))", sep="")))
+        if(class(g)=="Onto"){
+            g <- dcConverter(g, from='Onto', to='igraph', verbose=F)
+        }
+        ontology <- RData.ontology.customised
+
+    }else{
+        stop("There is no input for ontology! Please input one of two parameters ('ontology' and 'RData.ontology.customised').\n")
     }
     
     ## generate a subgraph of a direct acyclic graph (DAG) induced by terms in input annotations

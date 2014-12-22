@@ -147,7 +147,9 @@ list(
                 "dcAlgoPredict",
                 "dcAlgoPredictMain",
                 "dcAlgoPredictGenome",
-                "dcAlgoPredictPR"
+                "dcAlgoPredictPR",
+                "dcRWRpredict",
+                "dcNaivePredict"
             )
         ),
         sd_section("Databases used for ontology term predictions",

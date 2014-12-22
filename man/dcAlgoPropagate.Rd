@@ -3,11 +3,12 @@
 \alias{dcAlgoPropagate}
 \title{Function to propagate ontology annotations according to an input file}
 \usage{
-dcAlgoPropagate(input.file, ontology = c("GOBP", "GOMF", "GOCC", "DO",
-"HPPA",
-"HPMI", "HPON", "MP", "EC", "KW", "UP"), output.file = "HIS.RData",
-verbose = T, RData.location =
-"http://dcgor.r-forge.r-project.org/data")
+dcAlgoPropagate(input.file, ontology = c(NA, "GOBP", "GOMF", "GOCC",
+"DO",
+"HPPA", "HPMI", "HPON", "MP", "EC", "KW", "UP"), output.file =
+"HIS.RData",
+verbose = T, RData.ontology.customised = NULL,
+RData.location = "http://dcgor.r-forge.r-project.org/data")
 }
 \arguments{
 \item{input.file}{an input file used to build the object. This input
@@ -34,7 +35,9 @@ and clinical course, "MP" for Mammalian Phenotype, "EC" for Enzyme
 Commission, "KW" for UniProtKB KeyWords, "UP" for UniProtKB UniPathway.
 For details on the eligibility for pairs of input domain and ontology,
 please refer to the online Documentations at
-\url{http://supfam.org/dcGOR/docs.html}}
+\url{http://supfam.org/dcGOR/docs.html}. If NA, then the user has to
+input a customised RData-formatted file (see
+\code{RData.ontology.customised} below)}
 
 \item{output.file}{an output file used to save the \code{HIS} object as
 an RData-formatted file (see 'Value' for details). If NULL, this file
@@ -43,6 +46,12 @@ If NA, there will be no output file}
 
 \item{verbose}{logical to indicate whether the messages will be
 displayed in the screen. By default, it sets to TRUE for display}
+
+\item{RData.ontology.customised}{a file name for RData-formatted file
+containing an object of S4 class 'Onto' (i.g. ontology). By default, it
+is NULL. It is only needed when the user wants to perform customised
+analysis using their own ontology. See \code{\link{dcBuildOnto}} for
+how to creat this object}
 
 \item{RData.location}{the characters to tell the location of built-in
 RData files. By default, it remotely locates at

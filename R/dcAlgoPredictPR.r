@@ -2,8 +2,8 @@
 #'
 #' \code{dcAlgoPredictPR} is supposed to assess the prediction performance via Precision-Recall (PR) analysis. It requires two input files: 1) a Glod Standard Positive (GSP) file containing known annotations between proteins/genes and ontology terms; 2) a prediction file containing predicted terms for proteins/genes. Note: the known annotations will be recursively propagated towards the root of the ontology.
 #'
-#' @param GSP.file a Glod Standard Positive (GSP) file containing known annotations between proteins/genes and ontology terms. For example, a file containing annotations between human genes and HP terms can be found in \url{http://dcgor.r-forge.r-project.org/data/Algo/HP_anno.txt}. As seen in this example, the input file must contain the header (in the first row) and two columns: 1st column for 'SeqID' (actually these IDs can be anything), 2nd column for 'termID' (HP terms). Note: the file should use the tab delimiter as the field separator between columns
-#' @param prediction.file a prediction file containing proteins/genes, their predicted terms along with predictive scores. As seen in an example below, this file is usually created via \code{\link{dcAlgoPredictMain}}, containing three columns: 1st column for 'SeqID' (actually these IDs can be anything), 2nd column for 'Term' (ontology terms), 3rd column for 'Score' (predictive score). Note: the file should use the tab delimiter as the field separator between columns
+#' @param GSP.file a Glod Standard Positive (GSP) file containing known annotations between proteins/genes and ontology terms. For example, a file containing annotations between human genes and HP terms can be found in \url{http://dcgor.r-forge.r-project.org/data/Algo/HP_anno.txt}. As seen in this example, the input file must contain the header (in the first row) and two columns: 1st column for 'SeqID' (actually these IDs can be anything), 2nd column for 'termID' (HP terms). Alternatively, the GSP.file can be a matrix or data frame, assuming that GSP file has been read. Note: the file should use the tab delimiter as the field separator between columns
+#' @param prediction.file a prediction file containing proteins/genes, their predicted terms along with predictive scores. As seen in an example below, this file is usually created via \code{\link{dcAlgoPredictMain}}, containing three columns: 1st column for 'SeqID' (actually these IDs can be anything), 2nd column for 'Term' (ontology terms), 3rd column for 'Score' (predictive score). Alternatively, the prediction.file can be a matrix or data frame, assuming that prediction file has been read. Note: the file should use the tab delimiter as the field separator between columns
 #' @param ontology the ontology identity. It can be "GOBP" for Gene Ontology Biological Process, "GOMF" for Gene Ontology Molecular Function, "GOCC" for Gene Ontology Cellular Component, "DO" for Disease Ontology, "HPPA" for Human Phenotype Phenotypic Abnormality, "HPMI" for Human Phenotype Mode of Inheritance, "HPON" for Human Phenotype ONset and clinical course, "MP" for Mammalian Phenotype, "EC" for Enzyme Commission, "KW" for UniProtKB KeyWords, "UP" for UniProtKB UniPathway. For details on the eligibility for pairs of input domain and ontology, please refer to the online Documentations at \url{http://supfam.org/dcGOR/docs.html}. If NA, then the user has to input a customised RData-formatted file (see \code{RData.ontology.customised} below)
 #' @param num.threshold an integer to specify how many PR points (as a function of the score threshold) will be calculated
 #' @param bin how to bin the scores. It can be "uniform" for binning scores with equal interval (ie with uniform distribution), and 'quantile' for binning scores with eual frequency (ie with equal number)
@@ -32,7 +32,7 @@
 #' res_PR
 #' 
 #' # 3) Plot PR-curve
-#' plot(res_PR[,2], res_PR[,1], type="b", xlab="Recall", ylab="Precision")
+#' plot(res_PR[,2], res_PR[,1], xlim=c(0,1), ylim=c(0,1), type="b", xlab="Recall", ylab="Precision")
 #' }
 
 dcAlgoPredictPR <- function(GSP.file, prediction.file, ontology=c(NA,"GOBP","GOMF","GOCC","DO","HPPA","HPMI","HPON","MP","EC","KW","UP"), num.threshold=10, bin=c("uniform","quantile"), verbose=T, RData.ontology.customised=NULL, RData.location="http://dcgor.r-forge.r-project.org/data")
@@ -46,14 +46,6 @@ dcAlgoPredictPR <- function(GSP.file, prediction.file, ontology=c(NA,"GOBP","GOM
     ## match.arg matches arg against a table of candidate values as specified by choices, where NULL means to take the first one
     ontology <- match.arg(ontology)
     bin <- match.arg(bin)
-    
-    if(is.null(GSP.file) | is.na(GSP.file)){
-        stop("The file 'GSP.file' must be provided!\n")
-    }
-    
-    if(is.null(prediction.file) | is.na(prediction.file)){
-        stop("The file 'prediction.file' must be provided!\n")
-    }
     
     if(!is.na(ontology)){
     
@@ -91,17 +83,40 @@ dcAlgoPredictPR <- function(GSP.file, prediction.file, ontology=c(NA,"GOBP","GOM
     ###############################################################################################
     if(verbose){
         now <- Sys.time()
-        message(sprintf("Second, import files for GSP '%s' and predictions '%s' (%s) ...", GSP.file, prediction.file, as.character(now)), appendLF=T)
+        message(sprintf("Second, import files for GSP and predictions (%s) ...", as.character(now)), appendLF=T)
+    }
+
+    #####################    
+    ## import annotations
+    if(is.matrix(GSP.file) | is.data.frame(GSP.file)){
+        if(is.data.frame(GSP.file)){
+            gsp <- cbind(as.character(GSP.file[,1]), as.character(GSP.file[,2]))
+        }else{
+            gsp <- GSP.file
+        }
+    }else if(is.character(GSP.file) & GSP.file!='' & !is.null(GSP.file) & !is.na(GSP.file)){
+        #tab <- read.delim(GSP.file, header=F, sep="\t", nrows=50, skip=1)
+        #gsp <- read.table(GSP.file, header=F, sep="\t", skip=1, colClasses=sapply(tab,class))
+        gsp <- utils::read.delim(GSP.file, header=T, sep="\t", colClasses="character")
+    }else{
+        stop("The file 'GSP.file' must be provided!\n")
     }
     
-    ## import annotations
-    #tab <- read.delim(GSP.file, header=F, sep="\t", nrows=50, skip=1)
-    #gsp <- read.table(GSP.file, header=F, sep="\t", skip=1, colClasses=sapply(tab,class))
-    gsp <- utils::read.delim(GSP.file, header=T, sep="\t", colClasses="character")
-    ## import architectures
-    #tab <- read.delim(prediction.file, header=F, sep="\t", nrows=50, skip=1)
-    #pred <- read.table(prediction.file, header=F, sep="\t", skip=1, colClasses=sapply(tab,class))
-    pred <- utils::read.delim(prediction.file, header=T, sep="\t", colClasses="character")
+    #####################
+    ## import predictions
+    if(is.matrix(prediction.file) | is.data.frame(prediction.file)){
+        if(is.data.frame(prediction.file)){
+            pred <- cbind(as.character(prediction.file[,1]), as.character(prediction.file[,2]), as.character(prediction.file[,3]))
+        }else{
+            pred <- prediction.file
+        }
+    }else if(is.character(prediction.file) & prediction.file!='' & !is.null(prediction.file) & !is.na(prediction.file)){
+        #tab <- read.delim(prediction.file, header=F, sep="\t", nrows=50, skip=1)
+        #pred <- read.table(prediction.file, header=F, sep="\t", skip=1, colClasses=sapply(tab,class))
+        pred <- utils::read.delim(prediction.file, header=T, sep="\t", colClasses="character")
+    }else{
+        stop("The file 'prediction.file' must be provided!\n")
+    }
     pred <- pred[!is.na(pred[,3]),]
     
     ## replace proteins with internal id

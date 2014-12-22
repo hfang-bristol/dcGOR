@@ -167,7 +167,7 @@ dcRWRpipeline <- function(data, g, method=c("indirect","direct"), normalise=c("l
     if(method=='indirect'){
     
         if(verbose){
-            message(sprintf("\tusing %s method to do RWR (%s)...", method, as.character(Sys.time())), appendLF=T)
+            message(sprintf("\tusing '%s' method to do RWR (%s)...", method, as.character(Sys.time())), appendLF=T)
         }
         sAmatrix <- suppressWarnings(suppressMessages(dnet::dRWR(g=ig, normalise=normalise, restart=restart, normalise.affinity.matrix=normalise.affinity.matrix, parallel=parallel, multicores=multicores)))
         
@@ -199,7 +199,7 @@ dcRWRpipeline <- function(data, g, method=c("indirect","direct"), normalise=c("l
     
     B <- num.permutation
     if(verbose){
-        message(sprintf("Third, generate the distribution of contact strength based on %d permutations on nodes respecting %s (%s)...", B, permutation, as.character(Sys.time())), appendLF=T)
+        message(sprintf("Third, generate the distribution of contact strength based on %d permutations on nodes respecting '%s' (%s)...", B, permutation, as.character(Sys.time())), appendLF=T)
     }
     
     ###### parallel computing

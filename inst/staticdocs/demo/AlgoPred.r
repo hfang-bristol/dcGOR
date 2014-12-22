@@ -50,4 +50,13 @@ GSP.file <- "http://dcgor.r-forge.r-project.org/data/Algo/HP_anno.txt"
 res_PR <- dcAlgoPredictPR(GSP.file=GSP.file, prediction.file=prediction.file, ontology="HPPA")
 res_PR
 ### plot PR curve
-plot(res_PR[,2], res_PR[,1], type="b", xlab="Recall", ylab="Precision")
+plot(res_PR[,2], res_PR[,1], xlim=c(0,1), ylim=c(0,1), type="b", xlab="Recall", ylab="Precision")
+
+#---------------------------------------------------------------------------
+#---------------------------------------------------------------------------
+# Compared to RWR-based predictions and naive predictions
+#---------------------------------------------------------------------------
+#---------------------------------------------------------------------------
+
+## 1) RWR-based predictions, please see: dcRWRpredict
+## 2) Naive predictions, please see: dcNaivePredict
