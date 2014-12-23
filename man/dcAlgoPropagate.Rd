@@ -103,7 +103,6 @@ components: "hscore", "ic" and "slim".
 None
 }
 \examples{
-\dontrun{
 # build an "HIS" object for GO Molecular Function
 input.file <-
 "http://dcgor.r-forge.r-project.org/data/Feature/Feature2GO.sf.txt"
@@ -120,7 +119,6 @@ hscore_mat <- dcList2Matrix(hscore)
 colnames(hscore_mat) <- c("Feature_id", "Term_id", "Score")
 dim(hscore_mat)
 hscore_mat[1:10,]
-}
 }
 \seealso{
 \code{\link{dcRDataLoader}}, \code{\link{dcConverter}},

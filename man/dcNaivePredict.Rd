@@ -86,7 +86,6 @@ out, with the column names: 1st column the same as the input file (e.g.
 (along with predicted scores).
 }
 \examples{
-\dontrun{
 # 1) prepare genes to be predicted
 input.file <-
 "http://dcgor.r-forge.r-project.org/data/Algo/HP_anno.txt"
@@ -108,7 +107,6 @@ res_PR
 # 4) Plot PR-curve
 plot(res_PR[,2], res_PR[,1], xlim=c(0,1), ylim=c(0,1), type="b",
 xlab="Recall", ylab="Precision")
-}
 }
 \seealso{
 \code{\link{dcRDataLoader}}, \code{\link{dcAlgoPropagate}}

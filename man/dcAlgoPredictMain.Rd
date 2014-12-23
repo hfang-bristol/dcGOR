@@ -136,7 +136,6 @@ out, with the column names: 1st column the same as the input file (e.g.
 (along with predicted scores)
 }
 \examples{
-\dontrun{
 # 1) Prepare an input file containing domain architectures
 input.file <- "http://dcgor.r-forge.r-project.org/data/Feature/hs.txt"
 
@@ -155,7 +154,6 @@ base::save(list=x, file=RData.HIS.customised)
 output <- dcAlgoPredictMain(input.file, parallel=FALSE,
 RData.HIS.customised=RData.HIS.customised)
 output[1:5,]
-}
 }
 \seealso{
 \code{\link{dcRDataLoader}}, \code{\link{dcAlgoPropagate}},

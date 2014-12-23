@@ -139,7 +139,6 @@ run). Also, when using leave-one-out test, it has to be use 'indrect'
 method.
 }
 \examples{
-\dontrun{
 # 1) define an input network
 ## 1a) an igraph object that contains a functional protein association network in human.
 ### The network is extracted from the STRING database (version 9.1).
@@ -176,7 +175,6 @@ res_PR
 # 5) Plot PR-curve
 plot(res_PR[,2], res_PR[,1], xlim=c(0,1), ylim=c(0,1), type="b",
 xlab="Recall", ylab="Precision")
-}
 }
 \seealso{
 \code{\link{dcRDataLoader}}, \code{\link{dcAlgoPropagate}},

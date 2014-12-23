@@ -98,7 +98,6 @@ F-measure: the maximum of a harmonic mean between precision and recall
 along PR curve
 }
 \examples{
-\dontrun{
 # 1) Generate prediction file with HPPA predicitions for human genes
 architecture.file <-
 "http://dcgor.r-forge.r-project.org/data/Algo/SCOP_architecture.txt"
@@ -116,7 +115,6 @@ res_PR
 # 3) Plot PR-curve
 plot(res_PR[,2], res_PR[,1], xlim=c(0,1), ylim=c(0,1), type="b",
 xlab="Recall", ylab="Precision")
-}
 }
 \seealso{
 \code{\link{dcRDataLoader}}, \code{\link{dcConverter}},

@@ -129,7 +129,6 @@ with the column names: 1st column 'Feature_id' for features, 2nd
 indicative of strength of associations beteen features and terms
 }
 \examples{
-\dontrun{
 # 1) Prepare input file: anno.file and architecture.file
 anno.file <- "http://dcgor.r-forge.r-project.org/data/Algo/HP_anno.txt"
 architecture.file <-
@@ -150,7 +149,6 @@ base::save(list=x, file=RData.ontology.customised)
 res <- dcAlgo(anno.file, architecture.file, feature.mode="supra",
 parallel=FALSE, RData.ontology.customised=RData.ontology.customised)
 res[1:5,]
-}
 }
 \seealso{
 \code{\link{dcRDataLoader}}, \code{\link{dcSplitArch}},

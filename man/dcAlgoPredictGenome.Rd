@@ -134,7 +134,6 @@ genomes with domain architectures (including individual domains).
 none
 }
 \examples{
-\dontrun{
 # 1) Prepare an input file containing domain architectures
 input.file <-
 "http://dcgor.r-forge.r-project.org/data/Feature/Hominidae.txt"
@@ -156,7 +155,6 @@ output <- dcAlgoPredictGenome(input.file, parallel=FALSE,
 RData.HIS.customised=RData.HIS.customised)
 dim(output)
 output[1:10,]
-}
 }
 \seealso{
 \code{\link{dcRDataLoader}}, \code{\link{dcAlgoPropagate}},

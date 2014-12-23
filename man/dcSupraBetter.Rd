@@ -45,12 +45,10 @@ with the column names: 1st column 'Feature_id' for features, 2nd
 indicative of strength of associations beteen features and terms
 }
 \examples{
-\dontrun{
 input.file <-
 "http://dcgor.r-forge.r-project.org/data/Feature/Feature2GO.sf.txt"
 res <- dcSupraBetter(input.file)
 res[1:10,]
-}
 }
 \seealso{
 \code{\link{dcList2Matrix}}

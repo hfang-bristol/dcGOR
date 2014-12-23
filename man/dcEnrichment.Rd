@@ -195,7 +195,6 @@ maximum of both p-values in these two calculations.}
 }
 }
 \examples{
-\dontrun{
 # 1) Enrichment analysis for SCOP domain superfamilies (sf)
 ## 1a) load SCOP.sf (as 'InfoDataFrame' object)
 SCOP.sf <- dcRDataLoader('SCOP.sf')
@@ -334,7 +333,6 @@ view(eoutput, top_num=10, sortBy="pvalue", details=TRUE)
 ### visualise the top 10 significant terms in the ontology hierarchy
 ### color-coded according to 10-based negative logarithm of adjusted p-values (adjp)
 visEnrichment(eoutput)
-}
 }
 \seealso{
 \code{\link{dcRDataLoader}}, \code{\link{dcDAGannotate}},

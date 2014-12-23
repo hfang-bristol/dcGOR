@@ -36,13 +36,11 @@ of the assigement sign '<-', then no object will be loaded onto the
 working environment.
 }
 \examples{
-\dontrun{
 # build an "InfoDataFrame" object that contains information on InterPro domains (InterPro)
 InterPro <-
 dcBuildInfoDataFrame(input.file="http://dcgor.r-forge.r-project.org/data/InterPro/InterPro.txt",
 output.file="InterPro.RData")
 InterPro
-}
 }
 \seealso{
 \code{\link{InfoDataFrame}}

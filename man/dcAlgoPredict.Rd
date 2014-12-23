@@ -121,7 +121,6 @@ into predictive scores across terms.
 none
 }
 \examples{
-\dontrun{
 # 1) randomly generate 5 domains and/or domain architectures
 x <- dcRDataLoader(RData="Feature2GOMF.sf")
 data <- sample(names(x$hscore), 5)
@@ -150,7 +149,6 @@ data <- pscore[[1]]
 subg <- dnet::dDAGinduce(ig, nodes_query=names(data),
 path.mode="shortest_paths")
 dnet::visDAG(g=subg, data=data, node.info="term_id")
-}
 }
 \seealso{
 \code{\link{dcRDataLoader}}, \code{\link{dcSplitArch}},
