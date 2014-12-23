@@ -11,6 +11,7 @@
 #' @param restart the restart probability used for RWR. The restart probability takes the value from 0 to 1, controlling the range from the starting nodes/seeds that the walker will explore. The higher the value, the more likely the walker is to visit the nodes centered on the starting nodes. At the extreme when the restart probability is zero, the walker moves freely to the neighbors at each step without restarting from seeds, i.e., following a random walk (RW)
 #' @param normalise.affinity.matrix the way to normalise the output affinity matrix. It can be 'none' for no normalisation, 'quantile' for quantile normalisation to ensure that columns (if multiple) of the output affinity matrix have the same quantiles
 #' @param leave.one.out logical to indicate whether the leave-one-out test is used for predictions. By default, it sets to true for doing leave-one-out test (that is, known seeds are removed)
+#' @param propagation how to propagate the score. It can be "max" for retaining the maximum score (by default), "sum" for additively accumulating the score
 #' @param scale.method the method used to scale the predictive scores. It can be: "none" for no scaling, "linear" for being linearily scaled into the range between 0 and 1, "log" for the same as "linear" but being first log-transformed before being scaled. The scaling between 0 and 1 is done via: \eqn{\frac{S - S_{min}}{S_{max} - S_{min}}}, where \eqn{S_{min}} and \eqn{S_{max}} are the minimum and maximum values for \eqn{S}
 #' @param parallel logical to indicate whether parallel computation with multicores is used. By default, it sets to true, but not necessarily does so. Partly because parallel backends available will be system-specific (now only Linux or Mac OS). Also, it will depend on whether these two packages "foreach" and "doMC" have been installed. It can be installed via: \code{source("http://bioconductor.org/biocLite.R"); biocLite(c("foreach","doMC"))}. If not yet installed, this option will be disabled
 #' @param multicores an integer to specify how many cores will be registered as the multicore parallel backend to the 'foreach' package. If NULL, it will use a half of cores available in a user's computer. This option only works when parallel computation is enabled
@@ -64,7 +65,7 @@
 #' plot(res_PR[,2], res_PR[,1], xlim=c(0,1), ylim=c(0,1), type="b", xlab="Recall", ylab="Precision")
 #' }
 
-dcRWRpredict <- function(data, g, output.file=NULL, ontology=c(NA,"GOBP","GOMF","GOCC","DO","HPPA","HPMI","HPON","MP","EC","KW","UP"), method=c("indirect","direct"), normalise=c("laplacian","row","column","none"), restart=0.75, normalise.affinity.matrix=c("none","quantile"), leave.one.out=T, scale.method=c("log","linear","none"), parallel=TRUE, multicores=NULL, verbose=T, RData.ontology.customised=NULL, RData.location="http://dcgor.r-forge.r-project.org/data")
+dcRWRpredict <- function(data, g, output.file=NULL, ontology=c(NA,"GOBP","GOMF","GOCC","DO","HPPA","HPMI","HPON","MP","EC","KW","UP"), method=c("indirect","direct"), normalise=c("laplacian","row","column","none"), restart=0.75, normalise.affinity.matrix=c("none","quantile"), leave.one.out=T, propagation=c("max","sum"), scale.method=c("log","linear","none"), parallel=TRUE, multicores=NULL, verbose=T, RData.ontology.customised=NULL, RData.location="http://dcgor.r-forge.r-project.org/data")
 {
 
     startT <- Sys.time()
@@ -212,7 +213,7 @@ dcRWRpredict <- function(data, g, output.file=NULL, ontology=c(NA,"GOBP","GOMF",
         message(paste(c("##############################\n"), collapse=""), appendLF=T)
     }
     
-    res_RData <- dcAlgoPropagate(input.file=output, ontology=ontology, output.file=NA, verbose=verbose, RData.ontology.customised=RData.ontology.customised, RData.location=RData.location)
+    res_RData <- dcAlgoPropagate(input.file=output, ontology=ontology, propagation=propagation, output.file=NA, verbose=verbose, RData.ontology.customised=RData.ontology.customised, RData.location=RData.location)
     score <- res_RData$hscore
     
     if(verbose){

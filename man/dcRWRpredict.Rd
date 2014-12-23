@@ -9,10 +9,9 @@ dcRWRpredict(data, g, output.file = NULL, ontology = c(NA, "GOBP",
 method = c("indirect", "direct"), normalise = c("laplacian", "row",
 "column", "none"), restart = 0.75, normalise.affinity.matrix =
 c("none",
-"quantile"), leave.one.out = T, scale.method = c("log", "linear",
-"none"),
-parallel = TRUE, multicores = NULL, verbose = T,
-RData.ontology.customised = NULL,
+"quantile"), leave.one.out = T, propagation = c("max", "sum"),
+scale.method = c("log", "linear", "none"), parallel = TRUE,
+multicores = NULL, verbose = T, RData.ontology.customised = NULL,
 RData.location = "http://dcgor.r-forge.r-project.org/data")
 }
 \arguments{
@@ -66,6 +65,10 @@ output affinity matrix have the same quantiles}
 \item{leave.one.out}{logical to indicate whether the leave-one-out test
 is used for predictions. By default, it sets to true for doing
 leave-one-out test (that is, known seeds are removed)}
+
+\item{propagation}{how to propagate the score. It can be "max" for
+retaining the maximum score (by default), "sum" for additively
+accumulating the score}
 
 \item{scale.method}{the method used to scale the predictive scores. It
 can be: "none" for no scaling, "linear" for being linearily scaled into
