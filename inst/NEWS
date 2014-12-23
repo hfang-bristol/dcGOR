@@ -4,7 +4,8 @@ CHANGES IN VERSION 1.0.5
 NEW FEATURES
 
     o Add functions 'dcList2Matrix', 'dcAlgoPredictPR', 'dcSupraBetter', 'dcRWRpredict', 'dcNaivePredict'
-    
+
+    o Modify functions 'dcAlgoPropagate' supporting for additively accumulating the score
 
 CHANGES IN VERSION 1.0.4
 -----------------------

@@ -1,6 +1,6 @@
-#' Function to perform RWR-based ontology term predictions from an input known annotations and an input graph
+#' Function to perform RWR-based ontology term predictions from input known annotations and an input graph
 #'
-#' \code{dcRWRpredict} is supposed to perform ontology term predictions based on Random Walk with Restart (RWR) from an input known annotations and an input graph.
+#' \code{dcRWRpredict} is supposed to perform ontology term predictions based on Random Walk with Restart (RWR) from input known annotations and an input graph.
 #'
 #' @param data an input gene-term data matrix containing known annotations used for seeds. Each value in input matrix does not necessarily have to be binary (non-zeros will be used as a weight, but should be non-negative for easy interpretation). Also, data can be a list, each containing the known annotated genes
 #' @param g an object of class "igraph" or \code{\link{Dnetwork}}
@@ -136,10 +136,14 @@ dcRWRpredict <- function(data, g, output.file=NULL, ontology=c(NA,"GOBP","GOMF",
     }
     
     if(verbose){
-        message(sprintf("\tusing '%s' method to do RWR (%s)...", method, as.character(Sys.time())), appendLF=T)
+        if(leave.one.out){
+            message(sprintf("\tusing '%s' method to do RWR with leave-one-out test (%s)...", method, as.character(Sys.time())), appendLF=T)
+        }else{
+            message(sprintf("\tusing '%s' method to do RWR without leave-one-out test (%s)...", method, as.character(Sys.time())), appendLF=T)
+        }
         
         message(paste(c("\n##############################"), collapse=""), appendLF=T)
-        message(paste(c("'dnet::dRWR' is called"), collapse=""), appendLF=T)
+        message(paste(c("'dnet::dRWR' is being called..."), collapse=""), appendLF=T)
         message(paste(c("##############################\n"), collapse=""), appendLF=T)
         
     }
@@ -159,7 +163,7 @@ dcRWRpredict <- function(data, g, output.file=NULL, ontology=c(NA,"GOBP","GOMF",
             col_sum <- Matrix::colSums(P0matrix)
             col_sum_matrix <- matrix(rep(col_sum,nrow(ASmatrix)), ncol=ncol(ASmatrix), nrow=nrow(ASmatrix), byrow=T)
             ##################
-            ### for seeds, the average should be 1 less
+            ### for seeds, the average should be 1-less
             col_sum_adj_matrix <- col_sum_matrix - as.matrix(P0matrix)
             AAmatrix <- ASmatrix / col_sum_adj_matrix
             ##################
@@ -191,7 +195,7 @@ dcRWRpredict <- function(data, g, output.file=NULL, ontology=c(NA,"GOBP","GOMF",
     ####################################################
     if(verbose){
         message(paste(c("##############################"), collapse=""), appendLF=T)
-        message(paste(c("'dnet::dRWR' is completed"), collapse=""), appendLF=T)
+        message(paste(c("'dnet::dRWR' has been completed!"), collapse=""), appendLF=T)
         message(paste(c("##############################\n"), collapse=""), appendLF=T)
     
         message(sprintf("Second, propagate '%s' ontology annotations (%s)...", ontology, as.character(Sys.time())), appendLF=T)
@@ -204,7 +208,7 @@ dcRWRpredict <- function(data, g, output.file=NULL, ontology=c(NA,"GOBP","GOMF",
     
     if(verbose){
         message(paste(c("\n##############################"), collapse=""), appendLF=T)
-        message(paste(c("'dcAlgoPropagate' is called"), collapse=""), appendLF=T)
+        message(paste(c("'dcAlgoPropagate' is being called..."), collapse=""), appendLF=T)
         message(paste(c("##############################\n"), collapse=""), appendLF=T)
     }
     
@@ -213,7 +217,7 @@ dcRWRpredict <- function(data, g, output.file=NULL, ontology=c(NA,"GOBP","GOMF",
     
     if(verbose){
         message(paste(c("##############################"), collapse=""), appendLF=T)
-        message(paste(c("'dcAlgoPropagate' is completed"), collapse=""), appendLF=T)
+        message(paste(c("'dcAlgoPropagate' has been completed!"), collapse=""), appendLF=T)
         message(paste(c("##############################\n"), collapse=""), appendLF=T)
     
         message(sprintf("Third, rescale predictive score using '%s' method (%s)...", scale.method, as.character(Sys.time())), appendLF=T)

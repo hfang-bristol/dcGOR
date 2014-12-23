@@ -1,9 +1,10 @@
 #' Function to propagate ontology annotations according to an input file
 #'
-#' \code{dcAlgoPropagate} is supposed to propagate ontology annotations, given an input file. This input file contains original annotations between domains/features and ontology terms, along with the hypergeometric scores (hscore) in support for their annotations. The annotations are propagated to the ontology root (retaining the maximum hscore). After the propogation, the ontology terms of increasing levels are determined based on the concept of Information Content (IC) to product a slim version of ontology. It returns an object of S3 class "HIS" with three components: "hscore", "ic" and "slim".
+#' \code{dcAlgoPropagate} is supposed to propagate ontology annotations, given an input file. This input file contains original annotations between domains/features and ontology terms, along with the hypergeometric scores (hscore) in support for their annotations. The annotations are propagated to the ontology root (either retaining the maximum hscore or additively accumulating the hscore). After the propogation, the ontology terms of increasing levels are determined based on the concept of Information Content (IC) to product a slim version of ontology. It returns an object of S3 class "HIS" with three components: "hscore", "ic" and "slim".
 #'
 #' @param input.file an input file used to build the object. This input file contains original annotations between domains/features and ontology terms, along with the hypergeometric scores (hscore) in support for their annotations. For example, a file containing original annotations between SCOP domain architectures and GO terms can be found in \url{http://dcgor.r-forge.r-project.org/data/Feature/Feature2GO.sf.txt}. As seen in this example, the input file must contain the header (in the first row) and three columns: 1st column for 'Feature_id' (here SCOP domain architectures), 2nd column for 'Term_id' (GO terms), and 3rd column for 'Score' (hscore). Alternatively, the input.file can be a matrix or data frame, assuming that input file has been read. Note: the file should use the tab delimiter as the field separator between columns
 #' @param ontology the ontology identity. It can be "GOBP" for Gene Ontology Biological Process, "GOMF" for Gene Ontology Molecular Function, "GOCC" for Gene Ontology Cellular Component, "DO" for Disease Ontology, "HPPA" for Human Phenotype Phenotypic Abnormality, "HPMI" for Human Phenotype Mode of Inheritance, "HPON" for Human Phenotype ONset and clinical course, "MP" for Mammalian Phenotype, "EC" for Enzyme Commission, "KW" for UniProtKB KeyWords, "UP" for UniProtKB UniPathway. For details on the eligibility for pairs of input domain and ontology, please refer to the online Documentations at \url{http://supfam.org/dcGOR/docs.html}. If NA, then the user has to input a customised RData-formatted file (see \code{RData.ontology.customised} below)
+#' @param propagation how to propagate the score. It can be "max" for retaining the maximum hscore (by default), "sum" for additively accumulating the hscore
 #' @param output.file an output file used to save the \code{HIS} object as an RData-formatted file (see 'Value' for details). If NULL, this file will be saved into "HIS.RData" in the current working local directory. If NA, there will be no output file
 #' @param verbose logical to indicate whether the messages will be displayed in the screen. By default, it sets to TRUE for display
 #' @param RData.ontology.customised a file name for RData-formatted file containing an object of S4 class 'Onto' (i.g. ontology). By default, it is NULL. It is only needed when the user wants to perform customised analysis using their own ontology. See \code{\link{dcBuildOnto}} for how to creat this object
@@ -38,7 +39,7 @@
 #' hscore_mat[1:10,]
 #' }
 
-dcAlgoPropagate <- function(input.file, ontology=c(NA,"GOBP","GOMF","GOCC","DO","HPPA","HPMI","HPON","MP","EC","KW","UP"), output.file="HIS.RData", verbose=T, RData.ontology.customised=NULL, RData.location="http://dcgor.r-forge.r-project.org/data")
+dcAlgoPropagate <- function(input.file, ontology=c(NA,"GOBP","GOMF","GOCC","DO","HPPA","HPMI","HPON","MP","EC","KW","UP"), propagation=c("max","sum"), output.file="HIS.RData", verbose=T, RData.ontology.customised=NULL, RData.location="http://dcgor.r-forge.r-project.org/data")
 {
     startT <- Sys.time()
     message(paste(c("Start at ",as.character(startT)), collapse=""), appendLF=T)
@@ -47,6 +48,7 @@ dcAlgoPropagate <- function(input.file, ontology=c(NA,"GOBP","GOMF","GOCC","DO",
     
     ## match.arg matches arg against a table of candidate values as specified by choices, where NULL means to take the first one
     ontology <- match.arg(ontology)
+    propagation <- match.arg(propagation)
     
     if(is.matrix(input.file) | is.data.frame(input.file)){
         if(verbose){
@@ -133,7 +135,7 @@ dcAlgoPropagate <- function(input.file, ontology=c(NA,"GOBP","GOMF","GOCC","DO",
     
     if(verbose){
         now <- Sys.time()
-        message(sprintf("Do propagation (%s) ...", as.character(now)), appendLF=T)
+        message(sprintf("Do propagation via '%s' operation (%s) ...", propagation, as.character(now)), appendLF=T)
     }
     
     #######################
@@ -174,7 +176,11 @@ dcAlgoPropagate <- function(input.file, ontology=c(NA,"GOBP","GOMF","GOCC","DO",
                     all_mat <- rbind(nowDomain_mat, adjDomain_mat)
                     all_list <- base::split(x=as.numeric(all_mat[,2]), f=all_mat[,1])
                     output_list <- lapply(all_list, function(x){
-                        max(x)
+                        if(propagation=='max'){
+                            max(x)
+                        }else if(propagation=='sum'){
+                            sum(x)
+                        }
                     })
                     x_mat <- base::do.call(base::rbind, output_list)
                     output <- as.vector(x_mat)
@@ -193,6 +199,8 @@ dcAlgoPropagate <- function(input.file, ontology=c(NA,"GOBP","GOMF","GOCC","DO",
 
     #######################
     ## Propagate using environment
+    ## no longer support!!
+    #######################
     }else{
    
         if(verbose){

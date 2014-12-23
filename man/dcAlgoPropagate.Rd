@@ -5,9 +5,9 @@
 \usage{
 dcAlgoPropagate(input.file, ontology = c(NA, "GOBP", "GOMF", "GOCC",
 "DO",
-"HPPA", "HPMI", "HPON", "MP", "EC", "KW", "UP"), output.file =
-"HIS.RData",
-verbose = T, RData.ontology.customised = NULL,
+"HPPA", "HPMI", "HPON", "MP", "EC", "KW", "UP"), propagation = c("max",
+"sum"), output.file = "HIS.RData", verbose = T,
+RData.ontology.customised = NULL,
 RData.location = "http://dcgor.r-forge.r-project.org/data")
 }
 \arguments{
@@ -38,6 +38,10 @@ please refer to the online Documentations at
 \url{http://supfam.org/dcGOR/docs.html}. If NA, then the user has to
 input a customised RData-formatted file (see
 \code{RData.ontology.customised} below)}
+
+\item{propagation}{how to propagate the score. It can be "max" for
+retaining the maximum hscore (by default), "sum" for additively
+accumulating the hscore}
 
 \item{output.file}{an output file used to save the \code{HIS} object as
 an RData-formatted file (see 'Value' for details). If NULL, this file
@@ -88,11 +92,12 @@ terms}
 given an input file. This input file contains original annotations
 between domains/features and ontology terms, along with the
 hypergeometric scores (hscore) in support for their annotations. The
-annotations are propagated to the ontology root (retaining the maximum
-hscore). After the propogation, the ontology terms of increasing levels
-are determined based on the concept of Information Content (IC) to
-product a slim version of ontology. It returns an object of S3 class
-"HIS" with three components: "hscore", "ic" and "slim".
+annotations are propagated to the ontology root (either retaining the
+maximum hscore or additively accumulating the hscore). After the
+propogation, the ontology terms of increasing levels are determined
+based on the concept of Information Content (IC) to product a slim
+version of ontology. It returns an object of S3 class "HIS" with three
+components: "hscore", "ic" and "slim".
 }
 \note{
 None

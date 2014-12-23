@@ -1,6 +1,6 @@
-#' Function to perform naive prediction from an input known annotations
+#' Function to perform naive prediction from input known annotations
 #'
-#' \code{dcNaivePredict} is supposed to perform naive prediction from an input known annotations. For each gene/protein, a term to be predicted are simply the frequency of that term appearing in the known annotations.
+#' \code{dcNaivePredict} is supposed to perform naive prediction from input known annotations. For each gene/protein, a term to be predicted are simply the frequency of that term appearing in the known annotations.
 #'
 #' @param data an input vector containing genes/proteins to be predicted
 #' @param GSP.file a Glod Standard Positive (GSP) file containing known annotations between proteins/genes and ontology terms. For example, a file containing annotations between human genes and HP terms can be found in \url{http://dcgor.r-forge.r-project.org/data/Algo/HP_anno.txt}. As seen in this example, the input file must contain the header (in the first row) and two columns: 1st column for 'SeqID' (actually these IDs can be anything), 2nd column for 'termID' (HP terms). Alternatively, the GSP.file can be a matrix or data frame, assuming that GSP file has been read. Note: the file should use the tab delimiter as the field separator between columns
