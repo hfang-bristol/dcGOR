@@ -199,7 +199,7 @@ dcRWRpredict <- function(data, g, output.file=NULL, ontology=c(NA,"GOBP","GOMF",
         message(paste(c("'dnet::dRWR' has been completed!"), collapse=""), appendLF=T)
         message(paste(c("##############################\n"), collapse=""), appendLF=T)
     
-        message(sprintf("Second, propagate '%s' ontology annotations (%s)...", ontology, as.character(Sys.time())), appendLF=T)
+        message(sprintf("Second, propagate '%s' ontology annotations via '%s' operation (%s)...", ontology, propagation, as.character(Sys.time())), appendLF=T)
     }
     
     seq_names <- rownames(AAmatrix)
