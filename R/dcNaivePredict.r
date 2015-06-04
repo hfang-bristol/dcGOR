@@ -24,10 +24,10 @@
 #' # 1) prepare genes to be predicted
 #' input.file <- "http://dcgor.r-forge.r-project.org/data/Algo/HP_anno.txt"
 #' #input.file <- "http://dcgor.r-forge.r-project.org/data/Algo/SCOP_architecture.txt"
-#' input <- utils::read.delim(input.file, header=T, sep="\t", colClasses="character")
+#' input <- utils::read.delim(input.file, header=TRUE, sep="\t", colClasses="character")
 #' data <- unique(input[,1])
 #'
-#' # 2) Calculate Precision and Recall
+#' # 2) do naive prediction
 #' GSP.file <- "http://dcgor.r-forge.r-project.org/data/Algo/HP_anno.txt"
 #' res <- dcNaivePredict(data=data, GSP.file=GSP.file, ontology="HPPA")
 #' res[1:10,]
@@ -36,7 +36,7 @@
 #' res_PR <- dcAlgoPredictPR(GSP.file=GSP.file, prediction.file=res, ontology="HPPA")
 #' res_PR
 #' 
-#' # 4) Plot PR-curve
+#' # 4) plot PR-curve
 #' plot(res_PR[,2], res_PR[,1], xlim=c(0,1), ylim=c(0,1), type="b", xlab="Recall", ylab="Precision")
 #' }
 
