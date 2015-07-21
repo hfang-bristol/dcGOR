@@ -256,17 +256,6 @@ dcDAGdomainSim <- function (g, domains=NULL, method.domain=c("BM.average","BM.ma
     ###### parallel computing
     flag_parallel <- F
     if(parallel==TRUE){
-        
-        ############################
-        if(0){
-        pkgs <- c("doMC", "foreach")
-        if (any(pkgs %in% rownames(installed.packages()))) {
-            sapply(pkgs, function(pkg) {
-                suppressPackageStartupMessages(require(pkg, character.only = T))
-            })
-        }
-        }
-        ############################
     
         flag_parallel <- dnet::dCheckParallel(multicores=multicores, verbose=verbose)
         if(flag_parallel){

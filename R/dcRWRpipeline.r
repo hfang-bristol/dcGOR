@@ -123,7 +123,7 @@ dcRWRpipeline <- function(data, g, method=c("indirect","direct"), normalise=c("l
     ## A function to degree-preserving randomisation
     dp_randomisation <- function(ig, data){
         dg <- igraph::degree(ig)
-        at <- unique(quantile(dg, seq(from=0,to=1,by=0.1)))
+        at <- unique(stats::quantile(dg, seq(from=0,to=1,by=0.1)))
         groups <- sapply(dg, function(x){
             if(length(which(x>at))==0){
                 at[1]
@@ -205,17 +205,6 @@ dcRWRpipeline <- function(data, g, method=c("indirect","direct"), normalise=c("l
     ###### parallel computing
     flag_parallel <- F
     if(parallel==TRUE){
-        
-        ############################
-        if(0){
-        pkgs <- c("doMC", "foreach")
-        if (any(pkgs %in% rownames(installed.packages()))) {
-            sapply(pkgs, function(pkg) {
-                suppressPackageStartupMessages(require(pkg, character.only = T))
-            })
-        }
-        }
-        ############################
             
         flag_parallel <- dnet::dCheckParallel(multicores=multicores, verbose=verbose)
         if(flag_parallel){

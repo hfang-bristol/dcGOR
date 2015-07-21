@@ -7,7 +7,7 @@
 #' @return
 #' a list containing arguments and their default values
 #' @note
-#' This function is potentially useful when debugging. Because the developer does not have to specify default values for all arguments except those arguments are of interest
+#' None
 #' @export
 #' @seealso \code{\link{dcAlgoPredictMain}}
 #' @include dcSparseMatrix.r

@@ -108,7 +108,7 @@ dcSupraBetter <- function(input.file, output.file=NULL, verbose=T)
     if(!is.null(output.file)){
     
         output <- supra_mat_additional
-        write.table(output, file=output.file, quote=F, row.names=F, sep="\t")
+        utils::write.table(output, file=output.file, quote=F, row.names=F, sep="\t")
         
         if(file.exists(output.file)){
             message(sprintf("The results have been saved into '%s'.", file.path(getwd(),output.file)), appendLF=T)

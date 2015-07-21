@@ -35,8 +35,8 @@ dcBuildOnto <- function(relations.file, nodes.file, output.file="Onto.RData")
         output.file <- "Onto.RData"
     }
     
-    relations <- read.table(relations.file,sep="\t",quote="",header=T)
-    nodes <- read.table(nodes.file,sep="\t",quote="",header=T)
+    relations <- utils::read.table(relations.file,sep="\t",quote="",header=T)
+    nodes <- utils::read.table(nodes.file,sep="\t",quote="",header=T)
     
     ###########################
     # remove all those no-ASCII

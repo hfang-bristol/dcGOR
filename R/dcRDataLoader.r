@@ -113,7 +113,7 @@ dcRDataLoader <- function(RData=c(NA,'SCOP.sf','SCOP.fa','Pfam','InterPro','Rfam
             load(load_RData)
         }
     }else{
-        load_RData <- sprintf("package 'dcGOR' version %s", packageVersion("dcGOR"))
+        load_RData <- sprintf("package 'dcGOR' version %s", utils::packageVersion("dcGOR"))
     }
     
     out <- ''

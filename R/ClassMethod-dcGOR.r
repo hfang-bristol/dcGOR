@@ -807,7 +807,7 @@ setMethod("write", "Eoutput",
         
         out <- view(x, top_num=NULL, sortBy="pvalue", details=TRUE)
         
-        write.table(out, file=file, col.names=T, row.names=F, sep="\t")
+        utils::write.table(out, file=file, col.names=T, row.names=F, sep="\t")
         
         if(verbose){
             message(sprintf("A file ('%s') has been written into your local directory ('%s')", file, getwd()), appendLF=T)
@@ -1830,7 +1830,7 @@ setMethod("write", "Coutput",
         )
         
         res <- cbind(rownames(res), res)
-        write.table(res, file=file, col.names=T, row.names=F, sep="\t")
+        utils::write.table(res, file=file, col.names=T, row.names=F, sep="\t")
         
         if(verbose){
             message(sprintf("A file ('%s') has been written into your local directory ('%s')", file, getwd()), appendLF=T)

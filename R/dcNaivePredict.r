@@ -166,7 +166,7 @@ dcNaivePredict <- function(data, GSP.file, output.file=NULL, ontology=c(NA,"GOBP
     if(!is.null(output)){
    
         if(!is.null(output.file)){
-            write.table(output, file=output.file, quote=F, row.names=F, sep="\t")
+            utils::write.table(output, file=output.file, quote=F, row.names=F, sep="\t")
             if(file.exists(output.file)){
                 message(sprintf("The predictions have been saved into '%s'.", file.path(getwd(),output.file)), appendLF=T)
             }

@@ -12,8 +12,7 @@ An R object that contains information on Human Phenotype ONset and
 clinical course terms. These terms are organised as a direct acyclic
 graph (DAG), which is further stored as an object of the class 'igraph'
 (see \url{http://igraph.org/r/doc/aaa-igraph-package.html}). This data
-is prepared based on
-\url{http://compbio.charite.de/svn/hpo/trunk/src/ontology/human-phenotype-ontology.obo}.
+is prepared based on \url{http://purl.obolibrary.org/obo/hp.obo}.
 }
 
 \value{

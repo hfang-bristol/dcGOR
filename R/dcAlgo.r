@@ -211,12 +211,12 @@ dcAlgo <- function(anno.file, architecture.file, output.file=NULL, ontology=c(NA
     }
     
     ## import annotations
-    #tab <- read.delim(anno.file, header=F, sep="\t", nrows=50, skip=1)
-    #anno <- read.table(anno.file, header=F, sep="\t", skip=1, colClasses=sapply(tab,class))
+    #tab <- utils::read.delim(anno.file, header=F, sep="\t", nrows=50, skip=1)
+    #anno <- utils::read.table(anno.file, header=F, sep="\t", skip=1, colClasses=sapply(tab,class))
     anno <- utils::read.delim(anno.file, header=T, sep="\t", colClasses="character")
     ## import architectures
-    #tab <- read.delim(architecture.file, header=F, sep="\t", nrows=50, skip=1)
-    #arch <- read.table(architecture.file, header=F, sep="\t", skip=1, colClasses=sapply(tab,class))
+    #tab <- utils::read.delim(architecture.file, header=F, sep="\t", nrows=50, skip=1)
+    #arch <- utils::read.table(architecture.file, header=F, sep="\t", skip=1, colClasses=sapply(tab,class))
     arch <- utils::read.delim(architecture.file, header=T, sep="\t", colClasses="character")
     
     ## replace proteins with internal id
@@ -461,7 +461,7 @@ dcAlgo <- function(anno.file, architecture.file, output.file=NULL, ontology=c(NA
     if(!is.null(output.file)){
     
         output <- feature2term_score
-        write.table(output, file=output.file, quote=F, row.names=F, sep="\t")
+        utils::write.table(output, file=output.file, quote=F, row.names=F, sep="\t")
         
         if(file.exists(output.file)){
             message(sprintf("The results have been saved into '%s'.", file.path(getwd(),output.file)), appendLF=T)

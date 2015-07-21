@@ -54,8 +54,8 @@ dcBuildAnno <- function(domain_info.file, term_info.file, association.file, outp
     
     ###################
     ## import association
-    tab <- read.delim(association.file, header=F, sep="\t", nrows=50, skip=1)
-    association <- read.table(association.file, header=F, sep="\t", skip=1, colClasses=sapply(tab,class))
+    tab <- utils::read.delim(association.file, header=F, sep="\t", nrows=50, skip=1)
+    association <- utils::read.table(association.file, header=F, sep="\t", skip=1, colClasses=sapply(tab,class))
     
     ## sparse matrix
     x <- association[,1]
@@ -69,7 +69,7 @@ dcBuildAnno <- function(domain_info.file, term_info.file, association.file, outp
     
     ###################
     ## import term info
-    term_info <- read.delim(term_info.file,header=T)
+    term_info <- utils::read.delim(term_info.file,header=T)
     term_info <- as.data.frame(apply(term_info,1:2,f))
     
     colnames(term_info) <- c("ID","Name","Namespace","Distance")
@@ -91,7 +91,7 @@ dcBuildAnno <- function(domain_info.file, term_info.file, association.file, outp
     
     ###################
     ## import domain info
-    domain_info <- read.delim(domain_info.file,header=T)
+    domain_info <- utils::read.delim(domain_info.file,header=T)
     rownames(domain_info) <- domain_info[,1]
     domain_info <- domain_info[order(domain_info[,1]),] # order according to the first column
 

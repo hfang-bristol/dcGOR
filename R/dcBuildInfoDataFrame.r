@@ -30,7 +30,7 @@ dcBuildInfoDataFrame <- function(input.file, output.file="InfoDataFrame.RData")
     }
     
     ## read the input file
-    domain_info <- read.delim(input.file, header=T, sep="\t")
+    domain_info <- utils::read.delim(input.file, header=T, sep="\t")
     rownames(domain_info) <- domain_info[,1]
     domain_info <- domain_info[order(domain_info[,1]),] # order according to the first column
     

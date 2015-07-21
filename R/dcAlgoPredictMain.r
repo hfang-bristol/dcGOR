@@ -135,7 +135,7 @@ dcAlgoPredictMain <- function(input.file, output.file=NULL, RData.HIS=c(NA,"Feat
         colnames(output) <- c(colnames(input)[1], "Term", "Score")
     
         if(!is.null(output.file)){
-            write.table(output, file=output.file, quote=F, row.names=F, sep="\t")
+            utils::write.table(output, file=output.file, quote=F, row.names=F, sep="\t")
             if(file.exists(output.file)){
                 message(sprintf("The predictions have been saved into '%s'.", file.path(getwd(),output.file)), appendLF=T)
             }
