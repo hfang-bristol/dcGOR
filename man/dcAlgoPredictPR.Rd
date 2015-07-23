@@ -9,7 +9,8 @@ dcAlgoPredictPR(GSP.file, prediction.file, ontology = c(NA, "GOBP",
 "GOCC", "DO", "HPPA", "HPMI", "HPON", "MP", "EC", "KW", "UP"),
 num.threshold = 10, bin = c("uniform", "quantile"), verbose = T,
 RData.ontology.customised = NULL,
-RData.location = "http://dcgor.r-forge.r-project.org/data")
+RData.location =
+"https://github.com/hfang-bristol/RDataCentre/blob/master/dcGOR")
 }
 \arguments{
 \item{GSP.file}{a Glod Standard Positive (GSP) file containing known
@@ -66,7 +67,7 @@ how to creat this object}
 
 \item{RData.location}{the characters to tell the location of built-in
 RData files. By default, it remotely locates at
-"http://supfam.org/dcGOR/data" or
+"https://github.com/hfang-bristol/RDataCentre/blob/master/dcGOR" and
 "http://dcgor.r-forge.r-project.org/data". For the user equipped with
 fast internet connection, this option can be just left as default. But
 it is always advisable to download these files locally. Especially when
@@ -77,7 +78,10 @@ whole or part of them) can be first downloaded into your current
 working directory, and then set this option as:
 \eqn{RData.location="."}. If RData to load is already part of package
 itself, this parameter can be ignored (since this function will try to
-load it via function \code{data} first)}
+load it via function \code{data} first). Here is the UNIX command for
+downloading all RData files (preserving the directory structure):
+\eqn{wget -r -l2 -A "*.RData" -np -nH --cut-dirs=0
+"http://dcgor.r-forge.r-project.org/data"}}
 }
 \value{
 a data frame containing two columns: 1st column 'Precision' for

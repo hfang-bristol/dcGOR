@@ -6,7 +6,7 @@
 #' @param domain domain part of annotation RData to load. When RData is NA and this plus next are NOT NA, then this plus next one are used to specify which annotation RData to load. In addition to NA, it can also be: 'SCOP.sf', 'SCOP.fa', 'Pfam' and 'InterPro'
 #' @param ontology ontology part of annotation RData to load. This only works together with the previous 'domain' parameter. In addition to NA, it can also be: 'GOBP', 'GOMF', 'GOCC', 'DO', 'HPPA', 'HPMI', 'HPON', 'MP', 'EC', 'KW', 'UP'
 #' @param verbose logical to indicate whether the messages will be displayed in the screen. By default, it sets to TRUE for display
-#' @param RData.location the characters to tell the location of built-in RData files. By default, it remotely locates at "http://supfam.org/dcGOR/data" or "http://dcgor.r-forge.r-project.org/data". For the user equipped with fast internet connection, this option can be just left as default. But it is always advisable to download these files locally. Especially when the user needs to run this function many times, there is no need to ask the function to remotely download every time (also it will unnecessarily increase the runtime). For examples, these files (as a whole or part of them) can be first downloaded into your current working directory, and then set this option as: \eqn{RData.location="."}. If RData to load is already part of package itself, this parameter can be ignored (since this function will try to load it via function \code{data} first)
+#' @param RData.location the characters to tell the location of built-in RData files. By default, it remotely locates at "https://github.com/hfang-bristol/RDataCentre/blob/master/dcGOR" and "http://dcgor.r-forge.r-project.org/data". For the user equipped with fast internet connection, this option can be just left as default. But it is always advisable to download these files locally. Especially when the user needs to run this function many times, there is no need to ask the function to remotely download every time (also it will unnecessarily increase the runtime). For examples, these files (as a whole or part of them) can be first downloaded into your current working directory, and then set this option as: \eqn{RData.location="."}. If RData to load is already part of package itself, this parameter can be ignored (since this function will try to load it via function \code{data} first). Here is the UNIX command for downloading all RData files (preserving the directory structure): \eqn{wget -r -l2 -A "*.RData" -np -nH --cut-dirs=0 "http://dcgor.r-forge.r-project.org/data"}
 #' @return 
 #' any use-specified variable that is given on the right side of the assigement sign '<-', which contains the loaded RData.
 #' @note If there are no use-specified variable that is given on the right side of the assigement sign '<-', then no RData will be loaded onto the working environment. 
@@ -26,7 +26,7 @@
 #' # 2) in an indirect way: specify both domain and ontology
 #' SCOP.sf2GOMF <- dcRDataLoader(domain='SCOP.sf', ontology='GOMF')
 
-dcRDataLoader <- function(RData=c(NA,'SCOP.sf','SCOP.fa','Pfam','InterPro','Rfam','onto.GOBP','onto.GOMF','onto.GOCC','onto.DO','onto.HPPA','onto.HPMI','onto.HPON','onto.MP','onto.EC','onto.KW','onto.UP','SCOP.sf2GOBP','SCOP.sf2GOMF','SCOP.sf2GOCC','SCOP.sf2DO','SCOP.sf2HPPA','SCOP.sf2HPMI','SCOP.sf2HPON','SCOP.sf2MP','SCOP.sf2EC','SCOP.sf2KW','SCOP.sf2UP','SCOP.fa2GOBP','SCOP.fa2GOMF','SCOP.fa2GOCC','SCOP.fa2DO','SCOP.fa2HPPA','SCOP.fa2HPMI','SCOP.fa2HPON','SCOP.fa2MP','SCOP.fa2EC','SCOP.fa2KW','SCOP.fa2UP','Pfam2GOBP','Pfam2GOMF','Pfam2GOCC','InterPro2GOBP','InterPro2GOMF','InterPro2GOCC','Rfam2GOBP','Rfam2GOMF','Rfam2GOCC','Ancestral_domainome','eTOL','Feature2GOBP.sf','Feature2GOMF.sf','Feature2GOCC.sf','Feature2HPPA.sf','Feature2GOBP.pfam','Feature2GOMF.pfam','Feature2GOCC.pfam','Feature2HPPA.pfam','Feature2GOBP.interpro','Feature2GOMF.interpro','Feature2GOCC.interpro','Feature2HPPA.interpro'), domain=c(NA,'SCOP.sf','SCOP.fa','Pfam','InterPro','Rfam'), ontology=c(NA,'GOBP','GOMF','GOCC','DO','HPPA','HPMI','HPON','MP','EC','KW','UP'), verbose=T, RData.location="http://dcgor.r-forge.r-project.org/data")
+dcRDataLoader <- function(RData=c(NA,'SCOP.sf','SCOP.fa','Pfam','InterPro','Rfam','onto.GOBP','onto.GOMF','onto.GOCC','onto.DO','onto.HPPA','onto.HPMI','onto.HPON','onto.MP','onto.EC','onto.KW','onto.UP','SCOP.sf2GOBP','SCOP.sf2GOMF','SCOP.sf2GOCC','SCOP.sf2DO','SCOP.sf2HPPA','SCOP.sf2HPMI','SCOP.sf2HPON','SCOP.sf2MP','SCOP.sf2EC','SCOP.sf2KW','SCOP.sf2UP','SCOP.fa2GOBP','SCOP.fa2GOMF','SCOP.fa2GOCC','SCOP.fa2DO','SCOP.fa2HPPA','SCOP.fa2HPMI','SCOP.fa2HPON','SCOP.fa2MP','SCOP.fa2EC','SCOP.fa2KW','SCOP.fa2UP','Pfam2GOBP','Pfam2GOMF','Pfam2GOCC','InterPro2GOBP','InterPro2GOMF','InterPro2GOCC','Rfam2GOBP','Rfam2GOMF','Rfam2GOCC','Ancestral_domainome','eTOL','Feature2GOBP.sf','Feature2GOMF.sf','Feature2GOCC.sf','Feature2HPPA.sf','Feature2GOBP.pfam','Feature2GOMF.pfam','Feature2GOCC.pfam','Feature2HPPA.pfam','Feature2GOBP.interpro','Feature2GOMF.interpro','Feature2GOCC.interpro','Feature2HPPA.interpro'), domain=c(NA,'SCOP.sf','SCOP.fa','Pfam','InterPro','Rfam'), ontology=c(NA,'GOBP','GOMF','GOCC','DO','HPPA','HPMI','HPON','MP','EC','KW','UP'), verbose=T, RData.location="https://github.com/hfang-bristol/RDataCentre/blob/master/dcGOR")
 {
 
     ## match.arg matches arg against a table of candidate values as specified by choices, where NA means to take the first one
@@ -63,10 +63,79 @@ dcRDataLoader <- function(RData=c(NA,'SCOP.sf','SCOP.fa','Pfam','InterPro','Rfam
     
     ###############################
 
+	######################################################################################
+	# RData now is primarily hosted in github
+	######################################################################################
+	my_https_downloader <- function (url, method=c("auto","internal","wininet","libcurl","wget","curl"), quiet=T, mode=c("w","wb","a","ab"), cacheOK=T, extra=getOption("download.file.extra")){
+	
+		## https://stat.ethz.ch/R-manual/R-devel/library/utils/html/download.file.html
+		method <- match.arg(method)
+		mode <- match.arg(mode)
+	
+		## specify the temporary image files
+		tdir <- tempdir()
+		destfile <- file.path(tdir, "temp.RData")
+		## remove the existing temporary RData file
+		unlink(destfile, recursive=T, force=T)
+	
+		if(base::grepl("^https?://", url)){
+			isR32 <- base::getRversion() >= "3.2"
+			if(.Platform$OS.type == "windows"){
+				if(isR32){
+					method <- "wininet"
+				}else{
+					seti2 <- utils::"setInternet2"
+					internet2_start <- seti2(NA)
+					if(!internet2_start){
+						on.exit(suppressWarnings(seti2(internet2_start)))
+						suppressWarnings(seti2(TRUE))
+					}
+					method <- "internal"
+				}
+				suppressWarnings(utils::download.file(url, destfile=destfile, method=method, quiet=quiet, mode=mode, cacheOK=cacheOK, extra=extra))
+			}else{
+				if(isR32 && capabilities("libcurl")){
+					method <- "libcurl"
+				}else if(nzchar(Sys.which("wget")[1])){
+					method <- "wget"
+				}else if(nzchar(Sys.which("curl")[1])){
+					method <- "curl"
+					orig_extra_options <- getOption("download.file.extra")
+					on.exit(options(download.file.extra = orig_extra_options))
+					options(download.file.extra = paste("-L", orig_extra_options))
+				}else if(nzchar(Sys.which("lynx")[1])) {
+					method <- "lynx"
+				}else{
+					stop("no download method found")
+				}
+				suppressWarnings(utils::download.file(url, destfile=destfile, method=method, quiet=quiet, mode=mode, cacheOK=cacheOK, extra=extra))
+			}
+		}else{
+			suppressWarnings(utils::download.file(url, destfile=destfile, method=method, quiet=quiet, mode=mode, cacheOK=cacheOK, extra=extra))
+		}
+	
+		if(file.exists(destfile) & file.info(destfile)$size!=0){
+			res_RData <- get(load(destfile))
+			res_flag <- T
+		}else{
+			res_RData <- NULL
+			res_flag <- F
+		}
+		
+		res <- list(RData = res_RData,
+					flag = res_flag)
+		
+		invisible(res)
+	}
+	######################################################################################
+	######################################################################################
+
+    ###############################
+
     ## make sure there is no "/" at the end
     path_host <- gsub("/$", "", RData.location)
     if(path_host=="" || length(path_host)==0 || is.na(path_host)){
-        path_host <- "http://supfam.org/dcGOR/data"
+        path_host <- "https://github.com/hfang-bristol/RDataCentre/blob/master/dcGOR"
     }
 
     ## load 
@@ -86,26 +155,41 @@ dcRDataLoader <- function(RData=c(NA,'SCOP.sf','SCOP.fa','Pfam','InterPro','Rfam
         ## otherwise, load remote R files
         if(sum(load_flag)==0){
         
-            con <- url(load_remote)
-            if(class(suppressWarnings(try(load(con), T)))=="try-error"){
-                load_remote <- paste("http://supfam.org/dcGOR/data/", RData, ".RData", sep="")
-            
-                con <- url(load_remote)
-                if(class(suppressWarnings(try(load(con), T)))=="try-error"){
-                    load_remote <- paste("http://dcgor.r-forge.r-project.org/data/", RData, ".RData", sep="")
-                
-                    con <- url(load_remote)
-                    if(class(suppressWarnings(try(load(con), T)))=="try-error"){
-                        load_remote <- paste("https://github.com/hfang-bristol/dcGOR/tree/master/data/", RData, ".RData", sep="")
-                        
-                        con <- url(load_remote)
-                        if(class(suppressWarnings(try(load(con), T)))=="try-error"){
-                            stop("Built-in Rdata files cannot be loaded. Please check your internet connection or their location in your local machine.\n")   
-                        }
-                    }
-                }
-            }
-            close(con)
+        	flag_failed <- F
+        	if(length(grep('^https',load_remote,perl=T))){
+        		if(length(grep('github',load_remote,perl=T))){
+        			load_remote <- paste(load_remote, "?raw=true", sep="")
+        		}
+        		res <- my_https_downloader(load_remote, mode="wb")
+        		if(res$flag==F){
+        			flag_failed <- T
+        		}else{
+        			eval(parse(text=paste(RData, " <- res$RData", sep="")))
+        		}
+        	}else{
+        		if(class(suppressWarnings(try(load(url(load_remote)), T)))=="try-error"){
+        			flag_failed <- T
+        		}
+        	}
+        
+			if(flag_failed){
+				load_remote <- paste("https://github.com/hfang-bristol/RDataCentre/blob/master/dcGOR", RData, ".RData?raw=true", sep="")
+				res <- my_https_downloader(load_remote, mode="wb")
+				if(res$flag==F){
+					load_remote <- paste("http://supfam.org/dcGOR/data/", RData, ".RData", sep="")
+					
+					if(class(suppressWarnings(try(load(url(load_remote)), T)))=="try-error"){
+                    	load_remote <- paste("http://dcgor.r-forge.r-project.org/data/", RData, ".RData", sep="")
+						
+						if(class(suppressWarnings(try(load(url(load_remote)), T)))=="try-error"){
+							stop("Built-in Rdata files cannot be loaded. Please check your internet connection or their location in your local machine.\n")
+						}
+					}
+				}else{
+					eval(parse(text=paste(RData, " <- res$RData", sep="")))
+				}
+			
+			}
         
             load_RData <- load_remote
         }else{
@@ -116,8 +200,9 @@ dcRDataLoader <- function(RData=c(NA,'SCOP.sf','SCOP.fa','Pfam','InterPro','Rfam
         load_RData <- sprintf("package 'dcGOR' version %s", utils::packageVersion("dcGOR"))
     }
     
-    out <- ''
-    eval(parse(text=paste("out <- ", RData, sep="")))
+    #out <- ''
+    #eval(parse(text=paste("out <- ", RData, sep="")))
+    out <- base::get(RData)
     
     if(verbose){
         message(sprintf("'%s' (from %s) has been loaded into the working environment", RData, load_RData), appendLF=T)

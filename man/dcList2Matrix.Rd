@@ -26,6 +26,7 @@ containing three columns
 none
 }
 \examples{
+\dontrun{
 # load an object 'HIS'
 Feature2GOMF.sf <- dcRDataLoader(RData='Feature2GOMF.sf')
 # get a list
@@ -34,6 +35,7 @@ x <- Feature2GOMF.sf$hscore
 res <- dcList2Matrix(x)
 dim(res)
 res[1:10,]
+}
 }
 \seealso{
 \code{\link{dcAlgoPropagate}}

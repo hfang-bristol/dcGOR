@@ -12,6 +12,7 @@
 #' @seealso \code{\link{dcAlgoPropagate}}
 #' @include dcList2Matrix.r
 #' @examples
+#' \dontrun{
 #' # load an object 'HIS'
 #' Feature2GOMF.sf <- dcRDataLoader(RData='Feature2GOMF.sf')
 #' # get a list
@@ -20,6 +21,7 @@
 #' res <- dcList2Matrix(x)
 #' dim(res)
 #' res[1:10,]
+#' }
 
 dcList2Matrix <- function(x, verbose=T)
 {

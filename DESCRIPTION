@@ -2,14 +2,14 @@ Package: dcGOR
 Type: Package
 Title: Analysis of Ontologies and Protein Domain Annotations
 Version: 1.0.5
-Date: 2015-7-20
+Date: 2015-7-22
 Author: Hai Fang and Julian Gough
 Maintainer: Hai Fang <hfang@well.ox.ac.uk>
 Depends: R (>= 3.1.0), Matrix, igraph, dnet
 Imports: methods
 Suggests: foreach, doMC, ape
 Description: There lacks a package for analysing domain-centric ontologies and annotations, particularly those in the dcGO database. The dcGO (http://supfam.org/SUPERFAMILY/dcGO) is a comprehensive domain-centric database for annotating protein domains using a panel of ontologies including Gene Ontology. With the package, users are expected to analyse and visualise domain-centric ontologies and annotations. Supported analyses include but are not limited to: easy access to a wide range of ontologies and their domain-centric annotations; able to build customised ontologies and annotations; domain-based enrichment analysis and visualisation; construction of a domain (semantic similarity) network according to ontology annotations; significance analysis for estimating a contact (statistical significance) network via Random Walk with Restart; and high-performance parallel computing. The new functionalities are: 1) to create domain-centric ontologies; 2) to predict ontology terms for input protein sequences (precisely domain content in the form of architectures) plus to assess the predictions; 3) to reconstruct ancestral discrete characters using maximum likelihood/parsimony.
-URL: http://supfam.org/dcGOR, http://dcgor.r-forge.r-project.org, http://cran.r-project.org/package=dcGOR, https://github.com/hfang-bristol/dcGOR
+URL: http://supfam.org/dcGOR, http://cran.r-project.org/package=dcGOR, http://dcgor.r-forge.r-project.org, https://github.com/hfang-bristol/dcGOR
 Collate: 
     'ClassMethod-dcGOR.r'
     'dcDAGannotate.r'
