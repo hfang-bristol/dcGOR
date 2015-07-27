@@ -13,7 +13,7 @@ Process terms. These terms are organised as a direct acyclic graph
 (DAG), which is further stored as an object of the class 'igraph' (see
 \url{http://igraph.org/r/doc/aaa-igraph-package.html}). This data is
 prepared based on
-\url{http://sourceforge.net/p/diseaseontology/code/HEAD/tree/trunk/HumanDO.obo}.
+http://sourceforge.net/p/diseaseontology/code/HEAD/tree/trunk/HumanDO.obo.
 }
 
 \value{

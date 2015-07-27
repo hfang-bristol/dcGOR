@@ -65,14 +65,14 @@ displayed in the screen. By default, it sets to TRUE for display}
 
 \item{RData.location}{the characters to tell the location of built-in
 RData files. By default, it remotely locates at
-"https://github.com/hfang-bristol/RDataCentre/blob/master/dcGOR" and
-"http://dcgor.r-forge.r-project.org/data". For the user equipped with
-fast internet connection, this option can be just left as default. But
-it is always advisable to download these files locally. Especially when
-the user needs to run this function many times, there is no need to ask
-the function to remotely download every time (also it will
-unnecessarily increase the runtime). For examples, these files (as a
-whole or part of them) can be first downloaded into your current
+\url{https://github.com/hfang-bristol/RDataCentre/blob/master/dcGOR}
+and \url{http://dcgor.r-forge.r-project.org/data}. For the user
+equipped with fast internet connection, this option can be just left as
+default. But it is always advisable to download these files locally.
+Especially when the user needs to run this function many times, there
+is no need to ask the function to remotely download every time (also it
+will unnecessarily increase the runtime). For examples, these files (as
+a whole or part of them) can be first downloaded into your current
 working directory, and then set this option as:
 \eqn{RData.location="."}. If RData to load is already part of package
 itself, this parameter can be ignored (since this function will try to
