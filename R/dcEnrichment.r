@@ -174,7 +174,7 @@
 #' visEnrichment(eoutput)
 #' }
 
-dcEnrichment <- function(data, background=NULL, domain=c(NA,"SCOP.sf","SCOP.fa","Pfam","InterPro","Rfam"), ontology=c(NA,"GOBP","GOMF","GOCC","DO","HPPA","HPMI","HPON","MP","EC","KW","UP"), sizeRange=c(10,1000), min.overlap=3, which_distance=NULL, test=c("HypergeoTest","FisherTest","BinomialTest"), p.adjust.method=c("BH", "BY", "bonferroni", "holm", "hochberg", "hommel"), ontology.algorithm=c("none","pc","elim","lea"), elim.pvalue=1e-2, lea.depth=2, verbose=T, domain.RData=NULL, ontology.RData=NULL, annotations.RData=NULL, RData.location="http://dcgor.r-forge.r-project.org/data")
+dcEnrichment <- function(data, background=NULL, domain=c(NA,"SCOP.sf","SCOP.fa","Pfam","InterPro","Rfam"), ontology=c(NA,"GOBP","GOMF","GOCC","DO","HPPA","HPMI","HPON","MP","EC","KW","UP"), sizeRange=c(10,1000), min.overlap=3, which_distance=NULL, test=c("HypergeoTest","FisherTest","BinomialTest"), p.adjust.method=c("BH", "BY", "bonferroni", "holm", "hochberg", "hommel"), ontology.algorithm=c("none","pc","elim","lea"), elim.pvalue=1e-2, lea.depth=2, verbose=T, domain.RData=NULL, ontology.RData=NULL, annotations.RData=NULL, RData.location="https://github.com/hfang-bristol/RDataCentre/blob/master/dcGOR")
 {
     startT <- Sys.time()
     message(paste(c("Start at ",as.character(startT)), collapse=""), appendLF=T)

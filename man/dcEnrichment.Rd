@@ -17,7 +17,8 @@ min.overlap = 3, which_distance = NULL, test = c("HypergeoTest",
 "elim",
 "lea"), elim.pvalue = 0.01, lea.depth = 2, verbose = T,
 domain.RData = NULL, ontology.RData = NULL, annotations.RData = NULL,
-RData.location = "http://dcgor.r-forge.r-project.org/data")
+RData.location =
+"https://github.com/hfang-bristol/RDataCentre/blob/master/dcGOR")
 }
 \arguments{
 \item{data}{an input vector. It contains id for a list of domains, for

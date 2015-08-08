@@ -17,7 +17,7 @@ separator between columns}
 displayed in the screen. By default, it sets to TRUE for display}
 }
 \value{
-a list containing arguments and their default values
+an object of the dgCMatrix class (a sparse matrix)
 }
 \description{
 \code{dcSparseMatrix} is supposed to create a sparse matrix for an

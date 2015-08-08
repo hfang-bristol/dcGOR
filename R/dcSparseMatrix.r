@@ -5,7 +5,7 @@
 #' @param input.file an input file containing three columns: 1st column for rows, 2nd for columns, and 3rd for numeric values. Alternatively, the input.file can be a matrix or data frame, assuming that input file has been read. Note: the file should use the tab delimiter as the field separator between columns
 #' @param verbose logical to indicate whether the messages will be displayed in the screen. By default, it sets to TRUE for display
 #' @return
-#' a list containing arguments and their default values
+#' an object of the dgCMatrix class (a sparse matrix)
 #' @note
 #' None
 #' @export

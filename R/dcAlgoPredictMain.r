@@ -150,6 +150,9 @@ dcAlgoPredictMain <- function(input.file, output.file=NULL, RData.HIS=c(NA,"Feat
     runTime <- as.numeric(difftime(strptime(endT, "%Y-%m-%d %H:%M:%S"), strptime(startT, "%Y-%m-%d %H:%M:%S"), units="secs"))
     message(paste(c("Runtime in total is: ",runTime," secs\n"), collapse=""), appendLF=T)
     
+    if(all(sapply(pscore, function(x) is.null(x)))){
+    	warning("All architectures are not found/present; likely because the domain type in your provided 'RData.HIS' provided does not match what you input)!")
+    }
     
     invisible(output)
 }
