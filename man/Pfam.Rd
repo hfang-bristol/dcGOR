@@ -10,7 +10,7 @@ data(Pfam)
 \description{
 An object of class "InfoDataFrame" that contains information on Pfam
 domains (Pfam). This data is prepared based on
-\url{ftp://ftp.sanger.ac.uk/pub/databases/Pfam/current_release/database_files/pfamA.txt.gz}.
+\url{ftp://ftp.ebi.ac.uk/pub/databases/Pfam/current_release/database_files/pfamA.txt.gz}.
 }
 
 \value{

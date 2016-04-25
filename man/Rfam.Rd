@@ -10,7 +10,7 @@ data(Rfam)
 \description{
 An object of class "InfoDataFrame" that contains information on RNA
 families (Rfam). This data is prepared based on
-\url{ftp://anonymous@ftp.sanger.ac.uk/pub/databases/Rfam/11.0/database_files/rfam.txt.gz}.
+\url{ftp://ftp.ebi.ac.uk/pub/databases/Rfam/11.0/database_files/rfam.txt.gz}.
 }
 
 \value{
